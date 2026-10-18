@@ -160,7 +160,7 @@
         android:layout_gravity="start"
         android:background="@color/drawer_background"
         android:fillViewport="true"
-        android:clipToPadding="false">
+        android:clipToPadding="true">
 
         <LinearLayout
             android:layout_width="match_parent"

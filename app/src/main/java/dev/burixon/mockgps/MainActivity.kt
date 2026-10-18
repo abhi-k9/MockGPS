@@ -294,51 +294,65 @@ class MainActivity : ComponentActivity() {
 
     private fun setupInsets() {
 
-        ViewCompat.setOnApplyWindowInsetsListener(
-            findViewById(
+        val drawer =
+            findViewById<View>(
                 R.id.drawer
             )
+
+        val drawerPaddingLeft = drawer.paddingLeft
+        val drawerPaddingTop = drawer.paddingTop
+        val drawerPaddingRight = drawer.paddingRight
+        val drawerPaddingBottom = drawer.paddingBottom
+
+        val bottomPanelPaddingLeft = bottomPanel.paddingLeft
+        val bottomPanelPaddingTop = bottomPanel.paddingTop
+        val bottomPanelPaddingRight = bottomPanel.paddingRight
+        val bottomPanelPaddingBottom = bottomPanel.paddingBottom
+
+        val safeInsetTypes =
+            WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout()
+
+        ViewCompat.setOnApplyWindowInsetsListener(
+            drawer
         ) { view, insets ->
 
-            val status =
+            val safeInsets =
                 insets.getInsets(
-                    WindowInsetsCompat.Type.statusBars()
+                    safeInsetTypes
                 )
 
+            statusBarInsetTop =
+                safeInsets.top
+
             view.setPadding(
-                view.paddingLeft,
-                status.top,
-                view.paddingRight,
-                view.paddingBottom
+                maxOf(drawerPaddingLeft, safeInsets.left),
+                maxOf(drawerPaddingTop, safeInsets.top),
+                maxOf(drawerPaddingRight, safeInsets.right),
+                maxOf(drawerPaddingBottom, safeInsets.bottom)
             )
 
             view.bringToFront()
+            updateCompassPosition()
 
             insets
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(
-            findViewById(
-                R.id.drawer
-            )
+            bottomPanel
         ) { view, insets ->
 
-            val status =
+            val safeInsets =
                 insets.getInsets(
-                    WindowInsetsCompat.Type.statusBars()
+                    safeInsetTypes
                 )
 
-            statusBarInsetTop =
-                status.top
-
             view.setPadding(
-                view.paddingLeft,
-                statusBarInsetTop,
-                view.paddingRight,
-                view.paddingBottom
+                maxOf(bottomPanelPaddingLeft, safeInsets.left),
+                bottomPanelPaddingTop,
+                maxOf(bottomPanelPaddingRight, safeInsets.right),
+                maxOf(bottomPanelPaddingBottom, safeInsets.bottom)
             )
-
-            updateCompassPosition()
 
             insets
         }
