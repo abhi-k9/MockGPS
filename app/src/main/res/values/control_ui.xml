@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reboot_policy">Reboot never resumes simulation. FORCE_REAL is retained; AUTO waits for fresh vehicle state and a new confirmed start.</string>
+    <string name="automation_credential">Automation credential</string>
+    <string name="credential_warning">This credential authorizes Tasker commands. Anyone with it can send commands while integration is enabled. Tasker backups and the clipboard may expose it. Revoke it if shared.\n\n%s</string>
+    <string name="copy_credential">Copy credential</string>
+    <string name="credential_copied">Credential copied. Keep Tasker backups private and clear the clipboard after setup.</string>
+    <string name="integration_revoked">Credential revoked and integration disabled. Configure a new credential before enabling it again.</string>
+    <string name="enable_integration_first">Enable Tasker integration before revealing a credential.</string>
+    <string name="reveal_credential">Reveal Tasker credential</string>
+    <string name="revoke_credential">Revoke credential and disable</string>
+    <string name="disconnect_delay">Disconnect delay</string>
+    <string name="delay_description">Seconds after a car disconnect event before requesting simulation (0–3600). Android may still require a visible confirmation.</string>
+    <string name="delay_seconds">Disconnect delay (seconds): %1$d</string>
+    <string name="invalid_delay">Enter a whole number from 0 to 3600.</string>
+    <string name="mode_auto">AUTO</string>
+    <string name="mode_force_real">FORCE_REAL</string>
+    <string name="unknown_status">State unknown; no fresh genuine GPS fix confirmed.</string>
+    <string name="confirm_pending">Confirm pending simulation request</string>
+    <string name="stop_and_force_real">STOP · FORCE_REAL</string>
+    <string name="manual_start">START · MANUAL_MOCK</string>
+    <string name="select_location_first">Select a simulation location on the map first.</string>
+    <string name="map_privacy">Map data © OpenStreetMap contributors\nTiles by OpenFreeMap; rendered by MapLibre. Online map requests reveal your IP and viewed map area to the tile provider. Genuine fixes are shown only while this screen is open and are not saved as location history.</string>
+    <string name="control_ui_text_1">Center on mock location</string>
+    <string name="control_ui_text_2">100 m</string>
+    <string name="control_ui_text_3">No location selected</string>
+    <string name="control_ui_text_4">Copy coordinates</string>
+    <string name="control_ui_text_5">☰</string>
+    <string name="control_ui_text_6">START MOCKING</string>
+    <string name="control_ui_text_7">MockGPS</string>
+    <string name="control_ui_text_8">Settings</string>
+    <string name="control_ui_text_9">Tasker integration</string>
+    <string name="control_ui_text_10">Off by default. Requires an explicit credential.</string>
+    <string name="control_ui_text_11">Location drift</string>
+    <string name="control_ui_text_12">Bounded coordinate variation for testing</string>
+    <string name="control_ui_text_13">Map</string>
+    <string name="control_ui_text_14">MockGPS</string>
+    <string name="control_ui_text_15">Open-source GPS mocking application for Android.</string>
+    <string name="control_ui_text_16">GitHub</string>
+    <string name="control_ui_text_17">Website</string>
+    <string name="control_ui_text_18">Donations</string>
+    <string name="control_ui_text_19">MockGPS
+© 2026 Kamil BuriXon Burek
+GPL-3.0</string>
+    <string name="mode_status">%1$s\n%2$s\nRecorded vehicle: %3$s\nLast accepted command: %4$s\nTransition: %5$s</string>
+    <string name="credential_unavailable">Credential unavailable. Disable integration, then enable it to create a new credential.</string>
+    <string name="select_mock_app">Select MockGPS as the mock-location app in Developer options.</string>
+    <string name="version_attribution">MockGPS %1$s\n© 2026 Kamil BuriXon Burek\nGPL-3.0</string>
+    <string name="coordinates_copied">Coordinates copied.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="no_accepted_event">None</string>
+    <string name="return_auto_before_manual">Select AUTO before manual start</string>
+</resources>

@@ -5,19 +5,25 @@ import android.Manifest
 import android.app.AppOpsManager
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.Color as AndroidColor
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.Handler
 import android.os.Looper
+import android.os.Build
+import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipDescription
+import android.content.ClipboardManager
+import android.os.PersistableBundle
+import android.text.InputType
+import android.view.WindowManager
+import android.widget.EditText
+import androidx.core.view.GravityCompat
+import dev.burixon.mockgps.core.OperatingMode
+import dev.burixon.mockgps.core.ServiceState
 import android.provider.Settings
-import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
@@ -26,15 +32,14 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import org.maplibre.android.MapLibre
 import org.maplibre.android.maps.MapLibreMapOptions
-import org.maplibre.android.annotations.IconFactory
-import org.maplibre.android.annotations.Marker
-import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.camera.CameraPosition
 import android.graphics.drawable.GradientDrawable
@@ -70,7 +75,16 @@ class MainActivity : ComponentActivity() {
     private lateinit var copyCoordinatesButton: ImageButton
     private lateinit var toggleButton: Button
     private lateinit var mockLocationButton: ImageButton
-    private lateinit var bootSwitch: CompoundButton
+    private lateinit var modeStatus: TextView
+    private lateinit var autoButton: Button
+    private lateinit var forceRealButton: Button
+    private lateinit var confirmPendingButton: Button
+    private var displayedGeneration = 0L
+    private var resumed = false
+    private var observingRealLocation = false
+    private val controlListener: () -> Unit = {
+        runOnUiThread { if (resumed) refreshFromState() }
+    }
     private lateinit var broadcastSwitch: CompoundButton
     private lateinit var driftSwitch: CompoundButton
 
@@ -88,32 +102,10 @@ class MainActivity : ComponentActivity() {
             MODE_PRIVATE
         )
     }
-    private var selectedMarker: Marker? = null
+    private var selectedLocationSource: GeoJsonSource? = null
     private var realLocationSource: GeoJsonSource? = null
     private var lastSelectedLat: Double? = null
     private var lastSelectedLon: Double? = null
-
-    private var lastRealLat: Double? = null
-    private var lastRealLon: Double? = null
-
-    private val handler =
-        Handler(
-            Looper.getMainLooper()
-        )
-
-    private val uiRunnable =
-        object : Runnable {
-
-            override fun run() {
-
-                refreshFromState()
-
-                handler.postDelayed(
-                    this,
-                    1000L
-                )
-            }
-        }
 
     private val locationManager by lazy {
         getSystemService(
@@ -136,10 +128,9 @@ class MainActivity : ComponentActivity() {
                     return
                 }
 
-                updateRealLocation(
-                    location.latitude,
-                    location.longitude
-                )
+                if (isGenuineLocation(location)) {
+                    updateRealLocation(location.latitude, location.longitude)
+                }
             }
         }
 
@@ -159,6 +150,7 @@ class MainActivity : ComponentActivity() {
             savedInstanceState
         )
 
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         WindowCompat.setDecorFitsSystemWindows(
             window,
             false
@@ -197,7 +189,7 @@ class MainActivity : ComponentActivity() {
         mapView =
             MapView(
                 this,
-                MapLibreMapOptions()
+                MapLibreMapOptions.createFromAttributes(this)
                     .textureMode(true)
             )
 
@@ -229,10 +221,7 @@ class MainActivity : ComponentActivity() {
                 R.id.versionText
             )
 
-        versionText.text =
-            "MockGPS ${BuildConfig.VERSION_NAME}\n" +
-                    "© 2026 Kamil BuriXon Burek\n" +
-                    "GPL-3.0"
+        versionText.text = getString(R.string.version_attribution, BuildConfig.VERSION_NAME)
 
         toggleButton =
             findViewById(
@@ -244,10 +233,10 @@ class MainActivity : ComponentActivity() {
                 R.id.mockLocationButton
             )
 
-        bootSwitch =
-            findViewById(
-                R.id.bootSwitch
-            )
+        modeStatus = findViewById(R.id.modeStatus)
+        autoButton = findViewById(R.id.autoButton)
+        forceRealButton = findViewById(R.id.forceRealButton)
+        confirmPendingButton = findViewById(R.id.confirmPendingButton)
 
         broadcastSwitch =
             findViewById(
@@ -493,7 +482,7 @@ class MainActivity : ComponentActivity() {
 
         menuButton.setOnClickListener {
             drawerLayout.openDrawer(
-                Gravity.START
+                GravityCompat.START
             )
         }
 
@@ -534,7 +523,7 @@ class MainActivity : ComponentActivity() {
 
             Toast.makeText(
                 this,
-                "Coordinates copied.",
+                getString(R.string.coordinates_copied),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -543,9 +532,8 @@ class MainActivity : ComponentActivity() {
 
             animateButtonPress()
 
-            if (
-                State.isServiceRunning(this)
-            ) {
+            val current = ControlCenter.snapshot(this)
+            if (current.desired || current.service == ServiceState.INJECTING || current.service == ServiceState.STARTING) {
                 stopMocking()
             } else {
                 startMocking()
@@ -556,24 +544,25 @@ class MainActivity : ComponentActivity() {
             centerOnMockLocation()
         }
 
-        bootSwitch.setOnCheckedChangeListener {
-                _: CompoundButton,
-                checked: Boolean ->
-
-            State.setAutoStart(
-                this,
-                checked
-            )
+        autoButton.setOnClickListener { ControlCenter.selectAuto(this) }
+        forceRealButton.setOnClickListener { stopMocking() }
+        confirmPendingButton.setOnClickListener {
+            if (hasLocationPermission() && isMockLocationAllowed()) {
+                ControlCenter.confirmPending(this, displayedGeneration)
+            } else {
+                startPrerequisiteHelp()
+            }
         }
-
-        broadcastSwitch.setOnCheckedChangeListener {
-                _: CompoundButton,
-                checked: Boolean ->
-
-            State.setBroadcastEnabled(
-                this,
-                checked
-            )
+        findViewById<Button>(R.id.showTokenButton).setOnClickListener { showAutomationCredential() }
+        findViewById<Button>(R.id.revokeTokenButton).setOnClickListener {
+            if (AutomationAccess.revoke(this)) {
+                Toast.makeText(this, R.string.integration_revoked, Toast.LENGTH_LONG).show()
+            }
+            refreshFromState()
+        }
+        findViewById<Button>(R.id.delayButton).setOnClickListener { showDelayDialog() }
+        broadcastSwitch.setOnCheckedChangeListener { _, checked ->
+            ControlCenter.setIntegrationEnabled(this, checked)
         }
 
         driftSwitch.setOnCheckedChangeListener {
@@ -596,9 +585,7 @@ class MainActivity : ComponentActivity() {
             startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    android.net.Uri.parse(
-                        "https://github.com/BuriXon-code/MockGPS/"
-                    )
+                    "https://github.com/abhi-k9/MockGPS/".toUri()
                 )
             )
         }
@@ -609,9 +596,7 @@ class MainActivity : ComponentActivity() {
             startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    android.net.Uri.parse(
-                        "https://burixon.dev/MockGPS/"
-                    )
+                    "https://burixon.dev/MockGPS/".toUri()
                 )
             )
         }
@@ -622,9 +607,7 @@ class MainActivity : ComponentActivity() {
             startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    android.net.Uri.parse(
-                        "https://buycoffee.to/burixon-code"
-                    )
+                    "https://buycoffee.to/burixon-code".toUri()
                 )
             )
         }
@@ -641,28 +624,13 @@ class MainActivity : ComponentActivity() {
         val target =
             position.target ?: return
 
-        mapPrefs.edit()
-            .putLong(
-                "lat",
-                target.latitude.toBits()
-            )
-            .putLong(
-                "lon",
-                target.longitude.toBits()
-            )
-            .putLong(
-                "zoom",
-                position.zoom.toBits()
-            )
-            .putLong(
-                "bearing",
-                position.bearing.toBits()
-            )
-            .putLong(
-                "tilt",
-                position.tilt.toBits()
-            )
-            .apply()
+        mapPrefs.edit {
+            putLong("lat", target.latitude.toBits())
+            putLong("lon", target.longitude.toBits())
+            putLong("zoom", position.zoom.toBits())
+            putLong("bearing", position.bearing.toBits())
+            putLong("tilt", position.tilt.toBits())
+        }
     }
 
     private fun restoreCameraPosition(): Boolean {
@@ -745,7 +713,7 @@ class MainActivity : ComponentActivity() {
                 .isLogoEnabled = false
 
             loadedMap.uiSettings
-                .isAttributionEnabled = false
+                .isAttributionEnabled = true
 
             updateCompassPosition()
 
@@ -786,53 +754,27 @@ class MainActivity : ComponentActivity() {
 
     private fun refreshFromState() {
 
-        val running =
-            State.isServiceRunning(
-                this
-            )
-
-        /*
-         * Ignore listener callbacks while updating switches from external
-         * broadcasts. The switches are therefore always synchronized with
-         * State without generating accidental writes.
-         */
-
-        bootSwitch.setOnCheckedChangeListener(
-            null
-        )
-
-        bootSwitch.isChecked =
-            State.isAutoStart(
-                this
-            )
-
-        bootSwitch.setOnCheckedChangeListener {
-                _: CompoundButton,
-                checked: Boolean ->
-
-            State.setAutoStart(
-                this,
-                checked
-            )
+        val snapshot = ControlCenter.snapshot(this)
+        displayedGeneration = snapshot.generation
+        val running = snapshot.desired || snapshot.service == ServiceState.INJECTING ||
+            snapshot.service == ServiceState.STARTING
+        val acceptedAt = if (snapshot.lastEventTime < 0) getString(R.string.no_accepted_event)
+            else java.text.DateFormat.getDateTimeInstance().format(java.util.Date(snapshot.lastEventTime))
+        modeStatus.text = getString(R.string.mode_status, snapshot.mode.name, snapshot.displayStatus(),
+            snapshot.vehicle.name, acceptedAt, snapshot.result)
+        autoButton.isEnabled = snapshot.mode != OperatingMode.AUTO
+        forceRealButton.isEnabled = true // Retry cleanup even when FORCE_REAL is already selected.
+        confirmPendingButton.visibility = if (snapshot.needsConfirmation) View.VISIBLE else View.GONE
+        broadcastSwitch.setOnCheckedChangeListener(null)
+        broadcastSwitch.isChecked = State.isBroadcastEnabled(this)
+        broadcastSwitch.setOnCheckedChangeListener { _, checked ->
+            ControlCenter.setIntegrationEnabled(this, checked)
         }
-
-        broadcastSwitch.setOnCheckedChangeListener(
-            null
-        )
-
-        broadcastSwitch.isChecked =
-            State.isBroadcastEnabled(
-                this
-            )
-
-        broadcastSwitch.setOnCheckedChangeListener {
-                _: CompoundButton,
-                checked: Boolean ->
-
-            State.setBroadcastEnabled(
-                this,
-                checked
-            )
+        findViewById<Button>(R.id.delayButton).text = getString(R.string.delay_seconds, snapshot.delaySeconds)
+        if (snapshot.service == ServiceState.INJECTING || snapshot.service == ServiceState.STARTING) {
+            stopRealLocationUpdates()
+        } else if (resumed) {
+            startRealLocationUpdates()
         }
 
         driftSwitch.setOnCheckedChangeListener(
@@ -854,11 +796,14 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        toggleButton.isEnabled = snapshot.mode != OperatingMode.FORCE_REAL || running
         toggleButton.text =
-            if (running) {
-                "STOP MOCKING"
+            if (snapshot.mode == OperatingMode.FORCE_REAL && !running) {
+                getString(R.string.return_auto_before_manual)
+            } else if (running) {
+                getString(R.string.stop_and_force_real)
             } else {
-                "START MOCKING"
+                getString(R.string.manual_start)
             }
 
         toggleButton.setBackgroundResource(
@@ -908,86 +853,89 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startMocking() {
-
-        if (
-            !hasLocationPermission()
-        ) {
-            requestPermissionsIfNeeded()
-            return
-        }
-
-        if (
-            !isMockLocationAllowed()
-        ) {
+    private fun startPrerequisiteHelp() {
+        if (!hasLocationPermission()) requestPermissionsIfNeeded()
+        else if (!isMockLocationAllowed()) {
+            Toast.makeText(this, R.string.select_mock_app, Toast.LENGTH_LONG).show()
             showDeveloperOptions()
+        }
+    }
+
+    private fun startMocking() {
+        if (!hasLocationPermission() || !isMockLocationAllowed()) {
+            startPrerequisiteHelp()
             return
         }
-
-        /*
-         * Capture the real location before test providers are enabled.
-         */
-
-        captureRealLocation()
+        // FORCE_REAL can only be cleared by the explicit AUTO control.
+        if (ControlCenter.snapshot(this).mode == OperatingMode.FORCE_REAL) return
+        if (State.getLat(this) == null || State.getLon(this) == null) {
+            Toast.makeText(this, R.string.select_location_first, Toast.LENGTH_LONG).show()
+            return
+        }
         stopRealLocationUpdates()
-
-        State.setDesiredEnabled(
-            this,
-            true
-        )
-
-        State.setNotifyMode(
-            this,
-            State.NOTIFY_TOAST
-        )
-
-        val intent =
-            Intent(
-                this,
-                MockLocationService::class.java
-            ).apply {
-
-                putExtra(
-                    MockLocationService.COMMAND,
-                    MockLocationService.COMMAND_ON
-                )
-
-                putExtra(
-                    MockLocationService.EXTRA_TOAST,
-                    true
-                )
-            }
-
-        ContextCompat.startForegroundService(
-            this,
-            intent
-        )
-
+        ControlCenter.manualStart(this)
         refreshFromState()
     }
 
     private fun stopMocking() {
-
-        State.setDesiredEnabled(
-            this,
-            false
-        )
-
-        State.setServiceRunning(
-            this,
-            false
-        )
-
-        stopService(
-            Intent(
-                this,
-                MockLocationService::class.java
-            )
-        )
-
-        startRealLocationUpdates()
-
+        ControlCenter.forceReal(this)
         refreshFromState()
+    }
+
+    private fun showAutomationCredential() {
+        if (!State.isBroadcastEnabled(this)) {
+            Toast.makeText(this, R.string.enable_integration_first, Toast.LENGTH_LONG).show()
+            return
+        }
+        val token = AutomationAccess.token(this) ?: run {
+            Toast.makeText(this, R.string.credential_unavailable, Toast.LENGTH_LONG).show()
+            return
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.automation_credential)
+            .setMessage(getString(R.string.credential_warning, token))
+            .setPositiveButton(R.string.copy_credential) { _, _ ->
+                val clip = ClipData.newPlainText(getString(R.string.automation_credential), token)
+                if (Build.VERSION.SDK_INT >= 33) {
+                    clip.description.extras = PersistableBundle().apply {
+                        putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                    }
+                }
+                getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
+                Toast.makeText(this, R.string.credential_copied, Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        dialog.show()
+    }
+
+    private fun showDelayDialog() {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText(String.format(Locale.getDefault(), "%d", ControlCenter.snapshot(this@MainActivity).delaySeconds))
+            contentDescription = getString(R.string.delay_description)
+            selectAll()
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.disconnect_delay)
+            .setMessage(R.string.delay_description)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val seconds = input.text.toString().toLongOrNull()
+                if (seconds == null || seconds !in 0L..3600L) {
+                    input.error = getString(R.string.invalid_delay)
+                } else {
+                    ControlCenter.setDelay(this, seconds)
+                    dialog.dismiss()
+                }
+            }
+        }
+        dialog.show()
     }
 
     private fun selectLocation(
@@ -1042,51 +990,21 @@ class MainActivity : ComponentActivity() {
                 lon
             )
 
-        val markerColor =
-            if (
-                State.isServiceRunning(
-                    this
-                )
-            ) {
-                AndroidColor.rgb(
-                    224,
-                    72,
-                    82
-                )
-            } else {
-                AndroidColor.rgb(
-                    90,
-                    160,
-                    235
-                )
-            }
-
-        @Suppress("DEPRECATION")
-        if (
-            selectedMarker == null
-        ) {
-
-            selectedMarker =
-                loadedMap.addMarker(
-                    MarkerOptions()
-                        .position(point)
-                        .icon(
-                            markerIcon(
-                                markerColor
-                            )
-                        )
-                )
-
+        val markerColor = if (State.isServiceRunning(this)) {
+            AndroidColor.rgb(224, 72, 82)
         } else {
-
-            selectedMarker?.position =
-                point
-
-            selectedMarker?.icon =
-                markerIcon(
-                    markerColor
-                )
+            AndroidColor.rgb(90, 160, 235)
         }
+        val style = loadedMap.style ?: return
+        val source = selectedLocationSource ?: GeoJsonSource("selected-location-source").also {
+            style.addSource(it)
+            style.addLayer(CircleLayer("selected-location-layer", "selected-location-source")
+                .withProperties(circleRadius(9f), circleColor(markerColor),
+                    circleStrokeColor(AndroidColor.WHITE), circleStrokeWidth(2f)))
+            selectedLocationSource = it
+        }
+        source.setGeoJson(Point.fromLngLat(lon, lat))
+        style.getLayerAs<CircleLayer>("selected-location-layer")?.setProperties(circleColor(markerColor))
 
         if (moveCamera) {
 
@@ -1171,9 +1089,6 @@ class MainActivity : ComponentActivity() {
             lon
         )
 
-        lastRealLat = lat
-        lastRealLon = lon
-
         updateRealMarker(
             lat,
             lon
@@ -1247,10 +1162,8 @@ class MainActivity : ComponentActivity() {
         var best: Location? = null
 
         try {
-            best =
-                locationManager.getLastKnownLocation(
-                    LocationManager.GPS_PROVIDER
-                )
+            best = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                ?.takeIf(::isGenuineLocation)
         } catch (_: SecurityException) {
             return
         } catch (_: Exception) {
@@ -1264,10 +1177,10 @@ class MainActivity : ComponentActivity() {
                 )
 
             if (
-                network != null &&
+                network != null && isGenuineLocation(network) &&
                 (
                         best == null ||
-                                network.time > best!!.time
+                                network.time > best.time
                         )
             ) {
                 best = network
@@ -1278,31 +1191,16 @@ class MainActivity : ComponentActivity() {
         } catch (_: Exception) {
         }
 
-        best?.let {
-            updateRealLocation(
-                it.latitude,
-                it.longitude
-            )
+        best?.takeIf(::isGenuineLocation)?.let {
+            updateRealLocation(it.latitude, it.longitude)
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun startRealLocationUpdates() {
 
-        if (
-            State.isServiceRunning(this)
-        ) {
-            return
-        }
-
-        if (
-            !hasLocationPermission()
-        ) {
-            return
-        }
-
+        if (observingRealLocation || !resumed || State.isServiceRunning(this) || !hasLocationPermission()) return
         try {
-
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 2000L,
@@ -1310,6 +1208,7 @@ class MainActivity : ComponentActivity() {
                 locationListener,
                 Looper.getMainLooper()
             )
+            observingRealLocation = true
 
         } catch (_: SecurityException) {
             // Permission may have been revoked after our check.
@@ -1318,7 +1217,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun stopRealLocationUpdates() {
-
+        observingRealLocation = false
         try {
             locationManager.removeUpdates(
                 locationListener
@@ -1365,21 +1264,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun hasLocationPermission():
-            Boolean {
-
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission
-                .ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED ||
-
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission
-                        .ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun hasLocationPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
 
     private fun isMockLocationAllowed():
             Boolean {
@@ -1542,107 +1429,14 @@ class MainActivity : ComponentActivity() {
             }
     }
 
-    private fun markerIcon(
-        color: Int
-    ): org.maplibre.android.annotations.Icon {
-
-        val bitmap =
-            Bitmap.createBitmap(
-                64,
-                80,
-                Bitmap.Config.ARGB_8888
-            )
-
-        val canvas =
-            Canvas(bitmap)
-
-        val paint =
-            Paint(
-                Paint.ANTI_ALIAS_FLAG
-            )
-
-        paint.color =
-            color
-
-        paint.setShadowLayer(
-            5f,
-            0f,
-            3f,
-            AndroidColor.argb(
-                90,
-                0,
-                0,
-                0
-            )
-        )
-
-        val path =
-            Path().apply {
-
-                moveTo(
-                    32f,
-                    4f
-                )
-
-                cubicTo(
-                    14f,
-                    4f,
-                    8f,
-                    18f,
-                    8f,
-                    28f
-                )
-
-                cubicTo(
-                    8f,
-                    43f,
-                    20f,
-                    51f,
-                    32f,
-                    72f
-                )
-
-                cubicTo(
-                    44f,
-                    51f,
-                    56f,
-                    43f,
-                    56f,
-                    28f
-                )
-
-                cubicTo(
-                    56f,
-                    18f,
-                    50f,
-                    4f,
-                    32f,
-                    4f
-                )
-
-                close()
-            }
-
-        canvas.drawPath(
-            path,
-            paint
-        )
-
-        paint.clearShadowLayer()
-
-        paint.color =
-            AndroidColor.WHITE
-
-        canvas.drawCircle(
-            32f,
-            28f,
-            8f,
-            paint
-        )
-
-        return IconFactory
-            .getInstance(this)
-            .fromBitmap(bitmap)
+    private fun isGenuineLocation(location: Location): Boolean {
+        val mock = if (Build.VERSION.SDK_INT >= 31) location.isMock else {
+            @Suppress("DEPRECATION")
+            location.isFromMockProvider
+        }
+        val ageNanos = android.os.SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos
+        return !mock && ageNanos in 0..60_000_000_000L &&
+            State.validLat(location.latitude) && State.validLon(location.longitude)
     }
 
     private fun animateButtonPress() {
@@ -1675,10 +1469,9 @@ class MainActivity : ComponentActivity() {
 
         mapView.onResume()
 
-        handler.post(
-            uiRunnable
-        )
-
+        resumed = true
+        ControlCenter.addListener(controlListener)
+        refreshFromState()
         captureRealLocation()
         startRealLocationUpdates()
     }
@@ -1689,9 +1482,8 @@ class MainActivity : ComponentActivity() {
 
         stopRealLocationUpdates()
 
-        handler.removeCallbacks(
-            uiRunnable
-        )
+        resumed = false
+        ControlCenter.removeListener(controlListener)
 
         mapView.onPause()
 
@@ -1720,9 +1512,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
 
-        handler.removeCallbacksAndMessages(
-            null
-        )
+        ControlCenter.removeListener(controlListener)
 
         stopRealLocationUpdates()
 

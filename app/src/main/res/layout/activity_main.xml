@@ -34,7 +34,7 @@
                 android:padding="13dp"
                 android:background="@drawable/button_mock_location"
                 android:src="@drawable/ic_mock_location"
-                android:contentDescription="Center on mock location"
+                android:contentDescription="@string/control_ui_text_1"
                 android:elevation="8dp"
                 android:clickable="true"
                 android:focusable="true" />
@@ -56,7 +56,7 @@
                     android:id="@+id/scaleLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="100 m"
+                    android:text="@string/control_ui_text_2"
                     android:textColor="@color/map_overlay_text"
                     android:textSize="11sp" />
 
@@ -83,6 +83,41 @@
             android:paddingBottom="14dp"
             android:background="@drawable/bottom_panel">
 
+            <TextView
+                android:id="@+id/modeStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite"
+                android:text="@string/unknown_status"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:paddingBottom="6dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/autoButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/mode_auto" />
+                <Button
+                    android:id="@+id/forceRealButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/mode_force_real" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/confirmPendingButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/confirm_pending"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,19 +130,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="No location selected"
+                    android:text="@string/control_ui_text_3"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
                 <ImageButton
                     android:id="@+id/copyCoordinatesButton"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginStart="6dp"
-                    android:padding="7dp"
+                    android:padding="15dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/ic_copy"
-                    android:contentDescription="Copy coordinates" />
+                    android:contentDescription="@string/control_ui_text_4" />
 
             </LinearLayout>
 
@@ -120,11 +155,12 @@
 
                 <TextView
                     android:id="@+id/menuButton"
+                    android:contentDescription="@string/open_settings"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
-                    android:text="☰"
+                    android:text="@string/control_ui_text_5"
                     android:textColor="@color/baby_blue"
                     android:textSize="26sp"
                     android:clickable="true"
@@ -138,7 +174,7 @@
                     android:layout_weight="1"
                     android:minHeight="0dp"
                     android:padding="0dp"
-                    android:text="START MOCKING"
+                    android:text="@string/control_ui_text_6"
                     android:textAllCaps="false"
                     android:textColor="@color/button_text"
                     android:textSize="15sp"
@@ -164,7 +200,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="24dp">
 
@@ -175,7 +211,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:text="MockGPS"
+                android:text="@string/control_ui_text_7"
                 android:textColor="@color/text_primary"
                 android:textSize="28sp"
                 android:textStyle="bold"
@@ -188,49 +224,18 @@
                 android:paddingStart="22dp"
                 android:paddingTop="22dp"
                 android:paddingEnd="22dp"
-                android:text="Settings"
+                android:text="@string/control_ui_text_8"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- START ON BOOT -->
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="76dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="22dp"
-                android:paddingEnd="14dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Start on boot"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:text="Automatically start mocking after boot"
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <android.widget.Switch
-                    android:id="@+id/bootSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:padding="22dp"
+                android:text="@string/reboot_policy"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
 
             <!-- BROADCAST COMMANDS -->
             <LinearLayout
@@ -250,7 +255,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Broadcast commands"
+                        android:text="@string/control_ui_text_9"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp" />
 
@@ -258,7 +263,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Allow external apps to control MockGPS"
+                        android:text="@string/control_ui_text_10"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
@@ -270,6 +275,27 @@
                     android:layout_height="wrap_content" />
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/showTokenButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/reveal_credential" />
+
+            <Button
+                android:id="@+id/revokeTokenButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/revoke_credential" />
+
+            <Button
+                android:id="@+id/delayButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/disconnect_delay" />
 
             <!-- LOCATION DRIFT -->
             <LinearLayout
@@ -289,7 +315,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Location drift"
+                        android:text="@string/control_ui_text_11"
                         android:textColor="@color/text_primary"
                         android:textSize="15sp" />
 
@@ -297,7 +323,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Add realistic GPS movement"
+                        android:text="@string/control_ui_text_12"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
 
@@ -325,7 +351,7 @@
                 android:paddingStart="22dp"
                 android:paddingTop="14dp"
                 android:paddingEnd="22dp"
-                android:text="Map"
+                android:text="@string/control_ui_text_13"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -336,7 +362,7 @@
                 android:paddingStart="22dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="22dp"
-                android:text="Map data © OpenStreetMap contributors&#10;Tiles by OpenFreeMap&#10;Map rendering by MapLibre"
+                android:text="@string/map_privacy"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:lineSpacingExtra="3dp" />
@@ -356,7 +382,7 @@
                 android:paddingStart="22dp"
                 android:paddingTop="14dp"
                 android:paddingEnd="22dp"
-                android:text="MockGPS"
+                android:text="@string/control_ui_text_14"
                 android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -367,7 +393,7 @@
                 android:paddingStart="22dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="22dp"
-                android:text="Open-source GPS mocking application for Android."
+                android:text="@string/control_ui_text_15"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:lineSpacingExtra="3dp" />
@@ -382,11 +408,12 @@
                 android:layout_marginEnd="16dp"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:drawableStart="@drawable/github_ic_small"
                 android:drawablePadding="10dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="GitHub"
+                android:text="@string/control_ui_text_16"
                 android:textColor="@color/baby_blue_dark"
                 android:textSize="14sp"
                 android:background="@drawable/drawer_link" />
@@ -401,11 +428,12 @@
                 android:layout_marginEnd="16dp"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:drawableStart="@drawable/website_ic_small"
                 android:drawablePadding="10dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="Website"
+                android:text="@string/control_ui_text_17"
                 android:textColor="@color/baby_blue_dark"
                 android:textSize="14sp"
                 android:background="@drawable/drawer_link" />
@@ -420,11 +448,12 @@
                 android:layout_marginEnd="16dp"
                 android:gravity="center_vertical"
                 android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:drawableStart="@drawable/donations_ic_small"
                 android:drawablePadding="10dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="Donations"
+                android:text="@string/control_ui_text_18"
                 android:textColor="@color/baby_blue_dark"
                 android:textSize="14sp"
                 android:background="@drawable/drawer_link" />
@@ -437,7 +466,7 @@
                 android:paddingStart="22dp"
                 android:paddingTop="22dp"
                 android:paddingEnd="22dp"
-                android:text="MockGPS&#10;© 2026 Kamil BuriXon Burek&#10;GPL-3.0"
+                android:text="@string/control_ui_text_19"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:lineSpacingExtra="4dp" />
