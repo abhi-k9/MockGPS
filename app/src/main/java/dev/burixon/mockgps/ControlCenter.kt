@@ -23,7 +23,7 @@ object ControlCenter {
     private val listeners = linkedSetOf<() -> Unit>()
     private var notifying = false
     private var handlingStorageFailure = false
-    private var durableLastEventTime = -1L
+    private var durableLastSequence = -1L
     private const val REQUEST_ID = 2001
     private const val NOTIFICATION_ID = 2002
     private const val CHANNEL = "automation_requests"
@@ -33,7 +33,7 @@ object ControlCenter {
         checkThread()
         state?.let { return it }
         val loaded = runCatching { PolicyStore(context).load() }.getOrDefault(PolicySnapshot())
-        durableLastEventTime = loaded.lastEventTime
+        durableLastSequence = loaded.lastSequence
         val recovered = Policy.reduce(loaded, PolicyEvent.Recover, SystemClock.elapsedRealtime())
         state = recovered
         val migrationSucceeded = runCatching { State.migrate(context) }.isSuccess
@@ -76,7 +76,7 @@ object ControlCenter {
             changed(context)
             return false
         }
-        durableLastEventTime = s.lastEventTime
+        durableLastSequence = s.lastSequence
         state = s
         changed(context)
         return true
@@ -107,8 +107,10 @@ object ControlCenter {
         stopAndReport(context, Policy.reduce(ensure(context), PolicyEvent.Delay(seconds), now()))
     }
     fun setIntegrationEnabled(context: Context, enabled: Boolean): Boolean {
-        // Stop first: a failed credential write must not keep a previously active simulation running.
+        // A no-op must not reset replay protection for an unchanged credential.
         val s = ensure(context)
+        if (AutomationAccess.isEnabled(context) == enabled) return true
+        // Stop first: a failed credential write must not keep a previously active simulation running.
         stopAndReport(context, s.copy(generation = s.generation + 1, pendingAtElapsed = null,
             vehicle = VehicleState.UNKNOWN, result = "RECONCILE_REQUIRED"))
         try {
@@ -117,8 +119,7 @@ object ControlCenter {
             save(context, ensure(context).copy(service = ServiceState.ERROR, result = "CREDENTIAL_STORAGE_FAILED"))
             return false
         }
-        changed(context)
-        return true
+        return save(context, ensure(context).copy(lastSequence = -1, lastEventTime = -1))
     }
     fun manualStart(activity: Activity) {
         val old = ensure(activity)
@@ -178,43 +179,45 @@ object ControlCenter {
         val s = ensure(context)
         if (generation != s.generation) return
         cancelPending(context)
+        val uncertain = cleanupUncertain || State.legacyProviderStateUnverified(context)
         save(context, s.copy(desired = false, service = ServiceState.ERROR,
-            providers = if (cleanupUncertain) ProviderState.UNKNOWN else ProviderState.NONE,
-            injection = if (cleanupUncertain) InjectionState.UNKNOWN else InjectionState.NONE,
-            pendingAtElapsed = null, result = if (cleanupUncertain) "CLEANUP_UNCERTAIN" else code))
+            providers = if (uncertain) ProviderState.UNKNOWN else ProviderState.NONE,
+            injection = if (uncertain) InjectionState.UNKNOWN else InjectionState.NONE,
+            pendingAtElapsed = null, result = if (uncertain) "CLEANUP_UNCERTAIN" else code))
     }
     fun serviceStopped(context: Context, generation: Long, cleanupUncertain: Boolean) {
         val s = ensure(context)
         if (generation != s.generation) return
-        save(context, s.copy(desired = false, service = if (cleanupUncertain) ServiceState.ERROR else ServiceState.STOPPED,
-            providers = if (cleanupUncertain) ProviderState.UNKNOWN else ProviderState.NONE,
-            injection = if (cleanupUncertain) InjectionState.UNKNOWN else InjectionState.NONE,
-            result = if (cleanupUncertain) "CLEANUP_UNCERTAIN" else "STOPPED"))
+        val uncertain = cleanupUncertain || State.legacyProviderStateUnverified(context)
+        save(context, s.copy(desired = false, service = if (uncertain) ServiceState.ERROR else ServiceState.STOPPED,
+            providers = if (uncertain) ProviderState.UNKNOWN else ProviderState.NONE,
+            injection = if (uncertain) InjectionState.UNKNOWN else InjectionState.NONE,
+            result = if (uncertain) "CLEANUP_UNCERTAIN" else "STOPPED"))
     }
     fun external(context: Context, request: ExternalRequest): AuthResult {
         val s = ensure(context)
         val auth = CommandAuth.authorize(AutomationAccess.isEnabled(context), AutomationAccess.token(context), request,
-            System.currentTimeMillis(), s.lastEventTime)
+            System.currentTimeMillis(), s.lastSequence)
         if (!auth.accepted) return auth
-        val consumed = s.copy(lastEventTime = request.eventTime)
+        val consumed = s.copy(lastEventTime = request.eventTime, lastSequence = request.sequence)
         when (request.command) {
             "stop" -> stopAndReport(context, consumed.copy(mode = OperatingMode.FORCE_REAL,
                 generation = s.generation + 1, pendingAtElapsed = null, result = "STOPPED"))
-            "status" -> save(context, consumed)
+            "status" -> return auth // Read-only: never consumes a vehicle/control ordering sequence.
             else -> {
                 val vehicle = when (request.command) {
                     "vehicle_connected" -> VehicleState.CONNECTED
                     "vehicle_disconnected" -> VehicleState.DISCONNECTED
                     else -> VehicleState.UNKNOWN
                 }
-                val next = Policy.reduce(s, PolicyEvent.Vehicle(vehicle, request.eventTime), now())
+                val next = Policy.reduce(s, PolicyEvent.Vehicle(vehicle, request.eventTime, request.sequence), now())
                 if (next.generation != s.generation) {
                     stopAndReport(context, next)
                     if (next.pendingAtElapsed != null && ensure(context).generation == next.generation) schedule(context, next)
                 } else save(context, next)
             }
         }
-        return if (durableLastEventTime >= request.eventTime) auth else AuthResult(false, "STORAGE_UNAVAILABLE")
+        return if (durableLastSequence >= request.sequence) auth else AuthResult(false, "STORAGE_UNAVAILABLE")
     }
     private fun alarmIntent(context: Context, generation: Long = 0) = PendingIntent.getBroadcast(context, REQUEST_ID,
         Intent(context, DelayReceiver::class.java).putExtra("generation", generation),

@@ -18,6 +18,7 @@ data class PolicySnapshot(
     val pendingAtElapsed: Long? = null,
     val vehicle: VehicleState = VehicleState.UNKNOWN,
     val lastEventTime: Long = -1,
+    val lastSequence: Long = -1,
     val delaySeconds: Long = 120
 ) {
     val needsConfirmation: Boolean get() = result.startsWith("CONFIRMATION_REQUIRED")
@@ -36,7 +37,7 @@ data class PolicySnapshot(
 
 sealed interface PolicyEvent {
     data class SelectMode(val mode: OperatingMode) : PolicyEvent
-    data class Vehicle(val state: VehicleState, val eventTime: Long) : PolicyEvent
+    data class Vehicle(val state: VehicleState, val eventTime: Long, val sequence: Long = eventTime) : PolicyEvent
     data class Deadline(val generation: Long) : PolicyEvent
     data class Confirm(val generation: Long) : PolicyEvent
     data object ManualStart : PolicyEvent
@@ -52,8 +53,8 @@ object Policy {
             pendingAtElapsed = null, vehicle = VehicleState.UNKNOWN, result = "MODE_SELECTED"
         )
         is PolicyEvent.Vehicle -> {
-            if (e.eventTime <= s.lastEventTime) s else {
-                val next = s.copy(lastEventTime = e.eventTime, vehicle = e.state)
+            if (e.sequence < 0 || e.sequence <= s.lastSequence) s else {
+                val next = s.copy(lastEventTime = e.eventTime, lastSequence = e.sequence, vehicle = e.state)
                 if (s.mode != OperatingMode.AUTO) next
                 else if (e.state == s.vehicle) next // duplicate snapshots do not postpone an existing delay
                 else next.copy(

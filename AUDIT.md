@@ -116,3 +116,7 @@ The fork retains GPL-3.0 and upstream attribution. No alternative-project implem
 ## Unresolved external validation
 
 Android 17/One UI 9 background behavior, real-device provider removal, genuine GPS reacquisition, Tasker delivery while locked/optimized and Samsung tile presentation require actual target hardware. The conservative implementation deliberately turns an AUTO delayed request into visible confirmation. A successful broadcast is never considered evidence of foreground-service startup, and successful test-provider removal is never called a fresh genuine GPS fix.
+
+## Independent post-implementation review
+
+The previously delivered source is not the final development candidate. A second audit confirmed and repaired timestamp-order collisions/clock rollback, callback loss of persisted legacy cleanup uncertainty, CI SDK provisioning and cold-cache verification omissions. The fork now uses a separate installed package and API2 sequence contract. See [POST_IMPLEMENTATION_AUDIT.md](docs/POST_IMPLEMENTATION_AUDIT.md), [CI_REPAIR.md](docs/CI_REPAIR.md) and [IDENTITY_AND_SIGNING.md](docs/IDENTITY_AND_SIGNING.md). Current exact results/commit are in TESTING.md and VALIDATION.json; the earlier60-test/25-warning paragraph is historical evidence, not a claim about newer code.

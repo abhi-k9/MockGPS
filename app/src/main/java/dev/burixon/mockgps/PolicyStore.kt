@@ -11,15 +11,16 @@ internal class PolicyStore(context: Context) {
             .getOrDefault(OperatingMode.FORCE_REAL)
         return PolicySnapshot(mode = mode, generation = prefs.getLong("generation", 0),
             lastEventTime = prefs.getLong("last_event", -1),
+            lastSequence = prefs.getLong("last_sequence", -1),
             delaySeconds = prefs.getLong("delay", 120).coerceIn(0, 86400))
     }
     fun save(s: PolicySnapshot) {
-        check(prefs.edit().putInt("schema", 1).putString("mode", s.mode.name)
+        check(prefs.edit().putInt("schema", 2).putString("mode", s.mode.name)
             .putBoolean("desired", s.desired).putString("service", s.service.name)
             .putString("providers", s.providers.name).putString("injection", s.injection.name)
             .putString("result", s.result).putLong("generation", s.generation)
             .putLong("pending", s.pendingAtElapsed ?: -1).putString("vehicle", s.vehicle.name)
-            .putLong("last_event", s.lastEventTime).putLong("delay", s.delaySeconds).commit()) {
+            .putLong("last_sequence", s.lastSequence).putLong("last_event", s.lastEventTime).putLong("delay", s.delaySeconds).commit()) {
             "Policy storage unavailable"
         }
     }

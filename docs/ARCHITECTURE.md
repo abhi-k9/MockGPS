@@ -13,7 +13,7 @@ MockGPS keeps the existing native map/location-selection UI. This fork adds smal
 - injection acceptance (`UNKNOWN`, `NONE`, `CONFIRMED`);
 - sanitized last transition result;
 - generation and optional elapsed-time deadline;
-- last reported vehicle state and accepted event time;
+- last reported vehicle state, display-only accepted event time and persisted monotonic mutation sequence;
 - configured disconnection delay.
 
 `CONFIRMED` means both `LocationManager.setTestProviderLocation` calls returned successfully. It does not mean another application received the simulated location, that fused/vendor sources are controlled, or that a genuine GPS fix exists after stopping. `NONE` means this app's owned test providers were removed through the platform API; it is not a fresh genuine-location observation.
@@ -24,7 +24,7 @@ All Android commands/effects run on the main looper in one application process t
 
 ## Command boundary
 
-The exported `MockGpsReceiver` accepts only the documented versioned authenticated contract. `core/CommandAuth.kt` checks opt-in integration, capability token, command schema and time/replay bounds. The capability belongs to whoever possesses it; caller-supplied package names are not treated as identity. `AutomationAccess` owns local token enable/revoke operations. The old unauthenticated set/on/off/drift/boot interface is removed. The location service and delayed-action receiver are internal.
+The exported `MockGpsReceiver` accepts only the documented versioned authenticated contract. `core/CommandAuth.kt` checks opt-in integration, capability token, command schema and exact API2 types, freshness and sequence/replay bounds. The capability belongs to whoever possesses it; caller-supplied package names are not treated as identity. `AutomationAccess` owns local token enable/revoke operations. The old unauthenticated set/on/off/drift/boot interface is removed. The location service and delayed-action receiver are internal.
 
 Tasker owns the vehicle connection observation and must match the designated paired vehicle, reconcile current profile state, and send fresh monotonically ordered events. MockGPS owns the delay and cancellation policy. Because broadcasts do not establish FGS eligibility, delayed activation posts a request to review and confirm in the visible Activity. Tasker events cannot directly start simulation or leave FORCE_REAL. No network listener or background-location permission is needed.
 

@@ -116,12 +116,13 @@ class BoundaryInstrumentationTest {
             store.save(PolicySnapshot(mode = OperatingMode.AUTO, desired = true,
                 service = ServiceState.INJECTING, providers = ProviderState.READY,
                 injection = InjectionState.CONFIRMED, result = "INJECTING", generation = 7,
-                pendingAtElapsed = 200_000, vehicle = VehicleState.DISCONNECTED,
+                pendingAtElapsed = 200_000, lastSequence = 13, vehicle = VehicleState.DISCONNECTED,
                 lastEventTime = 1234, delaySeconds = 300))
             val loaded = PolicyStore(context).load()
             assertEquals(OperatingMode.AUTO, loaded.mode)
             assertEquals(300L, loaded.delaySeconds)
             assertEquals(1234L, loaded.lastEventTime)
+            assertEquals(13L, loaded.lastSequence)
             assertFalse(loaded.desired)
             assertEquals(ServiceState.UNKNOWN, loaded.service)
             assertEquals(ProviderState.UNKNOWN, loaded.providers)
@@ -173,12 +174,88 @@ class BoundaryInstrumentationTest {
         }
     }
 
+    @Test
+    fun actualReceiverOrdersSameMillisecondEventsAndStatusCannotConsumeSequence() {
+        val access = preferences("automation_access")
+        val policy = preferences("control_policy")
+        restoring(access, policy) {
+            try {
+                main { ControlCenter.setIntegrationEnabled(context, false) }
+                main { ControlCenter.selectAuto(context); ControlCenter.setIntegrationEnabled(context, true) }
+                val token = AutomationAccess.token(context)!!
+                val time = System.currentTimeMillis()
+                fun event(command: String, seq: Long) = controlIntent(token).putExtra("command", command)
+                    .putExtra("event_time", time).putExtra("seq", seq)
+                assertEquals(0, response(event("vehicle_disconnected", 1), true).first)
+                assertNotNull(main { ControlCenter.snapshot(context) }.pendingAtElapsed)
+                assertEquals(0, response(event("status", 999), true).first)
+                assertEquals(1L, main { ControlCenter.snapshot(context) }.lastSequence)
+                assertEquals(0, response(event("vehicle_connected", 2), true).first)
+                val connected = main { ControlCenter.snapshot(context) }
+                assertEquals(VehicleState.CONNECTED, connected.vehicle)
+                assertNull(connected.pendingAtElapsed)
+                assertFalse(connected.desired)
+                assertEquals("REPLAYED_EVENT", response(event("vehicle_disconnected", 1)).second)
+                assertEquals(0, response(event("stop", 3), true).first)
+                assertEquals(OperatingMode.FORCE_REAL, main { ControlCenter.snapshot(context) }.mode)
+            } finally { main { ControlCenter.setIntegrationEnabled(context, false); ControlCenter.forceReal(context) } }
+        }
+    }
+
+    @Test
+    fun serviceCallbacksCannotErasePersistedLegacyCleanupUncertainty() {
+        val config = preferences("mock_configuration")
+        val policy = preferences("control_policy")
+        restoring(config, policy) {
+            try {
+                assertTrue(config.edit().putBoolean("legacy_unverified", true).commit())
+                val generation = main { ControlCenter.snapshot(context) }.generation
+                main { ControlCenter.serviceFailed(context, generation, "FOREGROUND_START_REJECTED", false) }
+                assertEquals("CLEANUP_UNCERTAIN", main { ControlCenter.snapshot(context) }.result)
+                main { ControlCenter.serviceStopped(context, generation, false) }
+                val stopped = main { ControlCenter.snapshot(context) }
+                assertEquals(ProviderState.UNKNOWN, stopped.providers)
+                assertEquals(InjectionState.UNKNOWN, stopped.injection)
+                assertEquals("CLEANUP_UNCERTAIN", stopped.result)
+            } finally { assertTrue(config.edit().putBoolean("legacy_unverified", false).commit()); main { ControlCenter.forceReal(context) } }
+        }
+    }
+
+    @Test
+    fun unchangedCredentialDoesNotResetOrderingButRotationDoes() {
+        val access = preferences("automation_access")
+        val policy = preferences("control_policy")
+        restoring(access, policy) {
+            try {
+                main { ControlCenter.setIntegrationEnabled(context, false); ControlCenter.setIntegrationEnabled(context, true) }
+                val old = AutomationAccess.token(context)!!
+                val time = System.currentTimeMillis()
+                fun stop(token: String, seq: Long) = controlIntent(token).putExtra("command", "stop")
+                    .putExtra("event_time", time).putExtra("seq", seq)
+                assertEquals(0, response(stop(old, 100), true).first)
+                main { ControlCenter.setIntegrationEnabled(context, true) }
+                assertEquals("REPLAYED_EVENT", response(stop(old, 1)).second)
+                main { ControlCenter.setIntegrationEnabled(context, false); ControlCenter.setIntegrationEnabled(context, true) }
+                val fresh = AutomationAccess.token(context)!!
+                assertNotEquals(old, fresh)
+                assertEquals("UNAUTHORIZED", response(stop(old, 101)).second)
+                assertEquals(0, response(stop(fresh, 1), true).first)
+            } finally { main { ControlCenter.setIntegrationEnabled(context, false); ControlCenter.forceReal(context) } }
+        }
+    }
+
+    private fun <T> main(block: () -> T): T {
+        val value = java.util.concurrent.atomic.AtomicReference<T>()
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { value.set(block()) }
+        return value.get()
+    }
+
     private fun controlIntent(token: String) = Intent(MockGpsReceiver.ACTION)
         .setComponent(ComponentName(context, MockGpsReceiver::class.java))
-        .putExtra("api", 1).putExtra("token", token).putExtra("command", "status")
-        .putExtra("event_time", System.currentTimeMillis())
+        .putExtra("api", 2).putExtra("token", token).putExtra("command", "status")
+        .putExtra("event_time", System.currentTimeMillis()).putExtra("seq", 1L)
 
-    private fun response(intent: Intent): Pair<Int, String?> {
+    private fun response(intent: Intent, accepted: Boolean = false): Pair<Int, String?> {
         val delivered = CountDownLatch(1)
         var result: Pair<Int, String?>? = null
         var hasPrivateExtras = false
@@ -190,7 +267,7 @@ class BoundaryInstrumentationTest {
             }
         }, null, 99, null, null)
         assertTrue("Explicit ordered control broadcast did not complete", delivered.await(10, TimeUnit.SECONDS))
-        assertFalse("Rejected calls must not return private status or credentials", hasPrivateExtras)
+        assertEquals("Only authenticated calls return sanitized state", accepted, hasPrivateExtras)
         return requireNotNull(result)
     }
 

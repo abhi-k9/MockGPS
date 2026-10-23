@@ -271,4 +271,26 @@ class PolicyTest {
         val error = starting.copy(service = ServiceState.ERROR, result = "MISSING_MOCK_APP")
         assertEquals("Error: MISSING_MOCK_APP", error.displayStatus())
     }
+    @Test fun sameMillisecondReconnectionCancelsPendingStart() {
+        val initial = auto()
+        val disconnected = reduce(initial, PolicyEvent.Vehicle(VehicleState.DISCONNECTED, 1000, 1))
+        val connected = reduce(disconnected, PolicyEvent.Vehicle(VehicleState.CONNECTED, 1000, 2))
+        assertEquals(VehicleState.CONNECTED, connected.vehicle)
+        assertNull(connected.pendingAtElapsed)
+        assertFalse(connected.desired)
+        assertEquals(connected, reduce(connected, PolicyEvent.Deadline(disconnected.generation), now + 200_000))
+    }
+
+    @Test fun newerSequenceSurvivesWallClockRollback() {
+        val first = reduce(auto(), PolicyEvent.Vehicle(VehicleState.DISCONNECTED, 100_000, 1))
+        val second = reduce(first, PolicyEvent.Vehicle(VehicleState.CONNECTED, 1_000, 2))
+        assertEquals(VehicleState.CONNECTED, second.vehicle)
+        assertEquals(1_000, second.lastEventTime)
+        assertEquals(2, second.lastSequence)
+    }
+
+    @Test fun newerWallTimeCannotReplayAnOldControlSequence() {
+        val first = reduce(auto(), PolicyEvent.Vehicle(VehicleState.CONNECTED, 1000, 10))
+        assertEquals(first, reduce(first, PolicyEvent.Vehicle(VehicleState.DISCONNECTED, 2000, 9)))
+    }
 }

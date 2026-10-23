@@ -2,6 +2,8 @@
 
 A hardened native Kotlin fork of [BuriXon-code/MockGPS](https://github.com/BuriXon-code/MockGPS), preserving the MapLibre map, selected coordinates, camera position, clipboard control and optional bounded drift. Android's mock-location flags and foreground-service disclosures remain intact. No root, Shizuku, Accessibility service, network control server, cloud backend or detection bypass is used.
 
+Installed package: **`dev.abhik.mockgps`**; this is a fresh installation distinct from upstream/earlier engineering APKs. Stop the old app first, select the fork in Developer Options, add its tile and configure a new credential/API2 Tasker task. See [identity/signing](docs/IDENTITY_AND_SIGNING.md).
+
 **Android 17 / Samsung One UI 9 behavior is not hardware validated.** This is an engineering build, not a production-readiness claim. A Tasker broadcast does not grant permission to launch a location foreground service in the background. Vehicle disconnection therefore requests visible user confirmation; it never silently starts injection.
 
 ## Modes and controls
@@ -23,7 +25,7 @@ Prerequisites: a **Java 21 JDK** (Gradle daemon), Android SDK platform 36/build 
 ```sh
 export JAVA_HOME=/path/to/jdk-21
 export ANDROID_HOME=/path/to/android-sdk
-sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'platform-tools'
+scripts/setup-android-sdk.sh "$ANDROID_HOME" # pinned official Linux x86_64 bootstrap
 ./scripts/android-build.sh
 ```
 
@@ -52,7 +54,7 @@ Samsung sleeping/deep-sleeping apps, battery restrictions, force-stop and lock-s
 
 ## Automation and privacy
 
-External control is disabled by default. The old unauthenticated `on`, `set`, `boot` and direct-service interfaces are removed. The new API accepts only authenticated version-1 `vehicle_connected`, `vehicle_disconnected`, `vehicle_unknown`, `stop`, and `status` messages with fresh increasing timestamps. `stop` selects FORCE_REAL. Revoking the capability disables access and cancels automation; reenable to issue a new credential. Anyone holding the token can exercise this narrow API, so protect Tasker backups and clipboard contents.
+External control is disabled by default. The old unauthenticated `on`, `set`, `boot` and direct-service interfaces are removed. The new API accepts only authenticated version-2 `vehicle_connected`, `vehicle_disconnected`, `vehicle_unknown`, `stop`, and `status` messages with fresh timestamps and an independent increasing mutation sequence. `stop` selects FORCE_REAL. Revoking the capability disables access and cancels automation; reenable to issue a new credential. Anyone holding the token can exercise this narrow API, so protect Tasker backups and clipboard contents.
 
 Only selected mock coordinates/configuration and map camera position persist. Genuine location samples are filtered for mock flags/freshness and held in memory for the visible map; old persisted genuine coordinates are erased. Application backup and device transfer are explicitly excluded. Notifications/status omit coordinates and credentials. The map loads HTTPS OpenFreeMap styles/tiles/fonts; providers can observe your IP address and viewed area. No telemetry or advertisements were added; third-party network behavior has not been packet-captured. Attribution remains visible in the drawer and map controls.
 

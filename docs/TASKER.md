@@ -1,6 +1,6 @@
 # Tasker integration: selected-car state, not unrestricted remote control
 
-Protocol version: 1. This integration uses Android explicit broadcasts locally. It needs neither root nor Shizuku, an HTTP server, background-location permission, or a signature shared with Tasker. **The Tasker UI recipe and Bluetooth delivery have not been executed on a Samsung device.** No importable XML is supplied or claimed tested.
+Protocol version: 2. **Breaking engineering update:** fresh fork package/token and updated Tasker tasks are required; API1 is rejected. This integration uses Android explicit broadcasts locally. It needs neither root nor Shizuku, an HTTP server, background-location permission, or a signature shared with Tasker. **The Tasker UI recipe and Bluetooth delivery have not been executed on a Samsung device.** No importable XML is supplied or claimed tested.
 
 ## What the automation does
 
@@ -24,14 +24,15 @@ The delay is an **inexact elapsed-time alarm**, not a 120-second execution guara
 
 ## Versioned command contract
 
-Send an explicit broadcast with action `dev.burixon.mockgps.CONTROL` and component `dev.burixon.mockgps/.MockGpsReceiver`.
+Send an explicit broadcast with action `dev.abhik.mockgps.CONTROL` and component `dev.abhik.mockgps/dev.burixon.mockgps.MockGpsReceiver`.
 
 | Extra | Required Android type | Value |
 | --- | --- | --- |
-| `api` | `int` | `1` |
+| `api` | `int` | `2` |
 | `token` | `String` | Current 64-character hexadecimal token |
 | `command` | `String` | One of the commands below |
 | `event_time` | `long` | Sender epoch time in **milliseconds**; Tasker `%TIMEMS` |
+| `seq` | `long` | Nonnegative strictly increasing persisted sender counter for mutations; less than Long.MAX_VALUE |
 
 | Command | Effect |
 | --- | --- |
@@ -41,7 +42,7 @@ Send an explicit broadcast with action `dev.burixon.mockgps.CONTROL` and compone
 | `stop` | Select FORCE_REAL and request injection shutdown/cancellation; never grants permission to restart or clear the override. |
 | `status` | Refresh/report local diagnostic state; does not start injection or broadcast coordinates/credentials. |
 
-Every accepted command, including `status`, consumes its timestamp. Requests must be no more than 60 seconds old, **must not be in the future** according to the device wall clock, and must be **strictly newer** than the last accepted timestamp. Only the four documented extras are accepted; unexpected extra keys are rejected. Duplicate or out-of-order timestamps are rejected. A token is necessary but not sufficient: version, exact types, supported command, enabled integration and freshness must also pass. Old upstream `on`, `set`, `boot`, `drift`, or service intents are unsupported. Do not expect the legacy Termux frontend to work against this contract.
+Mutating commands consume a persisted `seq`, independent of the wall clock. It must exceed the last accepted mutation sequence. Duplicate/older sequences are rejected, including after process recovery. `status` is authenticated and fresh but read-only: it does not consume or reset ordering. Requests must be 0–60 seconds old and never in the future. A clock rollback does not block a fresh higher-sequence command; queued pre-rollback future-dated messages still fail. Same-millisecond events with distinct increasing sequences are valid. Exactly five typed extras are required; API1, missing/string/coerced numeric extras, unknown keys and legacy commands are rejected. Credential rotation starts a new sequence epoch; merely enabling an already-enabled credential must not reset replay protection.
 
 A capability proves knowledge of the token, not the identity of a package named in an extra. No caller-supplied package name is trusted. Time ordering is bounded replay protection; a stolen token still authorizes fresh supported commands until revoked.
 
@@ -49,25 +50,26 @@ There is no unauthenticated status endpoint or network listener. An authenticate
 
 ## Build typed broadcasts in Tasker
 
-Tasker's Send Intent extra coercion varies by input and version. Do not assume that `api:1` or `event_time:%TIMEMS` creates an `int`/`long`; a string extra must be rejected. The following recipe uses the public Android `Intent.parseUri` type grammar so the required types are explicit. Tasker's action names/UI can vary; validate the recipe on the installed Tasker version before relying on it.
+Tasker's Send Intent extra coercion varies by input and version. Do not assume that `api:2` or `event_time:%TIMEMS` creates an `int`/`long`; a string extra must be rejected. The following recipe uses the public Android `Intent.parseUri` type grammar so the required types are explicit. Tasker's action names/UI can vary; validate the recipe on the installed Tasker version before relying on it.
 
 Create a reusable Tasker task with a command parameter `%par1`:
 
 1. Store the private token in a Tasker variable you control, such as `%MockGpsToken`. A Tasker variable is not an Android Keystore; see the backup warning below.
-2. Use **Variable Set** to set a local `%mock_event_time` to `%TIMEMS` immediately before dispatch. Do not reuse the timestamp saved when a Bluetooth event originally occurred minutes earlier.
-3. Set local `%mock_uri` to this single line, allowing Tasker variable substitution:
+2. Maintain a private persisted `%MockGpsSeq` counter per credential, initialized to 0 for a newly issued token. Serialize this dispatcher task (Tasker task collision handling must queue/serialize events); increment the counter once before each mutating dispatch. Do not reset it on Tasker restart. Do not use `%TIMEMS` as the sequence. If the counter is lost or reaches Long.MAX_VALUE, revoke/reissue the credential and reinitialize deliberately. Reconcile current vehicle state instead of replaying old queued events.
+3. Use **Variable Set** to set a local `%mock_event_time` to `%TIMEMS` immediately before dispatch. Do not reuse the timestamp saved when a Bluetooth event originally occurred minutes earlier.
+4. Set local `%mock_uri` to this single line, allowing Tasker variable substitution:
 
    ```text
-   intent:#Intent;action=dev.burixon.mockgps.CONTROL;component=dev.burixon.mockgps/.MockGpsReceiver;i.api=1;S.token=%MockGpsToken;S.command=%par1;l.event_time=%mock_event_time;end
+   intent:#Intent;action=dev.abhik.mockgps.CONTROL;component=dev.abhik.mockgps/dev.burixon.mockgps.MockGpsReceiver;i.api=2;S.token=%MockGpsToken;S.command=%par1;l.event_time=%mock_event_time;l.seq=%MockGpsSeq;end
    ```
 
-4. Add **Java Function**. Class/object: `android.content.Intent`; function: `parseUri(String, int)` (return type `Intent`); parameters: `%mock_uri`, `0`; return object variable: `%mock_intent`.
-5. Add **Java Function**. Class/object: Tasker's `CONTEXT`; function: `sendBroadcast(Intent)`; parameter `%mock_intent`; no return value. This calls Android locally as Tasker and uses the explicit receiver, without shell privileges.
-6. Test an authenticated `status` first. Verify acceptance in the app. Test a wrong token, string-typed version/timestamp, stale time, and duplicate time: they must not change policy. Do not put URI/token contents into Flash actions or Tasker logs.
+5. Add **Java Function**. Class/object: `android.content.Intent`; function: `parseUri(String, int)` (return type `Intent`); parameters: `%mock_uri`, `0`; return object variable: `%mock_intent`.
+6. Add **Java Function**. Class/object: Tasker's `CONTEXT`; function: `sendBroadcast(Intent)`; parameter `%mock_intent`; no return value. This calls Android locally as Tasker and uses the explicit receiver, without shell privileges.
+7. Test an authenticated `vehicle_unknown` first with a new counter, then inspect recorded vehicle state/accepted time in the app. Unordered `status` has no acknowledgement and cannot prove delivery in the UI. Test a wrong token, string-typed fields, stale time and replayed sequence: they must not change policy. Do not put URI/token contents into Flash actions or Tasker logs.
 
 Android's Intent URI prefixes here are `i.` for integer, `l.` for long and `S.` for string. This grammar was verified in [AOSP Intent.parseUri source](https://github.com/aosp-mirror/platform_frameworks_base/blob/1cdfff555f4a21f71ccc978290e2e212e2f8b168/core/java/android/content/Intent.java); executing the Tasker action sequence on the target phone is still required. The token and allowed command strings contain no URI separators. Do not generalize this URI construction to arbitrary unescaped user text. Alternatively, a Tasker version with reliably typed native extras may use them after validation; the exact contract above is the authority.
 
-Two events generated in the same millisecond can collide. Serialize dispatch, generate the timestamp at send time, and ensure a newer timestamp before sending the next command. Do not queue an old “disconnect” behind a later connection. A rejected event means the app needs a current reconciliation, not a retry with stale car state. Changing device wall time backward can temporarily reject requests; prefer automatic date/time and resynchronize deliberately rather than disabling replay checks.
+Use one serialized sender/counter owner for this credential. The sequence orders sender events, not Android delivery: an older disconnect delivered after a newer connection is rejected. Two events may share a timestamp; their counter values distinguish them. Do not give a stale queued disconnection a newly allocated sequence after a later connection. If Tasker cannot maintain a durable counter and current-car truth, send UNKNOWN and use manual controls. Counter gaps are safe; resetting/reusing values is rejected. Reconciliation always describes current state, not historical queued triggers.
 
 ## Create the specific-vehicle profile
 
@@ -89,14 +91,14 @@ read -rs -p 'MockGPS token: ' MOCKGPS_TOKEN
 printf '\n'
 MOCKGPS_EVENT_TIME=$(python3 -c 'import time; print(time.time_ns() // 1000000)')
 adb shell am broadcast --user current \
-  -a dev.burixon.mockgps.CONTROL \
-  -n dev.burixon.mockgps/.MockGpsReceiver \
-  --ei api 1 --es token "$MOCKGPS_TOKEN" \
-  --es command status --el event_time "$MOCKGPS_EVENT_TIME"
+  -a dev.abhik.mockgps.CONTROL \
+  -n dev.abhik.mockgps/dev.burixon.mockgps.MockGpsReceiver \
+  --ei api 2 --es token "$MOCKGPS_TOKEN" \
+  --es command status --el event_time "$MOCKGPS_EVENT_TIME" --el seq 0
 unset MOCKGPS_TOKEN MOCKGPS_EVENT_TIME
 ```
 
-The computer timestamp must reach the phone no more than 60 seconds old and must not be ahead of the phone clock. Prefer automatic synchronized date/time; any future timestamp is rejected. `Broadcast completed` is not application acceptance. Use the app's last result; do not claim that ADB's shell identity demonstrates ordinary Tasker foreground-start eligibility. Run device probes from [the validation matrix](SAMSUNG_VALIDATION.md) before relying on the profile.
+The computer timestamp must reach the phone no more than 60 seconds old and must not be ahead of the phone clock. Prefer automatic synchronized date/time; any future timestamp is rejected. `Broadcast completed` is not application acceptance. For this read-only status probe inspect the ordered ACCEPTED response; it does not update the last mutation time. Use a fresh-sequence vehicle_unknown for GUI delivery confirmation; do not claim that ADB's shell identity demonstrates ordinary Tasker foreground-start eligibility. Run device probes from [the validation matrix](SAMSUNG_VALIDATION.md) before relying on the profile.
 
 ## Samsung settings and recovery
 
@@ -105,3 +107,7 @@ Keep Tasker and MockGPS notifications permitted and review Samsung's sleeping/de
 For an immediate manual override choose **FORCE_REAL** in the native tile or app. Confirm cleanup state in the app; a selected mode alone is not a fresh genuine location fix. If events appear wrong, disable/revoke integration, cancel Tasker profiles, reopen MockGPS and follow [recovery](SAMSUNG_VALIDATION.md#recovery-without-root). Reconciliation must use current vehicle state before returning to AUTO.
 
 Tasker backup/export may include variables, task text and the capability token. Treat backups as sensitive; redact the token before sharing, protect backups, and revoke/reissue after any exposure. Avoid syncing the token to other automation tools. MockGPS does not export it in notifications or status responses.
+
+## Package/signing migration
+
+This candidate installs as `dev.abhik.mockgps`, while Kotlin component classes retain `dev.burixon.mockgps`. Stop/recover the old installation before changing mock-app selection. Configure fresh permissions, selected point, token, Tasker explicit component/action and sequence epoch; remove the old tile and add the fork tile. No cross-package private-data/credential migration occurs. See [IDENTITY_AND_SIGNING.md](IDENTITY_AND_SIGNING.md).

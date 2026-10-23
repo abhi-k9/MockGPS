@@ -98,12 +98,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <Button
+                    style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/autoButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/mode_auto" />
                 <Button
+                    style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/forceRealButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
