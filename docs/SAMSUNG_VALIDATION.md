@@ -6,7 +6,7 @@
 
 Use a device and location-consuming test clients you control. Do not test with a safety-critical navigation session. Select a conspicuous but harmless mock location, record its expected value privately, and keep the app's FORCE_REAL control accessible. Keep simulated-location flags enabled; the validation client should inspect `Location.isMock()`, provider, wall time, elapsed realtime and accuracy.
 
-1. Install the debug APK with ADB or Android's package installer. Confirm its application ID `dev.burixon.mockgps`. If replacing a differently signed build, uninstall it deliberately first; this deletes settings and credentials.
+1. Install the debug APK with ADB or Android's package installer. Confirm its application ID `dev.abhik.mockgps` and recorded source/SHA256/signer. It installs separately from upstream/earlier engineering APKs: stop/recover the old package first, then configure fresh data/token/tile/tasks. A signer mismatch within the new package requires deliberate cleanup before reinstalling; never uninstall a still-injecting app blindly.
 2. Open MockGPS, enable Android Developer options, and select it under **Select mock location app**. Grant location permission, turn system Location on, and grant notifications. Select mock coordinates explicitly.
 3. Add the native tile from the Quick Settings edit panel. Samsung panel editing may vary. Verify that the app screen remains a usable fallback if the tile cannot be added.
 4. Keep integration disabled initially. Check that an unauthenticated legacy broadcast cannot control the app or exported service. Then configure a new token and the **specific paired vehicle** profile using [TASKER.md](TASKER.md).
@@ -40,14 +40,14 @@ All rows initially have result **NOT RUN**. For each row record timestamp, preco
 | 17 | Not selected as mock app | Deselect before start; startup must fail safely. Deselect while running and stop: if AppOp prevents removal, show cleanup uncertainty, then use recovery below. Do not claim real GPS restored. | NOT RUN |
 | 18 | Background-start rejection | Send Tasker disconnect/legacy start from the background. It must never use that broadcast to start injection. Exercise a deliberately restricted foreground-start attempt only in an instrumented/dev test; capture rejection without false success or a retry loop. | NOT RUN |
 | 19 | Provider cleanup failure | Revoke mock AppOp during injection or use an instrumented provider adapter failure. Verify uncertainty, no callback/restart loop, and recovery after reselecting MockGPS and explicitly stopping. Unit adapter failures supplement, not replace, platform observation. | NOT RUN |
-| 20 | Repeated transitions | Repeat start-stop-start-stop rapidly, then mix connection/reconnection/FORCE_REAL, duplicate timestamps and stale pending intents. End with no pending work, no active owned providers and matching app/tile state—or an explicit error. | NOT RUN |
+| 20 | Repeated transitions | Repeat start-stop-start-stop rapidly, then mix connection/reconnection/FORCE_REAL, duplicate/out-of-order sequences and stale pending intents. End with no pending work, no active owned providers and matching app/tile state—or an explicit error. | NOT RUN |
 | 21 | Other apps' recovery | In at least one Android LocationManager client and any separately chosen fused/OEM client, check fresh nonmock fixes after cleanup. Record cached-mock behavior and provider differences; app does not claim control over every source. | NOT RUN |
 | 22 | OS/app update | Record versions and signing identity. Upgrade with retained data when signatures permit; verify safe migration, integration disabled/revoked as defined, old restart/pending intents invalidated and selected mode coherent. Repeat #1–#8 after firmware update. | NOT RUN |
 
 ## Additional security and reconciliation probes
 
-* Disabled integration, missing/incorrect token, unsupported action/API/command, string-typed numeric extras, expired/future timestamp, equal/older timestamp, legacy `on` and direct external service start must not enable injection.
-* An accepted `status` consumes its timestamp, and a replay of it must be rejected without leaking stored coordinates or the token.
+* Disabled integration, missing/incorrect token, unsupported action/API/command, string-typed numeric extras, expired/future timestamp, equal/older sequence, legacy `on` and direct external service start must not enable injection.
+* Read-only `status` authenticates/freshness-checks but does not consume mutation ordering. Equal timestamps with increasing sequences must work; replayed mutation sequences must fail without leaking coordinates/token.
 * Revoke while a confirmation is pending. Clicking an old notification cannot start. Reenable and ensure the prior token no longer works.
 * Select FORCE_REAL during a delayed request and while the activity is opening from a notification. Old extras must not override the new mode.
 * Start Tasker when the car was already connected; the initial current-state reconciliation must send CONNECTED. A different Bluetooth device must not cause a selected-car disconnect.
@@ -63,14 +63,14 @@ Read app status first; collect only the minimum needed. These commands do not th
 adb shell getprop ro.build.version.release
 adb shell getprop ro.build.version.sdk
 adb shell getprop ro.build.version.security_patch
-adb shell dumpsys package dev.burixon.mockgps
-adb shell dumpsys activity services dev.burixon.mockgps
-adb shell cmd appops get dev.burixon.mockgps android:mock_location
+adb shell dumpsys package dev.abhik.mockgps
+adb shell dumpsys activity services dev.abhik.mockgps
+adb shell cmd appops get dev.abhik.mockgps android:mock_location
 ```
 
 Use `adb shell dumpsys alarm` to inspect this package's pending alarms, and `adb shell dumpsys notification` only if notification debugging is necessary. Both can expose unrelated personal data. `adb shell dumpsys location` can expose precise genuine/mock coordinates and attribution; inspect locally and redact coordinates, package identities unrelated to the test and device identifiers before sharing. Provider presence alone does not establish fresh genuine-location recovery.
 
-For a process-death probe, `adb shell am kill dev.burixon.mockgps` only kills processes eligible under Android's rules; it may not kill an active FGS. `adb shell am force-stop dev.burixon.mockgps` is a **different** scenario: it marks the app stopped and suppresses normal receivers/alarms until reopened. Record which command was actually used and whether the process exited. Do not label force-stop as an ordinary recoverable process kill. Avoid `pm clear` unless deliberately testing data reset.
+For a process-death probe, `adb shell am kill dev.abhik.mockgps` only kills processes eligible under Android's rules; it may not kill an active FGS. `adb shell am force-stop dev.abhik.mockgps` is a **different** scenario: it marks the app stopped and suppresses normal receivers/alarms until reopened. Record which command was actually used and whether the process exited. Do not label force-stop as an ordinary recoverable process kill. Avoid `pm clear` unless deliberately testing data reset.
 
 Inspect logcat locally around the exact transition for `ForegroundServiceStartNotAllowedException`, `SecurityException`, permission failures and service lifecycle. Prefer process/package-filtered capture; after process restart its PID changes. Full logcat may include precise locations, Bluetooth addresses, Tasker variables or secrets from unrelated apps. Do not upload unredacted logs or dump Intent extras. Record sanitized error category/time and the relevant app result instead. Never include the control token in a report.
 
@@ -107,3 +107,59 @@ PASS / FAIL / INCONCLUSIVE and reason:
 ```
 
 Keep results separate by firmware and app version. A passed unit test, compiled APK, or a test on another Android device must not be copied into this physical-device matrix as PASS.
+
+## Efficient physical-device sequence for this candidate
+
+**Every step below requires your Samsung phone and remains NOT RUN here.** An API36 emulator result does not mark these OneUI9/Android17 rows passed. Use a safe location-testing context and stop if normal-location recovery is uncertain.
+
+| Order | Action | Expected result / failure indicator |
+| --- | --- | --- |
+| 1 | Download the successful Actions artifact for the recorded source SHA; compare build-identity.json checksum/signer with the APK. Stop/recover old upstream/engineering app; install the fork. | Installed package dev.abhik.mockgps; signer mismatch is an installation blocker, not something -r overrides. |
+| 2 | Open fork, grant precise foreground location and notifications; select the fork in Developer Options. | Fresh FORCE_REAL state and explicit mock-app selection; missing permissions/selection must produce actionable failure rather than simulated success. |
+| 3 | Select a non-sensitive test point; explicitly select AUTO, then manual start in the visible app. | MANUAL_MOCK; injection only after accepted provider updates; a separate test client identifies simulated locations as mock. |
+| 4 | Select FORCE_REAL. | No pending request; cleanup result shown. No claim of a fresh genuine fix. If uncertain, keep fork selected and retry cleanup. |
+| 5 | Outdoors, obtain a new fix in an independent client. | New timestamp and mock=false; cached position alone is INCONCLUSIVE. Record elapsed reacquisition time, never exact genuine coordinates in a shared report. |
+| 6 | Add the fork tile, switch AUTO/FORCE_REAL rapidly, reopen panel and test locked screen. | Selected mode stays consistent with app; FORCE_REAL works without Tasker. Returning AUTO requires appropriate unlock; Samsung may restrict the whole panel. |
+| 7 | Configure fresh API2 token, exact full component, typed extras and persisted sequence dispatcher. Send vehicle_unknown, then wrong token/string types/replay. | Only authenticated fresh higher-sequence mutations affect recorded state; malformed requests do not. Status does not consume sequence. |
+| 8 | In AUTO with simulation active from a confirmed request, connect only the selected car. | Pending activation cancelled and injection stops. A watch/headset connection must not substitute for the car. |
+| 9 | Disconnect car with Bluetooth on; use default120seconds. | Inexact minimum delay, then user confirmation notification/app button. No unattended background start is promised. |
+| 10 | Reconnect before due and near due; repeat same-ms commands with different sequences and delayed older disconnect. | Reconnect cancels request; old sequence/generation cannot resurrect it. The actual Tasker dispatcher must report current car truth, not reorder historical edges. |
+| 11 | Exercise process termination and separately force-stop/reopen. | Reopen invalidates pending starts, preserves FORCE_REAL and reports cleanup/uncertainty. A missing onDestroy must not be mistaken for successful cleanup. Force-stop suppresses execution until reopened. |
+| 12 | Reboot, unlock and reopen; reconcile Tasker state. | No silent simulation restore; fresh reconciliation/visible confirmation required. Verify genuine recovery again before relying on normal location. |
+
+Host commands (downloaded artifact named app-debug.apk; inspect public identity, not private keys):
+
+```sh
+sha256sum app-debug.apk
+apksigner verify --verbose --print-certs app-debug.apk
+adb install -r app-debug.apk
+adb shell pm path dev.abhik.mockgps
+adb shell am start -n dev.abhik.mockgps/dev.burixon.mockgps.MainActivity
+adb shell getprop ro.build.version.release
+adb shell getprop ro.build.version.sdk
+adb shell getprop ro.product.manufacturer
+adb shell cmd appops get dev.abhik.mockgps android:mock_location
+```
+
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE` means the same installed package has another signer. Stop/recover it before any deliberate uninstall; new installation erases settings/token. Developer Options selection and runtime permission granting should be performed visibly, not replaced with shell exemptions as automation evidence.
+
+For process probes, first record app mode/result and PID (no coordinates/token):
+
+```sh
+adb shell pidof dev.abhik.mockgps
+adb shell am kill dev.abhik.mockgps
+# Recheck PID: am kill can leave an active foreground service alive.
+adb shell pidof dev.abhik.mockgps
+# A controlled crash probe is distinct from ordinary low-memory death:
+adb shell am crash dev.abhik.mockgps
+# A separate force-stop scenario deliberately suppresses normal receivers:
+adb shell am force-stop dev.abhik.mockgps
+adb shell am start -n dev.abhik.mockgps/dev.burixon.mockgps.MainActivity
+# Reboot only when ready to perform the reboot scenario:
+adb reboot
+adb wait-for-device
+```
+
+Do not call a no-op am kill a passed process-death test. Crash/force-stop/reboot are different outcomes and must be recorded separately. For diagnostics, record source SHA/APK SHA/signer, OS/build, exact scenario, mode, vehicle, sanitized transition code, sequence and times. Never include the capability, Tasker URI/tasks containing it, full intents, dumpsys location, raw coordinates or unreviewed full logcat. App/controller status and ordered authenticated responses omit coordinates/token. If a crash trace is necessary, inspect it locally and redact any token/URI/coordinates before sharing; do not automatically upload device logs. Use a separate client only to record timestamp/mock flag and PASS/FAIL/INCONCLUSIVE, not the real location itself.
+
+Recovery: FORCE_REAL → inspect/retry while fork remains selected → select mock app None → toggle location if appropriate → reboot if uncertain → independently verify a fresh non-mock fix. Never treat uninstall, a stopped service, tile selection or old cached position as proof of genuine recovery. Remove the fork tile/Tasker profiles and reconfigure the correctly signed old app only after safe cleanup if rolling back.

@@ -60,4 +60,6 @@ for p in files:
  r=E.parse(p).getroot();tests+=int(r.get('tests',0));failures+=int(r.get('failures',0));errors+=int(r.get('errors',0));skipped+=int(r.get('skipped',0))
 assert tests>=11 and failures==errors==skipped==0,(tests,failures,errors,skipped)
 print(f'Actual emulator instrumentation: {tests} tests, {failures} failures, {errors} errors, {skipped} skipped')
+if os.environ.get('GITHUB_ACTIONS')=='true':
+ print(f'::notice title=Actual emulator test results::tests={tests} failures={failures} errors={errors} skipped={skipped}')
 PYTEST

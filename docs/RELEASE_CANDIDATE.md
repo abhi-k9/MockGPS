@@ -1,0 +1,13 @@
+# Development candidate gate
+
+Do not merge or publish a production release automatically. The candidate uses installed package `dev.abhik.mockgps`, API2 authenticated mutation sequence ordering and explicit visible confirmation after a disconnected-car request. Source namespace remains `dev.burixon.mockgps`; follow the full component names in TASKER.md.
+
+The first successful post-review GitHub run is https://github.com/abhi-k9/MockGPS/actions/runs/40024641110 for source `941e82e43299b5367d068844d9d1801845cb3000`: both build and real API36 emulator jobs succeeded. Build artifact12532830228 is available at https://github.com/abhi-k9/MockGPS/actions/runs/40024641110/artifacts/12532830228 . This is a successful CI checkpoint, not Samsung/Tasker/secure-lock/genuine-fix validation. Newer candidate evidence belongs in VALIDATION.json and TESTING.md.
+
+The build job verifies the debug signature/application ID and uploads `development-candidate/build-identity.json`, `signature.txt`, APKs and reports. The JSON includes exact source SHA, dirty-worktree check, APK checksum and public signer digest. An unsigned release output is not an installable signed release. Fresh CI debug signing identities can differ between runs; matching package alone cannot authorize an update.
+
+Use the artifact for the exact reviewed SHA. Compare its JSON SHA256 to the downloaded debug APK and verify its public signer. Do not distribute a private release key or restore the old open broadcast API. Stop/recover the previous app before changing mock-app selection or uninstalling anything. New package means fresh permissions, coordinates, token, Tasker sequence state and tile.
+
+The local environment initially blocked both the Actions log host and observed artifact host `productionresultssa18.blob.core.windows.net`; those exact domains were saved for environment review. API job/annotation results and successful artifact upload are independent of download access. Do not claim an artifact was independently downloaded/hashed here unless TESTING.md records that operation succeeding. CI now emits public provenance/test-count notices to make those values inspectable through the GitHub API without exposing secrets or relying on signed download URLs.
+
+Before relying on the phone workflow, execute the prioritized12-step Samsung sequence and22-case matrix in SAMSUNG_VALIDATION.md. Particular gates are provider cleanup/fresh genuine fix, physical specific-car delivery/reconnection, permissions and locked tile behavior under both Samsung battery policies. All Samsung cases remain NOT RUN until you supply real-device results.

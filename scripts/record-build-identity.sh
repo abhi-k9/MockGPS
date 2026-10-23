@@ -10,6 +10,8 @@ apk=app/build/outputs/apk/debug/app-debug.apk
 python3 - <<'PY'
 from pathlib import Path
 import hashlib,json,re,subprocess
+import xml.etree.ElementTree as E
+from collections import Counter
 apk=Path('app/build/outputs/apk/debug/app-debug.apk')
 out=Path('app/build/development-candidate')
 package=re.search(r"package: name='([^']+)'",(out/'apk-badging.txt').read_text()).group(1)
@@ -23,6 +25,15 @@ identity=dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],text=Tru
     sha256=hashlib.sha256(apk.read_bytes()).hexdigest(),signer_certificate_sha256=cert,
     signing='Android development/debug certificate; unsigned release is not an installable release')
 assert identity['tracked_worktree_clean'],'Build identity must describe a clean reviewed source commit'
+suites=[E.parse(p).getroot() for p in Path('app/build/test-results/testDebugUnitTest').glob('TEST-*.xml')]
+identity['unit_tests']={k:sum(int(r.get(k,0)) for r in suites) for k in ['tests','failures','errors','skipped']}
+assert identity['unit_tests']['tests']>0 and all(identity['unit_tests'][k]==0 for k in ['failures','errors','skipped'])
+issues=E.parse('app/build/reports/lint-results-debug.xml').getroot().findall('issue')
+identity['lint']=dict(Counter(i.get('severity') for i in issues))
+assert identity['lint'].get('Error',0)==identity['lint'].get('Fatal',0)==0
 (out/'build-identity.json').write_text(json.dumps(identity,indent=2)+'\n')
 print(json.dumps(identity,indent=2))
+# Public provenance only; no private key, credential, genuine coordinate or signed download URL.
+if __import__('os').environ.get('GITHUB_ACTIONS')=='true':
+ print('::notice title=Development candidate provenance::'+json.dumps(identity,separators=(',',':')))
 PY
