@@ -796,12 +796,15 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        toggleButton.isEnabled = snapshot.mode != OperatingMode.FORCE_REAL || running
+        toggleButton.isEnabled = running || (snapshot.mode != OperatingMode.FORCE_REAL &&
+            snapshot.vehicle != dev.burixon.mockgps.core.VehicleState.CONNECTED)
         toggleButton.text =
             if (snapshot.mode == OperatingMode.FORCE_REAL && !running) {
                 getString(R.string.return_auto_before_manual)
             } else if (running) {
                 getString(R.string.stop_and_force_real)
+            } else if (snapshot.vehicle == dev.burixon.mockgps.core.VehicleState.CONNECTED) {
+                getString(R.string.vehicle_connected_before_manual)
             } else {
                 getString(R.string.manual_start)
             }

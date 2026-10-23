@@ -161,7 +161,8 @@ object ControlCenter {
     fun canRun(context: Context, generation: Long): Boolean {
         val s = ensure(context)
         return s.desired && s.generation == generation && s.mode != OperatingMode.FORCE_REAL &&
-            (s.mode == OperatingMode.MANUAL_MOCK || s.vehicle == VehicleState.DISCONNECTED)
+            (s.mode == OperatingMode.MANUAL_MOCK && s.vehicle != VehicleState.CONNECTED ||
+                s.mode == OperatingMode.AUTO && s.vehicle == VehicleState.DISCONNECTED)
     }
     fun serviceStarted(context: Context, generation: Long) {
         if (!canRun(context, generation)) return

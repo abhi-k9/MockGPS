@@ -50,4 +50,5 @@ GPL-3.0</string>
     <string name="open_settings">Open settings</string>
     <string name="no_accepted_event">None</string>
     <string name="return_auto_before_manual">Select AUTO before manual start</string>
+    <string name="vehicle_connected_before_manual">Vehicle connected — simulation disabled</string>
 </resources>

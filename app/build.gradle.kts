@@ -15,8 +15,8 @@ android {
         applicationId = "dev.abhik.mockgps"
         minSdk = 29
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.3.1-dev"
+        versionCode = 4
+        versionName = "0.3.2-dev"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

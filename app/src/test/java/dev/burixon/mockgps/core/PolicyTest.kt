@@ -12,6 +12,17 @@ class PolicyTest {
     private fun ready(s: PolicySnapshot = disconnected()) =
         reduce(s, PolicyEvent.Deadline(s.generation), requireNotNull(s.pendingAtElapsed))
 
+    @Test fun manualSessionIsStoppedByConnectedOrUnknownVehicle() {
+        for (vehicle in listOf(VehicleState.CONNECTED, VehicleState.UNKNOWN)) {
+            val manual = reduce(auto(), PolicyEvent.ManualStart)
+            val stopped = reduce(manual, PolicyEvent.Vehicle(vehicle, 1))
+            assertFalse("$vehicle must stop manual simulation", stopped.desired)
+            assertEquals(OperatingMode.AUTO, stopped.mode)
+            assertEquals(manual.generation + 1, stopped.generation)
+            assertNull(stopped.pendingAtElapsed)
+        }
+    }
+
     @Test fun initialStateIsSafeAndDoesNotClaimFreshGenuineLocation() {
         val s = PolicySnapshot()
         assertEquals(OperatingMode.FORCE_REAL, s.mode)
@@ -220,12 +231,10 @@ class PolicyTest {
         assertTrue(manual.desired)
         assertEquals(ServiceState.STARTING, manual.service)
         assertNull(manual.pendingAtElapsed)
-        for (vehicle in VehicleState.entries) {
-            val next = reduce(manual, PolicyEvent.Vehicle(vehicle, 1))
-            assertEquals(OperatingMode.MANUAL_MOCK, next.mode)
-            assertTrue(next.desired)
-            assertNull(next.pendingAtElapsed)
-        }
+        val disconnected = reduce(manual, PolicyEvent.Vehicle(VehicleState.DISCONNECTED, 1))
+        assertEquals(OperatingMode.MANUAL_MOCK, disconnected.mode)
+        assertTrue(disconnected.desired)
+        assertNull(disconnected.pendingAtElapsed) // No second automatic session is requested.
     }
 
     @Test fun manualStartCannotBypassForceRealWithoutExplicitReturnToAuto() {

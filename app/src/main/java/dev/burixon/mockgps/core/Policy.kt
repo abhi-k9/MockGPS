@@ -55,7 +55,15 @@ object Policy {
         is PolicyEvent.Vehicle -> {
             if (e.sequence < 0 || e.sequence <= s.lastSequence) s else {
                 val next = s.copy(lastEventTime = e.eventTime, lastSequence = e.sequence, vehicle = e.state)
-                if (s.mode != OperatingMode.AUTO) next
+                // A fresh safety observation ends even an explicitly started manual session.
+                // Return to AUTO, never FORCE_REAL, so a later disconnect can request a new
+                // delayed confirmation without resurrecting the terminated manual session.
+                if (e.state != VehicleState.DISCONNECTED) next.copy(
+                    mode = if (s.mode == OperatingMode.FORCE_REAL) s.mode else OperatingMode.AUTO,
+                    desired = false, generation = s.generation + 1,
+                    pendingAtElapsed = null, result = "VEHICLE_RECONCILED"
+                )
+                else if (s.mode != OperatingMode.AUTO) next
                 else if (e.state == s.vehicle) next // duplicate snapshots do not postpone an existing delay
                 else next.copy(
                     desired = false, generation = s.generation + 1,
@@ -71,7 +79,7 @@ object Policy {
         is PolicyEvent.Confirm -> if (e.generation == s.generation && s.mode == OperatingMode.AUTO &&
             s.vehicle == VehicleState.DISCONNECTED && s.needsConfirmation
         ) s.copy(desired = true, service = ServiceState.STARTING, result = "STARTING") else s
-        PolicyEvent.ManualStart -> if (s.mode == OperatingMode.FORCE_REAL) s else s.copy(
+        PolicyEvent.ManualStart -> if (s.mode == OperatingMode.FORCE_REAL || s.vehicle == VehicleState.CONNECTED) s else s.copy(
             mode = OperatingMode.MANUAL_MOCK, desired = true, service = ServiceState.STARTING,
             generation = s.generation + 1, pendingAtElapsed = null, result = "STARTING"
         )
