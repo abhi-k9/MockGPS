@@ -24,4 +24,4 @@ export PATH="$JAVA_HOME/bin:$PATH"
 # Gradle Wrapper validates its pinned distributionSha256Sum on first download.
 # Pass additional standard Gradle options (e.g. --offline or --project-cache-dir=...).
 ./gradlew clean :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest \
-  :app:lintDebug :app:assembleDebugAndroidTest --max-workers=2 --console=plain "$@"
+  :app:lintDebug :app:assembleDebugAndroidTest --dependency-verification=strict --max-workers=2 --console=plain "$@"
