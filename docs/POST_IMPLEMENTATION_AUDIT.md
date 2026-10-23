@@ -41,3 +41,7 @@ Resource density qualifiers, redundant pre-API26 launcher bitmaps (minSdk29), un
 | ExportedReceiver | 1 | Required separately signed Tasker transport, protected by opt-in capability/type/freshness/sequence checks. Signature-only permission would break that integration. |
 
 No broad suppression, lint baseline, skipped assertion or weakened dependency verification was introduced. The dedicated developer mock-location permission's existing narrow MockLocation annotation remains explained by the app's purpose. Native SystemUI and IPC tests are real instrumentation only when a completed emulator result proves execution. Samsung OneUI9, secure lock behavior, physical Bluetooth delivery and genuine recovery remain physical-device work.
+
+### CI/local warning reconciliation
+
+Cold hosted CI reports20 warnings versus16 locally. The four additional warnings were read from the CI-generated per-issue provenance, not guessed: two AndroidGradlePluginVersion notices and two GradleDependency notices for newer AndroidX core/activity releases. Hosted CI could obtain current online version recommendations that the local lint run did not emit. They are update recommendations, not verification mismatches, compilation failures or code-security findings. The selected/pinned AGP9.2.1, AndroidX and MapLibre versions are unchanged to keep the repair targeted; upgrading requires its own compatibility/integrity review. No online update check was disabled to equalize the counts.

@@ -1,60 +1,68 @@
-# Validation evidence and gaps
+# Independently reproduced validation
 
-Validation date: 2026-10-23. Linux x86_64 cloud environment; Java21 JDK, Android platform36/build-tools36.0.0, AGP9.2.1, Gradle9.6.0. **No emulator or physical Samsung device was run.** `/dev/kvm` was unavailable. GitHub Actions is configured, not observed running.
+Reviewed code checkpoint: **a6dc01744895095ee6fa1b1361cf77f299cd0382**, branch `harden/android17-automation`, 2026-10-23. `docs/VALIDATION.json` records exact source IDs, actual counts, job URLs, public artifact identity and limitations. A later documentation-only commit is not retroactively represented as the binary source for this checkpoint.
 
-## Commands and results
+## Actual outcomes
 
-A clean run of the shared developer/CI script completed with `BUILD SUCCESSFUL`:
-
-```sh
-source /workspace/setup/android-env.sh
-scripts/android-build.sh --project-cache-dir=/workspace/.cache/mockgps-project
-```
-
-After final policy, storage fail-safe and UI-review corrections, the affected checks were rerun with strict dependency verification:
-
-```sh
-./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest \
-  :app:lintDebug :app:assembleDebugAndroidTest \
-  --dependency-verification=strict \
-  --project-cache-dir=/workspace/.cache/mockgps-project --max-workers=2 --console=plain
-```
-
-Final results validate source commit `c192a13` and are recorded in `docs/VALIDATION.json`. That file is generated from the current run's JUnit/lint XML and artifact SHA-256 digests; it is not a claimed device report. Logs for this workspace are `/tmp/mockgps-final-validation.log` (clean checkpoint) and `/tmp/mockgps-delivery-validation.log` (final affected checks). The clean checkpoint passed59 tests; one strict FORCE_REAL regression was added afterwards. Use final XML/counts for current evidence.
-
-| Check | Outcome |
+| Check | Independently observed result |
 | --- | --- |
-| Clean debug and unsigned release builds | Passed; final affected builds also passed with strict verification |
-| JVM tests | Passed60; 0 failures, 0 errors, 0 skipped (actual JUnit XML) |
-| Android lint/static analysis | Passed; 0 errors, 25 warnings retained |
-| Instrumentation APK | Compiled; seven tests **not executed** locally |
-| APK signature | Debug APK verified with SDK apksigner; development v2 signature, no private release signing key |
-| Strict dependency verification | Final check uses committed SHA-256 verification metadata |
-| CI workflow/shell configuration | YAML parsed, shell syntax and git diff whitespace checked |
-| Android16 emulator CI | Configured; not run in this session |
-| Android17 / One UI9 / Tasker | **Not run**; all22 hardware scenarios remain unverified |
-| Dependency advisory scan | Public-PR dependency review configured; not run here |
+| Previously reviewed application source0cfeb55f | 60 JVM tests passed; 0 failures/errors/skips; lint0 errors/25 warnings. Reproduced from a Git archive after backporting **only** the three reviewed dependency metadata entries; original metadata failed cold resolution. |
+| Official SDK bootstrap | Passed in empty local SDK directory and both hosted jobs; explicit tools19.0/Java21/SDK36/buildtools36.0.0. |
+| Cold Gradle resolution | Reproduced two reported missing entries, then found/reviewed a third BOM during complete build; strict configuration/full builds subsequently passed. No permissive mode or blanket trust. |
+| Clean debug + unsigned release + instrumentation packaging | Passed locally and in GitHub. Unsigned release output is not an installable signed release. |
+| Current JVM tests | **67 passed, 0 failures, 0 errors, 0 skipped**, local and GitHub. |
+| Android lint | **0 errors;16 warnings locally,20 in cold hosted CI**. Extra4 are current online update recommendations; per-issue CI evidence was inspected. |
+| API36 emulator instrumentation | **11 passed, 0 failures, 0 errors, 0 skipped** in GitHub, with fresh nonzero XML checked. Not merely compiled. |
+| Debug identity/signature | CI apksigner verifies, installed package dev.abhik.mockgps; exact SHA/signer below and in artifact JSON. Local APK separately verifies with its own development signer. |
+| Workflow/shell static validation | Official checksum-verified actionlint1.7.7 (without optional ShellCheck) and Bash syntax passed. |
+| Dependency review | **Failed/external blocker**, not skipped/passed: GitHub reports unsupported repository feature; API403 and integration administrative restriction prevent changing it here. |
+| Samsung/OneUI9/Android17/real Tasker/secure lock/genuine fix | **NOT RUN**. API36 emulator does not establish them. |
 
-An initial parallel development build passed51 JVM tests but lint crashed inside Kotlin FIR / `UElementAsPsiDetector`. A subsequent clean serialized build with frozen sources completed without disabling that detector. This was a tooling failure, not a hidden pass; its resolved run is superseded by the clean/final validation above. No assertion, warning category, or test was disabled to obtain passing checks.
+GitHub primary jobs actually passed:
 
-## What the tests establish
+- Push: https://github.com/abhi-k9/MockGPS/actions/runs/40026375247
+- Draft-PR checks: https://github.com/abhi-k9/MockGPS/actions/runs/40026384491
+- Earlier successful repaired checkpoint941e82e: https://github.com/abhi-k9/MockGPS/actions/runs/40024641110
+- Dependency review blocker: https://github.com/abhi-k9/MockGPS/actions/runs/40026384411
 
-- **Policy23:** safe initial state; valid mode changes/idempotency; strict FORCE_REAL until explicit returnAUTO; default monotonic120-second delay; early/stale deadlines; visible confirmation including notification-denied fallback; duplicate/out-of-order events; reconnection/unknown cancellation; mode precedence; process/reboot recovery; invalid delays and rapid start/stop sequences.
-- **Authorization15:** disabled integration, API version, missing/wrong/oversized tokens, command scope, expired/future/overflow timestamps, replay boundaries, exact capability comparison and concurrent independent authorization decisions. Actual watermark serialization is a main-looper controller responsibility; a pure concurrent verifier test does not establish Android scheduling.
-- **Engine16:** missing/invalid point/metadata, partial setup rollback, injection failure, cleanup failure/retry and durable journal, unowned-provider protection, rapid cycles, polar/antimeridian drift and invalid restart cleanup.
-- **Tile6:** every mode's presentation/safe action, unlock requirement, pending state, injection versus selected policy and uncertainty. These are projection tests, not SystemUI/OneUI execution tests.
-- **Instrumentation7 (compiled only):** merged manifest exposure/tile permission, backups/least privilege, real private-preference migration/purge, reload recovery, capability revocation/rotation and actual ordered receiver rejection. They do not execute cross-UID exploits, provider injection or FGS admission.
+The first post-review workflow revision failed GitHub expression validation because runner.temp was used at job-env scope. It was corrected to initialize the isolated Gradle home inside a job step; the failed attempt is https://github.com/abhi-k9/MockGPS/actions/runs/40024520723 . This was not counted as a pass. Pinned actions also emit a Node20 deprecation/forced-Node24 notice; actual jobs pass, and that workflow-runtime warning is separate from Android lint.
 
-Source inspection separately confirmed one main-thread controller, private/nonsticky service, no restart loop, generation checks, a conservative provider journal, sanitized status, and preserved Android mock flags. Storage write failures invalidate pending starts and attempt cleanup; Android disk-full/IO fault injection was not executed. Foreground-service rejection handling exists, but actual Android17 admission is not proven by a unit test.
+## Commands and scope
 
-## Warnings and limitations
+```sh
+# Local managed workspace: activate existing trusted JDK/proxy, then use a new SDK/Gradle home.
+source /workspace/setup/android-env.sh
+scripts/setup-android-sdk.sh /workspace/post-review-sdk
+export ANDROID_HOME=/workspace/post-review-sdk
+export ANDROID_SDK_ROOT="$ANDROID_HOME"
+export ANDROID_USER_HOME="$ANDROID_HOME/.android-user"
+export GRADLE_USER_HOME=/workspace/post-clean-gradle-v2
+# Local extracted JDK needs the explicit installations path in this Gradle home's properties.
+scripts/android-build.sh --project-cache-dir=/workspace/post-project-cache-v2 --no-watch-fs
+```
 
-Lint warnings are retained visibly: target/compile SDK37 migration is deferred pending platform validation, MapLibre13.7.1 is newer than pinned13.6.1, the intentional exported capability receiver has no signature-only permission, API31 constants are inlined on the API29 compatibility branch, and remaining KTX/resource/icon/style suggestions exist. The dedicated developer app's single `MockLocation` manifest suppression is narrowly documented because release simulation intentionally requires the capability; it is not a global lint suppression.
+The bootstrap archive checksum, exact reviewed Maven hashes and cold-model diagnosis are in `docs/CI_REPAIR.md`. Local logs are retained outside the checkout under `/workspace/post-review-evidence/`. The original60-test reproduction uses archived0cf application/build files plus metadata-only repairs; it does not claim the original strict metadata passed.
 
-Gradle's wrapper checksum remains pinned. `gradle/verification-metadata.xml` was bootstrapped from artifacts resolved through TLS-protected Google/Maven/Gradle repositories, then enforced in a separate strict run. This detects changes to the reviewed artifact set; it is not independent provenance, a signature verification program, a vulnerability scan or proof a dependency is safe. No existing package-signature/TLS verification was disabled. Future dependency/platform/OS artifact additions require trusted hash review; Linux x86_64 is the validated host. Debug keystores and archive timestamps mean byte-identical APK reproducibility was not established.
+CI uses a fresh runner-temporary SDK and Gradle home, explicit Java21, strict verification and the same developer script. The emulator job provisions official SDK/system image, checks KVM, bounds boot readiness, runs connectedDebugAndroidTest, asserts fresh XML and nonzero tests, and retains diagnostics. It does not manufacture a passing result when no device exists. Local `/dev/kvm` was unavailable, so local device execution is not claimed.
 
-No PID, open port, compiled instrumentation APK, pure fake provider or tile projection is presented as hardware behavior. Samsung scheduling, lock-screen tiles, Tasker delivery, force-stop/reboot effects, competing/legacy providers, cleanup and fresh genuine-location reacquisition require the matrix in `docs/SAMSUNG_VALIDATION.md`.
+## Quality of tests
 
-## Reproduce device tests
+- Authorization19: exact raw Android types/schema, API1 rejection, missing/wrong/revoked token, command bounds, freshness/extreme times, independent sequence/replay bounds, same-ms events, rollback and read-only status.
+- Policy26: valid modes/idempotency, strict FORCE_REAL until explicit AUTO, monotonic delay, cancellation/reconnection/unknown, stale generations, confirmation, process/reboot recovery, duplicate events, clock rollback and rapid changes.
+- Engine16: coordinate/metadata validation, partial setup rollback, injection/removal failure, ownership journal/retry, unowned-name protection, rapid cycles and polar drift. Fakes do not prove Android permission admission.
+- Tile6: truthful mode/observation/error projection and unlock policy.
+- Android instrumentation11: actual packaged manifest, preferences/migration/recovery, credential rotation/epoch, ordered receiver acceptance/rejection with same-ms events, persistent legacy uncertainty and real SystemUI add/bind/click/reopen behavior. The unlocked emulator does not test Samsung secure-lock policy, a full SystemUI process restart, cross-UID malicious APK exploits or physical Tasker.
 
-Use a disposable API36 emulator or test device and run `./gradlew :app:connectedDebugAndroidTest`. Inspect current-run reports in `app/build/reports/androidTests/` and `app/build/outputs/androidTest-results/`; do not reuse old output as evidence. For Samsung Android17, follow the manual matrix and record OS/build, app commit/signing identity, settings, timestamps and sanitized results. Never include automation tokens or exact real coordinates in shared reports.
+No broad lint suppression, baseline, skipped assertion or weakened verification was used. MockLocation retains its narrowly documented annotation for this dedicated developer simulator. Three reviewed metadata entries are repository-rooted integrity pins, not independent publisher provenance or a clean vulnerability scan. Byte-identical debug APK reproduction is not claimed: CI creates development signing keys, and archive metadata can vary.
+
+## Warning disposition
+
+Individual20 hosted warnings are recorded in VALIDATION.json. Nine UseKtx suggestions retain explicit commit-failure checks; three InlinedApi warnings concern compile-time numeric constants on the guarded API29–30 compatibility path; one exported receiver is intentionally capability-protected for separately signed Tasker. OldTargetApi/compileSdk37 and online recommendations for newer Gradle/AGP/core/activity/MapLibre are retained pending a separate reviewed upgrade. Resource density, obsolete/redundant pre-API26 icon fallbacks, unused resources and button style were fixed. See the independent audit table; no online check was disabled merely to match local counts.
+
+## Artifact and signing
+
+The successful build artifact contains debug APK, unsigned release, instrumented APK, reports and `development-candidate/build-identity.json`/signature evidence. CI public notices expose actual source, package, APK SHA and public signer without private key material. Use the exact artifact/source in VALIDATION.json, not an APK copied from another run. Debug certificates can change between CI runs; a matching application ID does not override Android signer checks.
+
+Independent artifact download here was blocked by the observed Azure redirect host. CI's successful apksigner/application-ID check and public provenance were inspected through the GitHub API; that is **not** a claim that the zip/APK was independently downloaded and hashed locally. The local signed APK has a different documented SHA/signer. Review/apply the saved exact log/artifact-host network additions if that additional download verification is required in this environment.
+
+Dependency review remains a merge gate. The owner must check/enable Dependency graph at https://github.com/abhi-k9/MockGPS/settings/security_analysis and rerun it. The repo is public; a private-repo Advanced Security subscription is not the stated requirement here. The integration cannot administer that setting (Resource not accessible by integration403). No known high-severity application-code finding remains from this review; this is not a claim that unavailable advisory review found no vulnerable dependency.

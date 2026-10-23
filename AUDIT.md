@@ -88,7 +88,7 @@ This is an engineering audit, not certification or a claim of production readine
 - **Affected baseline:** No test sources or GitHub Actions; baseline lint errors in debug manifest:7, activity:496 and service:329.
 - **Impact/reproduction:** Baseline debug build passed, but unit task was NO-SOURCE and lint had three errors/76 warnings. No automatic protection for authorization, policy, partial provider failure or stale work.
 - **Recommended/implemented:** Meaningful pure Kotlin policy/auth/engine tests; Android component/storage/lifecycle instrumentation; pinned CI actions for clean debug/unsigned-release builds, unit tests, lint, instrumentation packaging and Android 16 emulator instrumentation; dependency-review workflow for repositories where supported. Version catalog is the active dependency source. Existing wrong-constant code was replaced. MockLocation has one narrow documented manifest suppression because a dedicated simulation app intentionally needs mock-location capability in release; no broad lint baseline or abort disabling is introduced.
-- **Remaining risk:** Added workflows are configuration until actually executed by GitHub; emulator tests do not establish Samsung Android 17 behavior. Actual local results are recorded in TESTING.md; unexecuted checks must not be counted as passed.
+- **Remaining risk:** The workflows now actually ran; API36 emulator tests still do not establish Samsung Android17 behavior. Exact outcomes and the dependency-review blocker are recorded in TESTING.md.
 
 ## Final hardening review corrections
 
@@ -96,9 +96,11 @@ This is an engineering audit, not certification or a claim of production readine
 - **Legacy provider uncertainty, medium correctness:** Old stopped/desired booleans were not trustworthy because baseline cleanup suppressed failures. Migration now treats any nonempty legacy installation as unverified, retries clearing legacy privacy data after a partial migration, and avoids claiming journal-based cleanup proves old unjournaled providers absent. Recovery documentation covers selecting the mock app and rebooting before normal use.
 - **FORCE_REAL precedence:** Final reducer guards both manual start and direct manual-mode selection while FORCE_REAL is active. Only explicit return to AUTO clears the override. The visible manual button cannot bypass it; regression tests exercise both event paths.
 
-## Validation checkpoint
+## Current validation checkpoint
 
-A clean serialized Gradle validation run recorded `BUILD SUCCESSFUL`. Current unit result XML records **60 tests, 0 failures, 0 errors, 0 skipped**: 15 command authorization, 23 policy, 6 tile presentation and 16 provider engine. Android lint completed with **0 errors and 25 warnings**. Debug, unsigned release and instrumentation APKs were compiled. Instrumentation was **not executed** locally, and GitHub Actions/Samsung hardware validation remain unexecuted. Final affected builds/tests/lint/instrumentation compilation also passed with strict Gradle dependency verification after the storage/migration/override corrections. `TESTING.md` and `docs/VALIDATION.json` are the final run record.
+The independently reviewed candidate is `a6dc01744895095ee6fa1b1361cf77f299cd0382`. GitHub push and draft-PR Android workflows passed clean debug/unsigned-release builds, strict dependency verification, **67 JVM tests** and **11 real API36 emulator tests**, all with0 failures/errors/skips. Lint reports **0 errors/20 warnings in CI** and16 locally; the4 extra hosted findings are inspected online update recommendations. The old application baseline was separately reproduced at60 tests/25 warnings after metadata-only repairs. Exact source/URLs/artifact checksum are in TESTING.md and VALIDATION.json.
+
+Dependency review remains an explicit external merge gate: GitHub reports unsupported repository configuration/feature, and the integration cannot access the administrative setting. It was not disabled or counted as passed. Samsung/Android17/real Tasker/genuine recovery remain untested; real emulator execution is not their substitute.
 
 ## Permissions and exposure review
 
@@ -119,4 +121,4 @@ Android 17/One UI 9 background behavior, real-device provider removal, genuine G
 
 ## Independent post-implementation review
 
-The previously delivered source is not the final development candidate. A second audit confirmed and repaired timestamp-order collisions/clock rollback, callback loss of persisted legacy cleanup uncertainty, CI SDK provisioning and cold-cache verification omissions. The fork now uses a separate installed package and API2 sequence contract. See [POST_IMPLEMENTATION_AUDIT.md](docs/POST_IMPLEMENTATION_AUDIT.md), [CI_REPAIR.md](docs/CI_REPAIR.md) and [IDENTITY_AND_SIGNING.md](docs/IDENTITY_AND_SIGNING.md). Current exact results/commit are in TESTING.md and VALIDATION.json; the earlier60-test/25-warning paragraph is historical evidence, not a claim about newer code.
+The previously delivered source is not the final development candidate. A second audit confirmed and repaired timestamp-order collisions/clock rollback, callback loss of persisted legacy cleanup uncertainty, CI SDK provisioning and cold-cache verification omissions. The fork now uses a separate installed package and API2 sequence contract. See [POST_IMPLEMENTATION_AUDIT.md](docs/POST_IMPLEMENTATION_AUDIT.md), [CI_REPAIR.md](docs/CI_REPAIR.md) and [IDENTITY_AND_SIGNING.md](docs/IDENTITY_AND_SIGNING.md). Current exact results/commit are in TESTING.md and VALIDATION.json; the independently reproduced60-test/25-warning baseline is historical evidence, not the newer candidate count.

@@ -77,3 +77,11 @@ Legacy unjournaled providers and competing mock apps cannot be conclusively iden
 ## License and attribution
 
 GPL-3.0; retain [LICENSE](LICENSE) and upstream copyright ©2026 Kamil BuriXon Burek. Fork hardening, tests and automation changes are documented in this repository. No alternative-project source was copied. Distribution of GPL binaries requires corresponding source and license notices; CI debug artifacts include no private release signing key. Map data ©OpenStreetMap contributors, tiles by OpenFreeMap, rendering by MapLibre. See [ATTRIBUTION.md](ATTRIBUTION.md).
+
+## Post-review development candidate
+
+Reviewed code checkpoint: `a6dc01744895095ee6fa1b1361cf77f299cd0382` (0.3.1-dev, package dev.abhik.mockgps). [Push CI](https://github.com/abhi-k9/MockGPS/actions/runs/40026375247) and [draft-PR CI](https://github.com/abhi-k9/MockGPS/actions/runs/40026384491) passed:67 JVM tests,11 actual API36 emulator tests, strict clean builds; lint0 errors/20 hosted warnings (16 local). [Draft PR1](https://github.com/abhi-k9/MockGPS/pull/1) remains unmerged. The existing source baseline's60 tests/25 warnings were independently reproduced with metadata-only repairs.
+
+[Download the signed debug build/reports artifact](https://github.com/abhi-k9/MockGPS/actions/runs/40026375247/artifacts/12532319586); extract the debug APK and compare against development-candidate/build-identity.json. CI APK SHA256: `3510b34c31cf5a7d86e83e1e3c41fa84ba4be09ead5a3bbff8bf6ac55459fffc`. Debug signing is for testing, not a production release, and may change between runs. Keep the exact downloaded APK when repeating tests.
+
+**Merge gates remain:** [dependency review](https://github.com/abhi-k9/MockGPS/actions/runs/40026384411) is blocked by repository feature/permission configuration (owner must check/enable Dependency graph); no clean advisory scan is claimed. Samsung OneUI9/Android17, real Tasker delivery, secure lock behavior and fresh genuine recovery remain physical-device work. Do not merge or publish automatically. See [release gate](docs/RELEASE_CANDIDATE.md), [second audit](docs/POST_IMPLEMENTATION_AUDIT.md), [CI repair](docs/CI_REPAIR.md) and the prioritized12-step Samsung sequence.
