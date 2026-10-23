@@ -1,0 +1,13 @@
+# Harden mock location lifecycle and add authenticated Tasker mode control
+
+The upstream exported receiver/service allowed unrelated apps to mutate simulation without authentication, and persisted running flags could report success after provider or service failure. This change makes the service private, replaces the open command protocol with opt-in capability authentication/replay checks, and reports desired state, observed service state and provider cleanup separately.
+
+AUTO, FORCE_REAL and explicit MANUAL_MOCK share one serialized controller. FORCE_REAL survives automation requests and blocks manual start until the user explicitly returns to AUTO. Car connection/unknown cancels pending AUTO activation; disconnection schedules an inexact confirmation request (default120seconds). A native Quick Settings tile provides the mode override. Starts require visible app confirmation; no Tasker/alarm background-FGS exemption is assumed.
+
+The provider engine journals ownership before registration, rolls back partial failures, validates coordinates/metadata, bounds drift and removes automatic restart loops. UI updates are event-driven, genuine fixes stay in memory, backups/transfer are excluded and status/notifications omit coordinates/credentials. Existing map, selected-point, camera and drift features remain.
+
+Validation: clean Linux/JDK21/SDK36 build checkpoint; final debug and unsigned release builds,60 JVM tests (0 failures/errors/skips), Android lint (0 errors,25 retained warnings), instrumentation APK compilation and strict SHA-256 dependency verification passed. Debug APK signature verifies. Seven instrumentation tests are compiled but have not run locally. API36 emulator CI and dependency review are configured, not observed executing.
+
+Samsung OneUI9/Android17, real Tasker actions, background delivery, lock-screen tile behavior and genuine GPS reacquisition remain unverified. All22 hardware scenarios are marked NOT RUN. This is not a production-readiness claim. The foundation/platform review, security audit, exact evidence, setup/Tasker/recovery procedures and GPL attribution are included.
+
+Repository/PR delivery: branch `harden/android17-automation` is pushed to `abhi-k9/MockGPS`. The GitHub API endpoint was policy-blocked in this environment, so no PR was created automatically. Create a draft PR against `master` at https://github.com/abhi-k9/MockGPS/pull/new/harden/android17-automation using this title/body. If API access is later enabled, `gh pr create --draft --base master --head harden/android17-automation --title 'Harden mock location lifecycle and add authenticated Tasker mode control' --body-file docs/PR_DESCRIPTION.md` is available; do not interpret this unrun command as a created PR.

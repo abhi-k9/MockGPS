@@ -1,0 +1,106 @@
+{
+  "date": "2026-10-23",
+  "validated_source_commit": "c192a13fe20aefd16f3ca95ba9a48e14cbef8fa0",
+  "baseline": "2a2e4322596dcb2b37327999dce3f0d079d35dea",
+  "branch": "harden/android17-automation",
+  "environment": {
+    "host": "Linux x86_64",
+    "jdk": "21.0.12.1",
+    "gradle": "9.6.0",
+    "agp": "9.2.1",
+    "compile_sdk": 36,
+    "target_sdk": 36,
+    "build_tools": "36.0.0"
+  },
+  "final_command": "./gradlew :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest :app:lintDebug :app:assembleDebugAndroidTest --dependency-verification=strict --project-cache-dir=/workspace/.cache/mockgps-project --max-workers=2 --console=plain",
+  "exit_code": 0,
+  "clean_checkpoint_passed": true,
+  "unit_suites": [
+    {
+      "name": "dev.burixon.mockgps.core.CommandAuthTest",
+      "timestamp": "2026-10-23T17:17:40.604Z",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "dev.burixon.mockgps.core.PolicyTest",
+      "timestamp": "2026-10-23T17:17:40.738Z",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "dev.burixon.mockgps.core.TilePresentationTest",
+      "timestamp": "2026-10-23T17:17:40.757Z",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "dev.burixon.mockgps.engine.ProviderEngineTest",
+      "timestamp": "2026-10-23T17:17:40.767Z",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "unit_totals": {
+    "tests": 60,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "severities": {
+      "Warning": 25
+    },
+    "issues_by_id": {
+      "InlinedApi": 3,
+      "OldTargetApi": 1,
+      "GradleDependency": 1,
+      "NewerVersionAvailable": 1,
+      "ExportedReceiver": 1,
+      "ObsoleteSdkInt": 1,
+      "UnusedResources": 3,
+      "IconLocation": 3,
+      "ButtonStyle": 2,
+      "UseKtx": 9
+    }
+  },
+  "debug_signature": "apksigner verify: Verifies; APK Signature Scheme v2=true; one development signer",
+  "artifacts": [
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 59448302,
+      "sha256": "dcc36c80dcfdbd9f1007ef4d3e1e4d3fdf18af40d8470fafd8fdb457c0bd7665"
+    },
+    {
+      "path": "app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 57397603,
+      "sha256": "d57c7a353eea62be9148f4e15a2c376cb5e755f674e59b0989e6741dce82d97f"
+    },
+    {
+      "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "bytes": 945450,
+      "sha256": "1ce50e007e2d2a893d1735f77835ad86a195ca43a22b3e117d37e8b78314b6ab"
+    }
+  ],
+  "instrumentation": {
+    "compiled_tests": 7,
+    "executed": 0,
+    "reason": "No connected device/emulator; /dev/kvm unavailable"
+  },
+  "hardware": {
+    "samsung_oneui9_android17": "NOT RUN",
+    "tasker": "NOT RUN",
+    "scenarios_not_run": 22
+  },
+  "ci": "Configured; not executed in this session",
+  "advisory_scan": "Not executed; public PR dependency review configured",
+  "dependency_integrity": "SHA-256 metadata bootstrapped over verified HTTPS, then enforced in separate strict run; no independent provenance claim"
+}
