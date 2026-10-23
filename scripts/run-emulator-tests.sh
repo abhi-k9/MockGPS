@@ -47,7 +47,26 @@ done
 # Preserve Gradle/instrumentation's actual exit status. Compilation alone is insufficient.
 test_start=$(date +%s)
 export MOCKGPS_DEVICE_TEST_START="$test_start"
-./gradlew :app:connectedDebugAndroidTest --dependency-verification=strict --max-workers=2 --console=plain "$@"
+if ./gradlew :app:connectedDebugAndroidTest --dependency-verification=strict --max-workers=2 --console=plain "$@"; then
+  :
+else
+  device_status=$?
+  # Public API diagnostics omit exception messages, stack traces, extras and locations.
+  python3 - <<'PYFAIL'
+from pathlib import Path
+import json,os,xml.etree.ElementTree as E
+failed=[]
+for p in Path('app/build/outputs/androidTest-results/connected').rglob('TEST-*.xml'):
+ if p.stat().st_mtime<int(os.environ['MOCKGPS_DEVICE_TEST_START']): continue
+ for test in E.parse(p).getroot().iter('testcase'):
+  for kind in ('failure','error'):
+   for failure in test.findall(kind):
+    failed.append({'class':test.get('classname'),'test':test.get('name'),'type':failure.get('type')})
+payload=json.dumps(failed).replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+print(f'::error title=Device test failures (names/types only)::{payload}')
+PYFAIL
+  exit "$device_status"
+fi
 
 python3 - <<'PYTEST'
 from pathlib import Path
