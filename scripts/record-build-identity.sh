@@ -30,10 +30,12 @@ identity['unit_tests']={k:sum(int(r.get(k,0)) for r in suites) for k in ['tests'
 assert identity['unit_tests']['tests']>0 and all(identity['unit_tests'][k]==0 for k in ['failures','errors','skipped'])
 issues=E.parse('app/build/reports/lint-results-debug.xml').getroot().findall('issue')
 identity['lint']=dict(Counter(i.get('severity') for i in issues))
+identity['lint_issues']=[dict(id=i.get('id'),severity=i.get('severity'),message=i.get('message')) for i in issues]
 assert identity['lint'].get('Error',0)==identity['lint'].get('Fatal',0)==0
 (out/'build-identity.json').write_text(json.dumps(identity,indent=2)+'\n')
 print(json.dumps(identity,indent=2))
 # Public provenance only; no private key, credential, genuine coordinate or signed download URL.
 if __import__('os').environ.get('GITHUB_ACTIONS')=='true':
- print('::notice title=Development candidate provenance::'+json.dumps(identity,separators=(',',':')))
+ payload=json.dumps(identity,separators=(',',':')).replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+ print('::notice title=Development candidate provenance::'+payload)
 PY
