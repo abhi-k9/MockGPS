@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout" android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <LinearLayout android:id="@+id/rootContent" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical" android:background="@color/ui_background">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="64dp" android:gravity="center_vertical"
+            android:paddingHorizontal="12dp" android:orientation="horizontal">
+            <ImageButton android:id="@+id/menuButton" style="@style/Widget.MockGPS.IconButton"
+                android:src="@drawable/ic_settings" android:contentDescription="@string/open_settings" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:orientation="vertical" android:paddingStart="8dp" android:paddingEnd="8dp">
+                <TextView style="@style/TextAppearance.Material3.TitleLarge" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="@string/app_name" android:textStyle="bold" />
+                <TextView style="@style/TextAppearance.Material3.LabelMedium" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="@string/app_tagline" android:textColor="@color/text_secondary" />
+            </LinearLayout>
+            <ImageButton android:id="@+id/helpButton" style="@style/Widget.MockGPS.IconButton"
+                android:src="@drawable/ic_help" android:contentDescription="@string/setup_help" />
+        </LinearLayout>
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1.1"
+            android:layout_marginHorizontal="12dp" android:background="@drawable/map_background" android:clipToOutline="true">
+            <FrameLayout android:id="@+id/mapContainer" android:layout_width="match_parent" android:layout_height="match_parent" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|start"
+                android:layout_margin="12dp" android:paddingHorizontal="12dp" android:paddingVertical="8dp"
+                android:background="@drawable/map_hint_background" android:text="@string/map_hint"
+                android:textAppearance="@style/TextAppearance.Material3.LabelMedium" android:textColor="@color/text_primary" />
+            <ImageButton android:id="@+id/mockLocationButton" style="@style/Widget.MockGPS.IconButton"
+                android:layout_gravity="bottom|end" android:layout_margin="12dp" android:background="@drawable/map_hint_background"
+                android:src="@drawable/ic_mock_location" android:contentDescription="@string/center_selection" android:elevation="2dp" />
+            <LinearLayout android:id="@+id/mapUnavailable" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_gravity="center" android:layout_margin="24dp" android:padding="16dp" android:orientation="vertical"
+                android:gravity="center" android:background="@drawable/map_hint_background" android:visibility="gone">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                    android:text="@string/map_unavailable" android:textColor="@color/text_primary" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/retryMapButton"
+                    style="@style/Widget.Material3.Button.TextButton" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="@string/retry_map" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Equal space remains available for the map and scrollable controls in landscape/large fonts. -->
+        <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:fillViewport="false" android:clipToPadding="false">
+            <LinearLayout android:id="@+id/bottomPanel" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <com.google.android.material.card.MaterialCardView android:id="@+id/setupCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="@color/primary_container" app:strokeWidth="0dp" app:cardCornerRadius="20dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp" android:orientation="vertical">
+                        <TextView style="@style/TextAppearance.Material3.TitleSmall" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="@string/setup_title" android:textColor="@color/on_primary_container" />
+                        <TextView android:id="@+id/setupDescription" style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                            android:text="@string/setup_location" android:textColor="@color/on_primary_container" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/setupButton" style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/continue_setup" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <TextView android:id="@+id/modeStatus" style="@style/TextAppearance.Material3.HeadlineSmall"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/status_stopped"
+                    android:accessibilityLiveRegion="polite" android:textColor="@color/text_primary" />
+                <TextView android:id="@+id/statusDescription" style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                    android:text="@string/unknown_status" android:textColor="@color/text_secondary" />
+                <com.google.android.material.button.MaterialButtonToggleGroup android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="16dp" app:singleSelection="true" app:selectionRequired="true">
+                    <com.google.android.material.button.MaterialButton android:id="@+id/autoButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="48dp" android:text="@string/mode_auto" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/forceRealButton"
+                        style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:minHeight="48dp" android:text="@string/mode_force_real" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+                <TextView style="@style/TextAppearance.Material3.BodySmall" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/mode_help" android:textColor="@color/text_secondary" android:layout_marginTop="4dp" />
+                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" app:cardBackgroundColor="@color/panel_background" app:strokeWidth="0dp" app:cardCornerRadius="16dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp">
+                        <TextView style="@style/TextAppearance.Material3.LabelLarge" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="@string/selected_location" android:textColor="@color/text_secondary" />
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <TextView android:id="@+id/coordinatesText" style="@style/TextAppearance.Material3.BodyLarge"
+                                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:fontFamily="monospace"
+                                android:text="@string/no_location_selected" android:textColor="@color/text_primary" android:textIsSelectable="true" />
+                            <ImageButton android:id="@+id/editCoordinatesButton" style="@style/Widget.MockGPS.IconButton"
+                                android:src="@drawable/ic_edit" android:contentDescription="@string/edit_coordinates" />
+                            <ImageButton android:id="@+id/copyCoordinatesButton" style="@style/Widget.MockGPS.IconButton"
+                                android:src="@drawable/ic_copy" android:contentDescription="@string/copy_coordinates" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.button.MaterialButton android:id="@+id/reviewShortcutButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="56dp" android:layout_marginTop="12dp"
+                    android:text="@string/shortcut_review" android:visibility="gone" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/confirmPendingButton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                    android:layout_marginTop="12dp" android:text="@string/confirm_pending" android:visibility="gone" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/toggleButton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                    android:layout_marginTop="12dp" android:text="@string/manual_start" android:textColor="@color/button_text"
+                    app:icon="@drawable/ic_play" app:iconGravity="textStart" app:iconTint="@color/button_text" app:cornerRadius="28dp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView android:id="@+id/drawer" android:layout_width="320dp" android:layout_height="match_parent"
+        android:layout_gravity="start" android:background="@color/drawer_background" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView style="@style/TextAppearance.Material3.HeadlineSmall" android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="@string/settings" android:textColor="@color/text_primary" />
+                <ImageButton android:id="@+id/closeSettingsButton" style="@style/Widget.MockGPS.IconButton"
+                    android:src="@drawable/ic_close" android:contentDescription="@string/close_settings" />
+            </LinearLayout>
+            <TextView style="@style/Widget.MockGPS.SectionTitle" android:text="@string/automation" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/integration_source_status" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/broadcastSwitch" style="@style/Widget.MockGPS.Switch"
+                android:text="@string/intent_automation" android:contentDescription="@string/intent_automation" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/intent_automation_description" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/showTokenButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/reveal_credential" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/revokeTokenButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/revoke_credential" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/shortcutIntegrationSwitch" style="@style/Widget.MockGPS.Switch"
+                android:text="@string/shortcut_integration" android:contentDescription="@string/shortcut_switch_description" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/shortcut_description" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/delayButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/automation_delay" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/reboot_policy" />
+            <TextView style="@style/Widget.MockGPS.SectionTitle" android:text="@string/simulation" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/driftSwitch" style="@style/Widget.MockGPS.Switch"
+                android:text="@string/location_drift" android:contentDescription="@string/location_drift" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/location_drift_description" />
+            <TextView style="@style/Widget.MockGPS.SectionTitle" android:text="@string/privacy_and_about" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/map_privacy" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/diagnosticsButton" style="@style/Widget.MockGPS.TextButton"
+                app:icon="@drawable/ic_help" android:text="@string/diagnostics" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/githubButton" style="@style/Widget.MockGPS.TextButton"
+                app:icon="@drawable/ic_code" android:text="@string/source_code" />
+            <TextView android:id="@+id/versionText" style="@style/Widget.MockGPS.Description" android:layout_marginTop="16dp" android:text="@string/app_name" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.drawerlayout.widget.DrawerLayout>

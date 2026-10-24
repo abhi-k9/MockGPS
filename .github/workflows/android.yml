@@ -1,0 +1,51 @@
+name: Android
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - '*.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew*'
+      - 'scripts/**'
+      - 'tasker/dispatch.js'
+      - '.github/workflows/android.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - '*.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew*'
+      - 'scripts/**'
+      - 'tasker/dispatch.js'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install verified SDK build prerequisites
+        run: scripts/setup-android-sdk.sh "$ANDROID_HOME"
+      - name: Check Tasker dispatcher
+        run: node scripts/test-tasker-dispatch.cjs
+      - name: Build debug APK, run JVM tests and lint
+        run: scripts/check-android.sh

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ui_background">#F6F9F7</color>
+    <color name="drawer_background">#F6F9F7</color>
+    <color name="panel_background">#E8EFEB</color>
+    <color name="primary_container">#C6EBDD</color>
+    <color name="on_primary_container">#07382A</color>
+    <color name="primary">#146B50</color>
+    <color name="secondary">#285D4D</color>
+    <color name="simulation_stop">#A32F3B</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="text_primary">#172D25</color>
+    <color name="text_secondary">#4A6056</color>
+    <color name="divider">#73867C</color>
+    <color name="ic_launcher_background">#123E31</color>
+</resources>

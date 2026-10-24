@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ui_background">#101A16</color>
+    <color name="drawer_background">#14201B</color>
+    <color name="panel_background">#23362D</color>
+    <color name="primary_container">#205440</color>
+    <color name="on_primary_container">#C6EBDD</color>
+    <color name="primary">#91D5B5</color>
+    <color name="secondary">#A6CDBA</color>
+    <color name="simulation_stop">#FFB2BA</color>
+    <color name="button_text">#07382A</color>
+    <color name="text_primary">#E1EDE5</color>
+    <color name="text_secondary">#B3C8BA</color>
+    <color name="divider">#8B9F92</color>
+</resources>

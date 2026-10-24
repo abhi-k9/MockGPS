@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check version tag
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re
+          source = pathlib.Path('app/build.gradle.kts').read_text()
+          versions = re.findall(r'^\s*versionName = "([^"]+)"', source, re.M)
+          if len(versions) != 1 or os.environ['GITHUB_REF_NAME'] != 'v' + versions[0]:
+              raise SystemExit('Tag must match the app versionName.')
+          PY
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install verified SDK build prerequisites
+        run: scripts/setup-android-sdk.sh "$ANDROID_HOME"
+      - name: Test and build release APK
+        run: |
+          node scripts/test-tasker-dispatch.cjs
+          ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease --dependency-verification=strict --max-workers=2 --console=plain
+      - name: Sign and verify release APK
+        env:
+          MOCKGPS_SIGNING_KEYSTORE_BASE64: ${{ secrets.MOCKGPS_SIGNING_KEYSTORE_BASE64 }}
+          MOCKGPS_SIGNING_KEY_ALIAS: ${{ secrets.MOCKGPS_SIGNING_KEY_ALIAS }}
+          MOCKGPS_SIGNING_KEY_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_KEY_PASSWORD }}
+          MOCKGPS_SIGNING_STORE_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_STORE_PASSWORD }}
+        run: scripts/sign-release.sh app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/release-assets"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          flags=()
+          [[ "$GITHUB_REF_NAME" != *-* ]] || flags+=(--prerelease)
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/release-assets/"* --verify-tag --title "$GITHUB_REF_NAME" --generate-notes "${flags[@]}"
