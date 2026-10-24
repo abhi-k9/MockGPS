@@ -50,7 +50,7 @@ Outputs: `app/build/outputs/apk/debug/app-debug.apk`, `app/build/outputs/apk/rel
 7. Edit Quick Settings to add **MockGPS mode**. If Samsung hides its subtitle or delays refresh, use the app screen as the state authority.
 8. Optionally enable authenticated automation, reveal/copy its credential and configure **only your specific paired vehicle** in Tasker following [docs/TASKER.md](docs/TASKER.md). Select AUTO and reconcile vehicle state. GUI delay range is 0–3600 seconds; default 120.
 
-Samsung sleeping/deep-sleeping apps, battery restrictions, force-stop and lock-screen behavior may prevent Tasker or notifications from running. Test both restrictive and unrestricted battery settings; changing battery settings does not grant missing Android foreground-service permissions. Full procedures and 22 unrun scenarios are in [docs/SAMSUNG_VALIDATION.md](docs/SAMSUNG_VALIDATION.md).
+Samsung sleeping/deep-sleeping apps, battery restrictions, force-stop and lock-screen behavior may prevent Tasker or notifications from running. Test both restrictive and unrestricted battery settings; changing battery settings does not grant missing Android foreground-service permissions. Full procedures and 24 unrun scenarios are in [docs/SAMSUNG_VALIDATION.md](docs/SAMSUNG_VALIDATION.md).
 
 ## Automation and privacy
 
@@ -80,10 +80,12 @@ GPL-3.0; retain [LICENSE](LICENSE) and upstream copyright ©2026 Kamil BuriXon B
 
 ## Post-review development candidate
 
-Version **4 / 0.3.2-dev**, installed package `dev.abhik.mockgps`. The old 67-JVM/11-emulator checkpoint predates the manual-session safety correction and is not the revised candidate. Latest inspected source `6fd92d2` passed its build job (79 JVM tests) but failed emulator instrumentation; see [current evidence](docs/VALIDATION.json) and [testing](TESTING.md).
+Version **4 / 0.3.2-dev**, installed package `dev.abhik.mockgps`. The old 67-JVM/11-emulator checkpoint predates the manual-session safety correction and is not the revised candidate. Reviewed source `89e01d191a8a72c4d749f17846899731c7ec514f` passed [push Android](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820) and [PR Android](https://github.com/abhi-k9/MockGPS/actions/runs/40057434383): **79 JVM and15 real API36 emulator tests**, zero failures/errors/skips; lint0 errors/16 local and20 hosted warnings; see [current evidence](docs/VALIDATION.json) and [testing](TESTING.md).
 
 Fresh authenticated CONNECTED or UNKNOWN stops active or starting MANUAL_MOCK as well as AUTO, advances generation and cancels pending confirmation. FORCE_REAL stays selected; other modes become inactive AUTO. Known CONNECTED blocks manual start. An explicit visible manual start while UNKNOWN remains possible, but a later delivered UNKNOWN stops it. A later DISCONNECTED creates a new delay and visible-confirmation request; it cannot resurrect the old manual session.
 
 Missing Tasker delivery cannot be inferred from silence: an active session may continue until an accepted event, runtime failure or local stop. Successful provider cleanup does not establish a fresh genuine fix; verify a new nonmock location in an independent client.
 
 The independent Maven scan covered 174 coordinates and found one remaining medium Kotlin build-cache advisory; no high/critical matches. Caches/incremental compilation are disabled as mitigation, not a patched-version claim. [Dependency review](docs/DEPENDENCY_REVIEW.md) remains externally blocked; the owner must check/enable Dependency graph and rerun it. Samsung OneUI9/Android17 and physical Tasker remain untested. [PR1](https://github.com/abhi-k9/MockGPS/pull/1) stays draft/unmerged; no production release is authorized. Use only exact reviewed source/APK provenance from [the release gate](docs/RELEASE_CANDIDATE.md).
+
+[Download the development-signed debug APK/reports artifact](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820/artifacts/12546211907) and extract app-debug.apk. Compare its checksum/public signer with [the recorded CI identity](docs/evidence/candidate-89e01d1/ci-build-identity.json). Keep this exact APK; CI development signing identities can differ between runs.

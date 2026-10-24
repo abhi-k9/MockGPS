@@ -1,0 +1,17 @@
+{
+  "source_commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
+  "job_id": 120763400928,
+  "notice": {
+    "path": ".github",
+    "blob_href": "https://github.com/abhi-k9/MockGPS/blob/89e01d191a8a72c4d749f17846899731c7ec514f/.github",
+    "start_line": 137,
+    "start_column": null,
+    "end_line": 137,
+    "end_column": null,
+    "annotation_level": "notice",
+    "title": "Actual emulator test results",
+    "message": "tests=15 failures=0 errors=0 skipped=0",
+    "raw_details": ""
+  },
+  "required_methods_enforced_by": "scripts/run-emulator-tests.sh at this source"
+}
