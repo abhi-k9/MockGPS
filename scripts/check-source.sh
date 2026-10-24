@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 for script in scripts/*.sh; do bash -n "$script"; done
 python3 - <<'PY'

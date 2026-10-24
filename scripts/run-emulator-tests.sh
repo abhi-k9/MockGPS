@@ -10,6 +10,9 @@ if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
   exit 2
 fi
 export PATH="$ANDROID_HOME/cmdline-tools/19.0/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+# Compile before starting the VM: avoid compiler/guest startup memory and CPU contention.
+./gradlew :app:assembleDebug :app:assembleDebugAndroidTest --dependency-verification=strict --max-workers=2 --console=plain "$@"
+./gradlew --stop
 mkdir -p "$ANDROID_AVD_HOME" app/build/emulator-diagnostics
 test_api=${MOCKGPS_TEST_API:-36}
 [[ "$test_api" == 36 || "$test_api" == 37.0 ]] || { echo "Unsupported test API" >&2; exit 2; }
@@ -17,10 +20,23 @@ avd_name="MockGPS_API${test_api//./_}"
 printf 'no\n' | avdmanager create avd --force --name "$avd_name" \
   --package "system-images;android-${test_api};google_apis;x86_64" --device pixel_6
 emulator -avd "$avd_name" -port 5554 -no-window -no-audio -no-boot-anim \
-  -no-snapshot -wipe-data -gpu swiftshader_indirect -accel on \
+  -no-snapshot -wipe-data -gpu swiftshader -accel on -memory 2048 -cores 2 \
   > app/build/emulator-diagnostics/emulator.log 2>&1 &
 emulator_pid=$!
 cleanup() {
+  # Raw guest crashes stay private; export only types/frames/signals, never messages/extras.
+  crash_private="$ANDROID_AVD_HOME/mockgps-crash-private.txt"
+  timeout 10 adb -s emulator-5554 logcat -b crash -d > "$crash_private" 2>/dev/null || true
+  python3 - "$crash_private" <<'PYCRASH'
+from pathlib import Path
+import json,re,sys
+s=Path(sys.argv[1]).read_text(errors='replace')
+r=dict(types=sorted(set(re.findall(r'\b([a-zA-Z_$][\w.$]*(?:Exception|Error))(?::|$)',s,re.M))),
+       frames=re.findall(r'\bat ((?:com\.android\.server|android|dev\.burixon\.mockgps)[\w.$]+\([\w.$]+:\d+\))',s)[:20],
+       signals=re.findall(r'Fatal signal (\d+) \(([A-Z0-9]+)\)',s))
+Path('app/build/emulator-diagnostics/guest-crash-sanitized.json').write_text(json.dumps(r,indent=2)+'\n')
+PYCRASH
+  rm -f "$crash_private"
   adb -s emulator-5554 emu kill >/dev/null 2>&1 || true
   kill "$emulator_pid" >/dev/null 2>&1 || true
 }
@@ -64,7 +80,7 @@ done
 # Preserve Gradle/instrumentation's actual exit status. Compilation alone is insufficient.
 test_start=$(date +%s)
 export MOCKGPS_DEVICE_TEST_START="$test_start"
-if ./gradlew :app:connectedDebugAndroidTest --dependency-verification=strict --max-workers=2 --console=plain "$@"; then
+if ./gradlew :app:connectedDebugAndroidTest --dependency-verification=strict --max-workers=1 --console=plain "$@"; then
   :
 else
   device_status=$?
