@@ -79,7 +79,8 @@ object Policy {
         is PolicyEvent.Confirm -> if (e.generation == s.generation && s.mode == OperatingMode.AUTO &&
             s.vehicle == VehicleState.DISCONNECTED && s.needsConfirmation
         ) s.copy(desired = true, service = ServiceState.STARTING, result = "STARTING") else s
-        PolicyEvent.ManualStart -> if (s.mode == OperatingMode.FORCE_REAL || s.vehicle == VehicleState.CONNECTED) s else s.copy(
+        PolicyEvent.ManualStart -> if (s.mode == OperatingMode.FORCE_REAL || s.vehicle == VehicleState.CONNECTED ||
+            (s.mode == OperatingMode.MANUAL_MOCK && s.desired)) s else s.copy(
             mode = OperatingMode.MANUAL_MOCK, desired = true, service = ServiceState.STARTING,
             generation = s.generation + 1, pendingAtElapsed = null, result = "STARTING"
         )

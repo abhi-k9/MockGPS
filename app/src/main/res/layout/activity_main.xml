@@ -71,7 +71,11 @@
 
         </FrameLayout>
 
-        <!-- BOTTOM PANEL -->
+        <!-- Controls remain reachable by scrolling with large fonts or landscape. -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="false">
         <LinearLayout
             android:id="@+id/bottomPanel"
             android:layout_width="match_parent"
@@ -187,6 +191,7 @@
             </LinearLayout>
 
         </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 

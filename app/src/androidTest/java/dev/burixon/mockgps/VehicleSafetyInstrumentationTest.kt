@@ -207,4 +207,49 @@ class VehicleSafetyInstrumentationTest {
         assertFalse(snapshot().desired)
         assertFalse(main { MockLocationService.hasOwnedProviders(context) })
     }
+    @Test fun repeatedManualStartKeepsTheRealSessionAndMalformedIpcCannotStopIt() {
+        val generation = startManualAndAwaitInjection()
+        val before = snapshot()
+        scenario!!.onActivity { ControlCenter.manualStart(it) }
+        assertEquals(before, snapshot())
+        val bad = request("vehicle_connected")
+        val delivered = CountDownLatch(1)
+        var code = -1
+        context.sendOrderedBroadcast(Intent(MockGpsReceiver.ACTION)
+            .setComponent(ComponentName(context, MockGpsReceiver::class.java))
+            .putExtra("api", bad.api).putExtra("token", bad.token).putExtra("command", bad.command)
+            .putExtra("event_time", bad.eventTime).putExtra("seq", bad.sequence.toString()), null,
+            object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) { code = resultCode; delivered.countDown() }
+            }, null, -1, null, null)
+        assertTrue(delivered.await(10, TimeUnit.SECONDS))
+        assertEquals(1, code)
+        assertEquals(before, snapshot())
+        assertTrue(main { MockLocationService.hasOwnedProviders(context) })
+        assertTrue(main { ControlCenter.canRun(context, generation) })
+        assertEquals("MALFORMED_REQUEST", main { ControlCenter.commandDiagnostic().lastRejected })
+    }
+
+    @Test fun taskerIntentUriRecipePreservesTheFiveExactTypes() {
+        startManualAndAwaitInjection()
+        val token = AutomationAccess.token(context)!!
+        val time = System.currentTimeMillis()
+        val intent = Intent.parseUri("intent:#Intent;action=" + MockGpsReceiver.ACTION +
+            ";component=dev.abhik.mockgps/dev.burixon.mockgps.MockGpsReceiver;" +
+            "i.api=2;S.token=$token;S.command=vehicle_connected;l.event_time=$time;l.seq=${++sequence};end",
+            Intent.URI_INTENT_SCHEME)
+        @Suppress("DEPRECATION")
+        val raw = intent.extras!!.keySet().associateWith { intent.extras!!.get(it) }
+        assertNotNull(CommandAuth.parse(raw))
+        val delivered = CountDownLatch(1)
+        var code = -1
+        context.sendOrderedBroadcast(intent, null, object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) { code = resultCode; delivered.countDown() }
+        }, null, -1, null, null)
+        assertTrue(delivered.await(10, TimeUnit.SECONDS))
+        assertEquals(0, code)
+        assertFalse(snapshot().desired)
+        assertFalse(main { MockLocationService.hasOwnedProviders(context) })
+    }
+
 }

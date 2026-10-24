@@ -760,8 +760,9 @@ class MainActivity : ComponentActivity() {
             snapshot.service == ServiceState.STARTING
         val acceptedAt = if (snapshot.lastEventTime < 0) getString(R.string.no_accepted_event)
             else java.text.DateFormat.getDateTimeInstance().format(java.util.Date(snapshot.lastEventTime))
+        val diagnostic = ControlCenter.commandDiagnostic()
         modeStatus.text = getString(R.string.mode_status, snapshot.mode.name, snapshot.displayStatus(),
-            snapshot.vehicle.name, acceptedAt, snapshot.result)
+            snapshot.vehicle.name, acceptedAt, snapshot.result, diagnostic.lastAccepted, diagnostic.lastRejected)
         autoButton.isEnabled = snapshot.mode != OperatingMode.AUTO
         forceRealButton.isEnabled = true // Retry cleanup even when FORCE_REAL is already selected.
         confirmPendingButton.visibility = if (snapshot.needsConfirmation) View.VISIBLE else View.GONE

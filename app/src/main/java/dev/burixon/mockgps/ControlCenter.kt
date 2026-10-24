@@ -20,6 +20,17 @@ import dev.burixon.mockgps.core.*
 /** All entry points/effects execute on the main looper in this one application process. */
 object ControlCenter {
     private var state: PolicySnapshot? = null
+    private var diagnostic = CommandDiagnostic()
+    fun commandDiagnostic(): CommandDiagnostic { checkThread(); return diagnostic }
+    fun rejected(context: Context, code: String) {
+        checkThread()
+        val next = diagnostic.rejected(code)
+        if (next != diagnostic) { diagnostic = next; changed(context) }
+    }
+    private fun accepted(context: Context, command: String) {
+        diagnostic = diagnostic.accepted(command)
+        changed(context)
+    }
     private val listeners = linkedSetOf<() -> Unit>()
     private var notifying = false
     private var handlingStorageFailure = false
@@ -204,12 +215,12 @@ object ControlCenter {
         val s = ensure(context)
         val auth = CommandAuth.authorize(AutomationAccess.isEnabled(context), AutomationAccess.token(context), request,
             System.currentTimeMillis(), s.lastSequence)
-        if (!auth.accepted) return auth
+        if (!auth.accepted) { rejected(context, auth.code); return auth }
         val consumed = s.copy(lastEventTime = request.eventTime, lastSequence = request.sequence)
         when (request.command) {
             "stop" -> stopAndReport(context, consumed.copy(mode = OperatingMode.FORCE_REAL,
                 generation = s.generation + 1, pendingAtElapsed = null, result = "STOPPED"))
-            "status" -> return auth // Read-only: never consumes a vehicle/control ordering sequence.
+            "status" -> { accepted(context, "status"); return auth } // Read-only policy; diagnostic only.
             else -> {
                 val vehicle = when (request.command) {
                     "vehicle_connected" -> VehicleState.CONNECTED
@@ -223,7 +234,11 @@ object ControlCenter {
                 } else save(context, next)
             }
         }
-        return if (durableLastSequence >= request.sequence) auth else AuthResult(false, "STORAGE_UNAVAILABLE")
+        return if (durableLastSequence >= request.sequence) {
+            accepted(context, requireNotNull(request.command)); auth
+        } else {
+            rejected(context, "STORAGE_UNAVAILABLE"); AuthResult(false, "STORAGE_UNAVAILABLE")
+        }
     }
     private fun alarmIntent(context: Context, generation: Long = 0) = PendingIntent.getBroadcast(context, REQUEST_ID,
         Intent(context, DelayReceiver::class.java).putExtra("generation", generation),
