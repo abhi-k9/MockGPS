@@ -1,815 +1,261 @@
 package dev.burixon.mockgps
 
-import java.util.Locale
-import android.app.AlarmManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.location.Criteria
-import android.location.Location
-import android.location.LocationManager
-import android.location.provider.ProviderProperties
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.SystemClock
-import kotlin.math.cos
+import dev.burixon.mockgps.engine.AndroidProviderPort
+import dev.burixon.mockgps.engine.Coordinates
+import dev.burixon.mockgps.engine.EngineResult
+import dev.burixon.mockgps.engine.MockFix
+import dev.burixon.mockgps.engine.ProviderEngine
 import kotlin.random.Random
 
+/** Internal non-sticky service. Only visible, explicit user actions may request a start. */
 class MockLocationService : Service() {
-
     companion object {
+        const val EXTRA_GENERATION = "generation"
+        private const val NOTIFICATION_ID = 1001
+        private const val FAILURE_NOTIFICATION_ID = 1003
+        private const val CHANNEL_ID = "mockgps"
+        private const val UPDATE_INTERVAL = 1_000L
+        private const val DRIFT_INTERVAL = 2_500L
+        private var live: MockLocationService? = null
 
-        const val COMMAND = "command"
+        /** Main-thread only. Works after process death using the durable ownership journal. */
+        fun stopNow(context: Context): Boolean {
+            check(Looper.myLooper() == Looper.getMainLooper())
+            val current = live
+            if (current != null) return current.shutdown(report = true).success
+            val result = ProviderEngine(AndroidProviderPort(context.applicationContext)).stop()
+            context.stopService(Intent(context, MockLocationService::class.java))
+            return result.success
+        }
 
-        const val COMMAND_ON = "on"
-        const val COMMAND_OFF = "off"
-
-        const val EXTRA_TOAST = "toast"
-
-        private const val GPS =
-            LocationManager.GPS_PROVIDER
-
-        private const val NETWORK =
-            LocationManager.NETWORK_PROVIDER
-
-        private const val NOTIFICATION_ID =
-            1001
-
-        private const val CHANNEL_ID =
-            "mockgps"
-
-        private const val RESTART_REQUEST_CODE =
-            1001
-
-        private const val UPDATE_INTERVAL =
-            1000L
-
-        private const val DRIFT_INTERVAL =
-            2500L
-
-        private const val MAX_DRIFT_METERS =
-            15.0
+        fun hasOwnedProviders(context: Context): Boolean =
+            AndroidProviderPort(context.applicationContext).ownedProviders().isNotEmpty()
     }
 
-    private lateinit var locationManager: LocationManager
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var engine: ProviderEngine
+    private var generation = -1L
+    private var stopping = false
+    private var lastCleanup: EngineResult? = null
+    private var foreground = false
+    private var firstInjection = true
+    private var driftPoint: Coordinates? = null
+    private var driftBase: Coordinates? = null
+    private var nextDriftAt = 0L
 
-    private val handler =
-        Handler(
-            Looper.getMainLooper()
-        )
-
-    private var gpsReady = false
-    private var networkReady = false
-
-    private var driftLat: Double? = null
-    private var driftLon: Double? = null
-    private var driftAccuracy = 0f
-    private var nextDriftUpdate = 0L
-
-    private var shouldToastOnStart = false
-
-    private val updateRunnable =
-        object : Runnable {
-
-            override fun run() {
-
-                if (
-                    !State.isDesiredEnabled(
-                        this@MockLocationService
-                    )
-                ) {
-                    stopServiceCleanly()
-                    return
-                }
-
-                publishCurrent()
-
-                /*
-                 * Re-post the same notification continuously.
-                 * It is the single persistent notification for the service.
-                 * If an OEM removes it, the next update recreates it.
-                 */
-
-                updateNotification()
-
-                handler.postDelayed(
-                    this,
-                    UPDATE_INTERVAL
-                )
+    private val publisher = object : Runnable {
+        override fun run() {
+            try {
+                publishTick()
+            } catch (_: Exception) {
+                // Unexpected state/notification failures must still remove providers before returning.
+                fail("SIMULATION_UPDATE_FAILED")
             }
         }
+
+        private fun publishTick() {
+            if (stopping) return
+            if (!ControlCenter.canRun(this@MockLocationService, generation)) {
+                shutdown(report = true)
+                return
+            }
+            val latitude = State.getLat(this@MockLocationService)
+            val longitude = State.getLon(this@MockLocationService)
+            if (latitude == null || longitude == null) {
+                fail("NO_LOCATION_SELECTED")
+                return
+            }
+            val base = Coordinates(latitude, longitude)
+            if (!base.valid) {
+                fail("INVALID_COORDINATES")
+                return
+            }
+            val point = currentPoint(base)
+            val result = engine.publish(MockFix(point, System.currentTimeMillis(), SystemClock.elapsedRealtimeNanos()))
+            if (!result.success) {
+                fail(result.code, result)
+                return
+            }
+            if (firstInjection) {
+                firstInjection = false
+                ControlCenter.serviceInjected(this@MockLocationService, generation)
+                updateNotification("Simulation active", "Android accepted both test-provider updates.")
+            }
+            handler.postDelayed(this, UPDATE_INTERVAL)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
-
-        locationManager =
-            getSystemService(
-                LocationManager::class.java
-            )
-
-        State.setServiceRunning(
-            this,
-            false
+        engine = ProviderEngine(AndroidProviderPort(this))
+        live = this
+        getSystemService(NotificationManager::class.java).createNotificationChannel(
+            NotificationChannel(CHANNEL_ID, "MockGPS simulation", NotificationManager.IMPORTANCE_LOW).apply {
+                description = "Developer mock-location service status"
+            }
         )
-
-        createNotificationChannel()
-
-        startForeground(
-            NOTIFICATION_ID,
-            createNotification(),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
-        )
-
-        createProviders()
     }
 
-    override fun onStartCommand(
-        intent: Intent?,
-        flags: Int,
-        startId: Int
-    ): Int {
-
-        when (
-            intent?.getStringExtra(
-                COMMAND
-            )
-        ) {
-
-            COMMAND_ON -> {
-
-                shouldToastOnStart =
-                    intent.getBooleanExtra(
-                        EXTRA_TOAST,
-                        false
-                    )
-
-                State.setDesiredEnabled(
-                    this,
-                    true
-                )
-
-                startMocking()
-
-                if (shouldToastOnStart) {
-                    android.widget.Toast
-                        .makeText(
-                            this,
-                            "Mocking started.",
-                            android.widget.Toast.LENGTH_SHORT
-                        )
-                        .show()
-                }
-
-                shouldToastOnStart =
-                    false
-            }
-
-            COMMAND_OFF -> {
-
-                State.setDesiredEnabled(
-                    this,
-                    false
-                )
-
-                stopServiceCleanly()
-
-                stopSelfResult(
-                    startId
-                )
-
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val requestedGeneration = intent?.getLongExtra(EXTRA_GENERATION, -1L) ?: -1L
+        if (requestedGeneration < 0 || !ControlCenter.canRun(this, requestedGeneration)) {
+            // A null/redelivered/stale intent cannot reactivate injection or change the selected mode.
+            if (generation < 0 || !ControlCenter.canRun(this, generation)) shutdown(report = true)
+            return START_NOT_STICKY
+        }
+        if (generation == requestedGeneration && !stopping) return START_NOT_STICKY
+        handler.removeCallbacks(publisher)
+        if (generation >= 0) {
+            val previousCleanup = engine.stop()
+            if (!previousCleanup.success) {
+                generation = requestedGeneration
+                fail("RECOVERY_CLEANUP_FAILED", previousCleanup)
                 return START_NOT_STICKY
             }
-
-            null -> {
-
-                if (
-                    State.isDesiredEnabled(this)
-                ) {
-                    startMocking()
-                } else {
-                    stopServiceCleanly()
-
-                    stopSelfResult(
-                        startId
-                    )
-
-                    return START_NOT_STICKY
-                }
-            }
         }
-
-        return START_STICKY
-    }
-
-    private fun startMocking() {
-
-        if (
-            !gpsReady ||
-            !networkReady
-        ) {
-            createProviders()
-        }
-
-        if (
-            !gpsReady ||
-            !networkReady
-        ) {
-
-            State.setServiceRunning(
-                this,
-                false
-            )
-
-            scheduleRestart()
-
-            return
-        }
-
-        State.ensureLocation(
-            this
-        )
-
-        State.setServiceRunning(
-            this,
-            true
-        )
-
-        handler.removeCallbacks(
-            updateRunnable
-        )
-
-        updateRunnable.run()
-    }
-
-    private fun createProviders() {
-
-        createProvider(
-            GPS,
-            true
-        )
-
-        createProvider(
-            NETWORK,
-            false
-        )
-    }
-
-    private fun createProvider(
-        provider: String,
-        isGps: Boolean
-    ) {
-
+        generation = requestedGeneration
+        live = this
+        stopping = false
+        lastCleanup = null
+        firstInjection = true
+        driftPoint = null
+        driftBase = null
+        nextDriftAt = 0L
         try {
-
-            if (
-                Build.VERSION.SDK_INT >=
-                Build.VERSION_CODES.S
-            ) {
-
-                val properties: ProviderProperties =
-                    ProviderProperties.Builder()
-                        .setAccuracy(
-                            if (isGps) {
-                                ProviderProperties
-                                    .ACCURACY_FINE
-                            } else {
-                                ProviderProperties
-                                    .ACCURACY_COARSE
-                            }
-                        )
-                        .setPowerUsage(
-                            ProviderProperties
-                                .POWER_USAGE_LOW
-                        )
-                        .setHasSpeedSupport(true)
-                        .setHasBearingSupport(true)
-                        .setHasAltitudeSupport(true)
-                        .setHasSatelliteRequirement(false)
-                        .build()
-
-                @Suppress("DEPRECATION")
-                try {
-                    locationManager.removeTestProvider(
-                        provider
-                    )
-                } catch (_: Exception) {
-                }
-
-                locationManager.addTestProvider(
-                    provider,
-                    properties
-                )
-
-            } else {
-
-                @Suppress("DEPRECATION")
-                try {
-                    locationManager.removeTestProvider(
-                        provider
-                    )
-                } catch (_: Exception) {
-                }
-
-                @Suppress("DEPRECATION")
-                locationManager.addTestProvider(
-                    provider,
-                    false,
-                    false,
-                    false,
-                    false,
-                    true,
-                    true,
-                    true,
-                    Criteria.POWER_LOW,
-                    if (isGps) {
-                        Criteria.ACCURACY_FINE
-                    } else {
-                        Criteria.ACCURACY_COARSE
-                    }
-                )
-            }
-
-            @Suppress("DEPRECATION")
-            locationManager.setTestProviderEnabled(
-                provider,
-                true
+            startForeground(
+                NOTIFICATION_ID, notification("Starting simulation", "Provider readiness is not yet confirmed."),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
             )
-
-            if (isGps) {
-                gpsReady = true
-            } else {
-                networkReady = true
-            }
-
-        } catch (_: Exception) {
-
-            if (isGps) {
-                gpsReady = false
-            } else {
-                networkReady = false
-            }
+            foreground = true
+        } catch (_: SecurityException) {
+            fail("LOCATION_FOREGROUND_PERMISSION_DENIED")
+            return START_NOT_STICKY
+        } catch (_: RuntimeException) {
+            fail("FOREGROUND_START_REJECTED")
+            return START_NOT_STICKY
         }
-    }
-
-    private fun publishCurrent() {
-
-        val baseLat =
-            State.getLat(this)
-                ?: return
-
-        val baseLon =
-            State.getLon(this)
-                ?: return
-
-        val drifting =
-            State.isDrifting(this)
-
-        val now =
-            System.currentTimeMillis()
-
-        var lat = baseLat
-        var lon = baseLon
-        var accuracy = 0f
-
-        if (drifting) {
-
-            if (
-                now >= nextDriftUpdate ||
-                driftLat == null ||
-                driftLon == null
-            ) {
-
-                val angle =
-                    Random.nextDouble(
-                        0.0,
-                        Math.PI * 2.0
-                    )
-
-                val distance =
-                    Random.nextDouble(
-                        2.0,
-                        MAX_DRIFT_METERS
-                    )
-
-                val metersPerDegreeLat =
-                    111_320.0
-
-                val metersPerDegreeLon =
-                    111_320.0 *
-                            cos(
-                                Math.toRadians(
-                                    baseLat
-                                )
-                            )
-
-                val offsetLat =
-                    cos(angle) *
-                            distance /
-                            metersPerDegreeLat
-
-                val offsetLon =
-                    kotlin.math.sin(angle) *
-                            distance /
-                            metersPerDegreeLon
-
-                driftLat =
-                    baseLat +
-                            offsetLat
-
-                driftLon =
-                    baseLon +
-                            offsetLon
-
-                driftAccuracy =
-                    Random.nextFloat() *
-                            50.0f
-
-                nextDriftUpdate =
-                    now +
-                            DRIFT_INTERVAL
-            }
-
-            lat =
-                driftLat
-                    ?: baseLat
-
-            lon =
-                driftLon
-                    ?: baseLon
-
-            accuracy =
-                driftAccuracy
-
-        } else {
-
-            /*
-             * Drift disabled:
-             * exact selected coordinates and 0 accuracy.
-             */
-
-            driftLat = null
-            driftLon = null
-            driftAccuracy = 0f
-            nextDriftUpdate = 0L
-
-            lat = baseLat
-            lon = baseLon
-            accuracy = 0f
+        val latitude = State.getLat(this)
+        val longitude = State.getLon(this)
+        if (latitude == null || longitude == null) {
+            fail("NO_LOCATION_SELECTED")
+            return START_NOT_STICKY
         }
-
-        publish(
-            GPS,
-            lat,
-            lon,
-            accuracy,
-            now
-        )
-
-        publish(
-            NETWORK,
-            lat,
-            lon,
-            accuracy,
-            now
-        )
-    }
-
-    private fun publish(
-        provider: String,
-        lat: Double,
-        lon: Double,
-        accuracy: Float,
-        time: Long
-    ) {
-
+        val result = engine.start(Coordinates(latitude, longitude))
+        if (!result.success) {
+            fail(result.code, result)
+            return START_NOT_STICKY
+        }
         try {
-
-            val location =
-                Location(provider).apply {
-
-                    latitude = lat
-                    longitude = lon
-
-                    this.accuracy =
-                        accuracy
-
-                    altitude = 0.0
-                    speed = 0f
-                    bearing = 0f
-
-                    this.time =
-                        time
-
-                    elapsedRealtimeNanos =
-                        SystemClock
-                            .elapsedRealtimeNanos()
-                }
-
-            @Suppress("DEPRECATION")
-            locationManager.setTestProviderLocation(
-                provider,
-                location
-            )
-
+            ControlCenter.serviceStarted(this, generation)
+            publisher.run()
         } catch (_: Exception) {
+            fail("SIMULATION_START_FAILED")
         }
+        return START_NOT_STICKY
     }
 
-    private fun createNotificationChannel() {
-
-        val manager =
-            getSystemService(
-                NotificationManager::class.java
-            )
-
-        manager.createNotificationChannel(
-            NotificationChannel(
-                CHANNEL_ID,
-                "MockGPS",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description =
-                    "Persistent MockGPS service"
-            }
-        )
-    }
-
-    private fun createNotification(): Notification {
-
-        val launchIntent =
-            packageManager.getLaunchIntentForPackage(
-                packageName
-            )
-
-        val pendingIntent =
-            launchIntent?.let {
-                PendingIntent.getActivity(
-                    this,
-                    0,
-                    it,
-                    PendingIntent.FLAG_UPDATE_CURRENT or
-                            PendingIntent.FLAG_IMMUTABLE
-                )
-            }
-
-        val lat =
-            State.getLat(this)
-
-        val lon =
-            State.getLon(this)
-
-        val coordinateText =
-            if (
-                lat != null &&
-                lon != null
-            ) {
-                String.format(
-                    Locale.US,
-                    "%.6f, %.6f",
-                    lat,
-                    lon
-                )
-            } else {
-                "No location selected"
-            }
-
-        val builder =
-            Notification.Builder(
-                this,
-                CHANNEL_ID
-            )
-                .setSmallIcon(
-                    R.mipmap.ic_launcher
-                )
-                .setContentTitle(
-                    "Running..."
-                )
-                .setContentText(
-                    coordinateText
-                )
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setShowWhen(false)
-                .setPriority(
-                    Notification.PRIORITY_MIN
-                )
-
-        if (pendingIntent != null) {
-            builder.setContentIntent(
-                pendingIntent
-            )
+    private fun currentPoint(base: Coordinates): Coordinates {
+        if (!State.isDrifting(this)) {
+            driftPoint = null
+            driftBase = null
+            return base
         }
-
-        return builder.build()
-    }
-
-    private fun updateNotification() {
-
-        val manager =
-            getSystemService(
-                NotificationManager::class.java
-            )
-
-        manager.notify(
-            NOTIFICATION_ID,
-            createNotification()
-        )
-    }
-
-    private fun scheduleRestart() {
-
-        if (
-            !State.isDesiredEnabled(this)
-        ) {
-            return
+        val now = SystemClock.elapsedRealtime()
+        if (driftBase != base || driftPoint == null || now >= nextDriftAt) {
+            driftPoint = base.offset(Random.nextDouble(2.0, 15.0), Random.nextDouble(0.0, Math.PI * 2.0))
+            driftBase = base
+            nextDriftAt = now + DRIFT_INTERVAL
         }
-
-        val alarmManager =
-            getSystemService(
-                AlarmManager::class.java
-            )
-
-        val intent =
-            Intent(
-                this,
-                BootReceiver::class.java
-            ).apply {
-                action =
-                    BootReceiver
-                        .ACTION_RESTART_SERVICE
-            }
-
-        val pendingIntent =
-            PendingIntent.getBroadcast(
-                this,
-                RESTART_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or
-                        PendingIntent.FLAG_IMMUTABLE
-            )
-
-        alarmManager.set(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + 1000L,
-            pendingIntent
-        )
+        return driftPoint ?: base
     }
 
-    private fun cancelRestart() {
-
-        val alarmManager =
-            getSystemService(
-                AlarmManager::class.java
-            )
-
-        val intent =
-            Intent(
-                this,
-                BootReceiver::class.java
-            ).apply {
-                action =
-                    BootReceiver
-                        .ACTION_RESTART_SERVICE
-            }
-
-        val pendingIntent =
-            PendingIntent.getBroadcast(
-                this,
-                RESTART_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or
-                        PendingIntent.FLAG_IMMUTABLE
-            )
-
-        alarmManager.cancel(
-            pendingIntent
-        )
+    private fun fail(code: String, knownCleanup: EngineResult? = null) {
+        val cleanup = shutdown(report = false)
+        val uncertain = !cleanup.success || knownCleanup?.cleanupUncertain == true
+        ControlCenter.serviceFailed(this, generation, code, uncertain)
+        showFailureNotification(uncertain)
     }
 
-    private fun stopServiceCleanly() {
+    private fun shutdown(report: Boolean): EngineResult {
+        if (stopping) return lastCleanup ?: EngineResult(false, "CLEANUP_IN_PROGRESS", true)
+        stopping = true
+        handler.removeCallbacksAndMessages(null)
+        val result = engine.stop()
+        lastCleanup = result
+        if (foreground) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            foreground = false
+        }
+        driftPoint = null
+        driftBase = null
+        if (live === this) live = null
+        if (report && generation >= 0) ControlCenter.serviceStopped(this, generation, !result.success)
+        stopSelf()
+        return result
+    }
 
-        handler.removeCallbacks(
-            updateRunnable
+    private fun notification(title: String, text: String, ongoing: Boolean = true): Notification {
+        val open = PendingIntent.getActivity(
+            this, 0, Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        return Notification.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_mock_location)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setContentIntent(open)
+            .setVisibility(Notification.VISIBILITY_PRIVATE)
+            .setOngoing(ongoing)
+            .setOnlyAlertOnce(true)
+            .setShowWhen(false)
+            .build()
+    }
 
-        cancelRestart()
-
+    private fun updateNotification(title: String, text: String) {
         try {
-            @Suppress("DEPRECATION")
-            locationManager.setTestProviderEnabled(
-                GPS,
-                false
-            )
-        } catch (_: Exception) {
+            getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(title, text))
+        } catch (_: SecurityException) {
+            // Notification permission is independent of successful provider injection.
         }
-
-        try {
-            @Suppress("DEPRECATION")
-            locationManager.setTestProviderEnabled(
-                NETWORK,
-                false
-            )
-        } catch (_: Exception) {
-        }
-
-        try {
-            @Suppress("DEPRECATION")
-            locationManager.removeTestProvider(
-                GPS
-            )
-        } catch (_: Exception) {
-        }
-
-        try {
-            @Suppress("DEPRECATION")
-            locationManager.removeTestProvider(
-                NETWORK
-            )
-        } catch (_: Exception) {
-        }
-
-        gpsReady = false
-        networkReady = false
-
-        driftLat = null
-        driftLon = null
-        driftAccuracy = 0f
-        nextDriftUpdate = 0L
-
-        State.setServiceRunning(
-            this,
-            false
-        )
-
-        stopForeground(
-            STOP_FOREGROUND_REMOVE
-        )
     }
 
-    override fun onTaskRemoved(
-        rootIntent: Intent?
-    ) {
-
-        if (
-            State.isDesiredEnabled(this)
-        ) {
-            scheduleRestart()
+    private fun showFailureNotification(uncertain: Boolean) {
+        val manager = getSystemService(NotificationManager::class.java)
+        if (!manager.areNotificationsEnabled()) return
+        try {
+            manager.notify(FAILURE_NOTIFICATION_ID, notification(
+                if (uncertain) "Provider cleanup uncertain" else "Simulation stopped",
+                "Open MockGPS for the result and recovery instructions.", ongoing = false
+            ))
+        } catch (_: SecurityException) {
+            // The actionable result remains in the app when notifications are unavailable.
         }
-
-        super.onTaskRemoved(
-            rootIntent
-        )
     }
 
     override fun onDestroy() {
-
-        handler.removeCallbacks(
-            updateRunnable
-        )
-
-        /*
-         * Do NOT cancel a scheduled restart here.
-         * onDestroy may happen because the process/service was killed.
-         * The alarm must remain alive while desired_enabled=true.
-         */
-
-        if (
-            !State.isDesiredEnabled(this)
-        ) {
-            cancelRestart()
+        if (live != null && live !== this) {
+            // A newer service instance owns the journal; an obsolete callback must not remove its providers.
+            handler.removeCallbacksAndMessages(null)
+            super.onDestroy()
+            return
         }
-
-        try {
-            @Suppress("DEPRECATION")
-            locationManager.removeTestProvider(
-                GPS
-            )
-        } catch (_: Exception) {
-        }
-
-        try {
-            @Suppress("DEPRECATION")
-            locationManager.removeTestProvider(
-                NETWORK
-            )
-        } catch (_: Exception) {
-        }
-
-        State.setServiceRunning(
-            this,
-            false
-        )
-
+        val wasStopping = stopping
+        val result = shutdown(report = false)
+        if (!wasStopping && generation >= 0) ControlCenter.serviceStopped(this, generation, !result.success)
         super.onDestroy()
     }
 
-    override fun onBind(
-        intent: Intent?
-    ): IBinder? = null
+    override fun onBind(intent: Intent?): IBinder? = null
 }

@@ -1,0 +1,1 @@
+{"gitleaks":"8.30.1; official archive checksum verified; exact historical false positives documented in BETA_AUDIT.md","actionlint":"1.7.7","ktlint":"1.7.1; canonical Maven TLS artifact and published SHA1 matched; formatter applied to two new Kotlin files","tasker_import":"NOT RUN; no Tasker/device attached","local_emulator":"NOT RUN; no /dev/kvm"}

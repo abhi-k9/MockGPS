@@ -1,0 +1,2792 @@
+{
+  "schema": 1,
+  "source_commit": "26b8786e139832d4fe79ca93a26d2138bca42b31",
+  "queried_at_utc": "2026-10-23T22:04:52.424410+00:00",
+  "source": "GitHub Advisory Database public REST API; type=reviewed, ecosystem=maven, affects=package@version",
+  "inventory_sha256": "44db34a9a253d710ffdd67ee27bed0c74061c4345d960ec46236310fbf88a007",
+  "modules_scanned": 174,
+  "scopes": [
+    "::classpath",
+    ":app:classpath",
+    ":app:debugAndroidTestRuntimeClasspath",
+    ":app:debugRuntimeClasspath",
+    ":app:debugUnitTestRuntimeClasspath",
+    ":app:releaseRuntimeClasspath"
+  ],
+  "limitations": [
+    "Maven coordinates only; excludes embedded/shaded native code and Gradle distribution internals",
+    "Includes buildscript plugin transitive dependencies; not an exhaustive inventory of SDK/system-image tools",
+    "Snapshot of published reviewed Maven advisories only; unknown/unreviewed vulnerabilities are not excluded",
+    "No native/shaded library, Android platform, SDK or firmware security clearance is implied",
+    "Does not replace the blocked GitHub PR dependency-diff review"
+  ],
+  "positive_control": {
+    "package": "org.apache.logging.log4j:log4j-core@2.14.1",
+    "expected_ghsa": "GHSA-jfh8-c2jp-5v3q",
+    "passed": true
+  },
+  "results": [
+    {
+      "name": "androidx.activity:activity-ktx",
+      "version": "1.10.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.activity:activity",
+      "version": "1.10.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.annotation:annotation-experimental",
+      "version": "1.4.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.annotation:annotation-jvm",
+      "version": "1.8.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.annotation:annotation",
+      "version": "1.8.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.arch.core:core-common",
+      "version": "2.2.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.arch.core:core-runtime",
+      "version": "2.2.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.collection:collection-jvm",
+      "version": "1.4.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.collection:collection",
+      "version": "1.4.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.concurrent:concurrent-futures-ktx",
+      "version": "1.2.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.concurrent:concurrent-futures",
+      "version": "1.1.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.core:core-ktx",
+      "version": "1.17.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.core:core-viewtree",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.core:core",
+      "version": "1.17.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.customview:customview",
+      "version": "1.1.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.databinding:databinding-common",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.databinding:databinding-compiler-common",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.drawerlayout:drawerlayout",
+      "version": "1.2.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.fragment:fragment",
+      "version": "1.8.9",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.interpolator:interpolator",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-common",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata-core",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime-ktx",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-savedstate",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.loader:loader",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.profileinstaller:profileinstaller",
+      "version": "1.4.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.savedstate:savedstate-ktx",
+      "version": "1.2.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.savedstate:savedstate",
+      "version": "1.2.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.startup:startup-runtime",
+      "version": "1.1.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test.ext:junit",
+      "version": "1.3.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test.services:storage",
+      "version": "1.6.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test:core",
+      "version": "1.7.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test:monitor",
+      "version": "1.8.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test:runner",
+      "version": "1.7.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.tracing:tracing",
+      "version": "1.2.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.versionedparcelable:versionedparcelable",
+      "version": "1.1.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.viewpager:viewpager",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.application:com.android.application.gradle.plugin",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.databinding:baseLibrary",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:crash",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:protos",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:shared",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:tracker",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build.jetifier:jetifier-core",
+      "version": "1.0.0-beta10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build.jetifier:jetifier-processor",
+      "version": "1.0.0-beta10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:aapt2-proto",
+      "version": "9.2.1-15009934",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:aaptcompiler",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:apksig",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:apkzlib",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:builder-model",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:builder-test-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:builder",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:bundletool",
+      "version": "1.18.3",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle-common-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle-settings-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:manifest-merger",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.ddms:ddmlib",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.layoutlib:layoutlib-api",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.lint:lint-model",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.lint:lint-typedef-remover",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.utp:gradle-work-action-api",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:annotations",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:common",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:dvlib",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:repository",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:sdk-common",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:sdklib",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android:signflinger",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android:zipflinger",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.auto.value:auto-value-annotations",
+      "version": "1.6.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.code.findbugs:jsr305",
+      "version": "3.0.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.code.gson:gson",
+      "version": "2.10.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.code.gson:gson",
+      "version": "2.11.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.crypto.tink:tink",
+      "version": "1.7.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.dagger:dagger",
+      "version": "2.28.3",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.errorprone:error_prone_annotations",
+      "version": "2.28.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.flatbuffers:flatbuffers-java",
+      "version": "1.12.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:failureaccess",
+      "version": "1.0.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:guava",
+      "version": "33.3.1-jre",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:listenablefuture",
+      "version": "1.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:listenablefuture",
+      "version": "9999.0-empty-to-avoid-conflict-with-guava",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.j2objc:j2objc-annotations",
+      "version": "3.0.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.jimfs:jimfs",
+      "version": "1.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.protobuf:protobuf-java-util",
+      "version": "3.25.5",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.protobuf:protobuf-java",
+      "version": "3.25.5",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.googlecode.juniversalchardet:juniversalchardet",
+      "version": "1.0.3",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.jakewharton.timber:timber",
+      "version": "5.0.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup.okhttp3:okhttp",
+      "version": "4.12.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup.okio:okio-jvm",
+      "version": "3.6.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup.okio:okio",
+      "version": "3.6.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup:javapoet",
+      "version": "1.13.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup:javawriter",
+      "version": "2.5.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.sun.istack:istack-commons-runtime",
+      "version": "3.0.8",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.sun.xml.fastinfoset:FastInfoset",
+      "version": "1.2.16",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "commons-codec:commons-codec",
+      "version": "1.17.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "commons-io:commons-io",
+      "version": "2.16.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "commons-logging:commons-logging",
+      "version": "1.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "jakarta.activation:jakarta.activation-api",
+      "version": "1.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+      "version": "2.3.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "javax.inject:javax.inject",
+      "version": "1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "junit:junit",
+      "version": "4.13.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.java.dev.jna:jna-platform",
+      "version": "5.6.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.java.dev.jna:jna",
+      "version": "5.6.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.sf.jopt-simple:jopt-simple",
+      "version": "4.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.sf.kxml:kxml2",
+      "version": "2.3.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.commons:commons-compress",
+      "version": "1.27.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.commons:commons-lang3",
+      "version": "3.16.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-j288-q9x7-2f5v",
+          "cve_id": "CVE-2025-48924",
+          "url": "https://api.github.com/advisories/GHSA-j288-q9x7-2f5v",
+          "html_url": "https://github.com/advisories/GHSA-j288-q9x7-2f5v",
+          "summary": "Apache Commons Lang is vulnerable to Uncontrolled Recursion when processing long inputs",
+          "description": "Uncontrolled Recursion vulnerability in Apache Commons Lang.\n\nThis issue affects Apache Commons Lang: Starting with\u00a0commons-lang:commons-lang\u00a02.0 to 2.6, and, from org.apache.commons:commons-lang3 3.0 before\u00a03.18.0.\n\nThe methods ClassUtils.getClass(...) can throw\u00a0StackOverflowError on very long inputs. Because an Error is usually not handled by applications and libraries, a StackOverflowError could\u00a0cause an application to stop.\n\nUsers are recommended to upgrade to version 3.18.0, which fixes the issue.",
+          "type": "reviewed",
+          "severity": "medium",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/apache/commons-lang",
+          "identifiers": [
+            {
+              "value": "GHSA-j288-q9x7-2f5v",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2025-48924",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-48924",
+            "https://lists.apache.org/thread/bgv0lpswokgol11tloxnjfzdl7yrc1g1",
+            "https://github.com/apache/commons-lang/commit/b424803abdb2bec818e4fbcb251ce031c22aca53",
+            "https://lists.debian.org/debian-lts-announce/2025/08/msg00000.html",
+            "https://lists.debian.org/debian-lts-announce/2025/08/msg00026.html",
+            "https://lists.debian.org/debian-lts-announce/2025/09/msg00032.html",
+            "https://lists.debian.org/debian-lts-announce/2025/09/msg00036.html",
+            "http://www.openwall.com/lists/oss-security/2025/07/11/1",
+            "https://github.com/advisories/GHSA-j288-q9x7-2f5v"
+          ],
+          "published_at": "2025-07-11T15:31:37Z",
+          "updated_at": "2025-11-05T20:30:33Z",
+          "github_reviewed_at": "2025-07-12T00:48:03Z",
+          "nvd_published_at": "2025-07-11T15:15:24Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.apache.commons:commons-lang3"
+              },
+              "vulnerable_version_range": ">= 3.0, < 3.18.0",
+              "first_patched_version": "3.18.0",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "commons-lang:commons-lang"
+              },
+              "vulnerable_version_range": ">= 2.0, <= 2.6",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "score": 6.5
+            },
+            "cvss_v4": {
+              "vector_string": null,
+              "score": 0.0
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-674",
+              "name": "Uncontrolled Recursion"
+            }
+          ],
+          "credits": [],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+            "score": 6.5
+          },
+          "epss": {
+            "percentage": 0.02632,
+            "percentile": 0.85132
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.apache.httpcomponents:httpclient",
+      "version": "4.5.14",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.httpcomponents:httpcore",
+      "version": "4.4.16",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.httpcomponents:httpmime",
+      "version": "4.5.6",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.bitbucket.b_c:jose4j",
+      "version": "0.9.5",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-3677-xxcr-wjqv",
+          "cve_id": "CVE-2024-29371",
+          "url": "https://api.github.com/advisories/GHSA-3677-xxcr-wjqv",
+          "html_url": "https://github.com/advisories/GHSA-3677-xxcr-wjqv",
+          "summary": "jose4j is vulnerable to DoS via compressed JWE content",
+          "description": "In jose4j before 0.9.6, an attacker can cause a Denial-of-Service (DoS) condition by crafting a malicious JSON Web Encryption (JWE) token with an exceptionally high compression ratio. When this token is processed by the server, it results in significant memory allocation and processing time during decompression.",
+          "type": "reviewed",
+          "severity": "high",
+          "repository_advisory_url": null,
+          "source_code_location": "https://bitbucket.org/b_c/jose4j/wiki/Home",
+          "identifiers": [
+            {
+              "value": "GHSA-3677-xxcr-wjqv",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2024-29371",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2024-29371",
+            "https://bitbucket.org/b_c/jose4j/issues/220/vuln-zip-bomb-attack",
+            "https://bitbucket.org/b_c/jose4j/commits/19a90a64c47bb07c4aa5462f1316d5c293d81fcf",
+            "https://github.com/advisories/GHSA-3677-xxcr-wjqv"
+          ],
+          "published_at": "2025-12-17T18:31:33Z",
+          "updated_at": "2026-01-06T19:46:24Z",
+          "github_reviewed_at": "2025-12-18T15:34:32Z",
+          "nvd_published_at": "2025-12-17T16:16:04Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bitbucket.b_c:jose4j"
+              },
+              "vulnerable_version_range": "< 0.9.6",
+              "first_patched_version": "0.9.6",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "score": 7.5
+            },
+            "cvss_v4": {
+              "vector_string": null,
+              "score": 0.0
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-1259",
+              "name": "Improper Restriction of Security Token Assignment"
+            }
+          ],
+          "credits": [
+            {
+              "user": {
+                "login": "ShichengRao",
+                "id": 122049441,
+                "node_id": "U_kgDOB0ZToQ",
+                "avatar_url": "https://avatars.githubusercontent.com/u/122049441?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/ShichengRao",
+                "html_url": "https://github.com/ShichengRao",
+                "followers_url": "https://api.github.com/users/ShichengRao/followers",
+                "following_url": "https://api.github.com/users/ShichengRao/following{/other_user}",
+                "gists_url": "https://api.github.com/users/ShichengRao/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/ShichengRao/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/ShichengRao/subscriptions",
+                "organizations_url": "https://api.github.com/users/ShichengRao/orgs",
+                "repos_url": "https://api.github.com/users/ShichengRao/repos",
+                "events_url": "https://api.github.com/users/ShichengRao/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/ShichengRao/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            }
+          ],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+            "score": 7.5
+          },
+          "epss": {
+            "percentage": 0.00257,
+            "percentile": 0.1559
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.bouncycastle:bcpkix-jdk18on",
+      "version": "1.79",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-wg6q-6289-32hp",
+          "cve_id": "CVE-2026-5588",
+          "url": "https://api.github.com/advisories/GHSA-wg6q-6289-32hp",
+          "html_url": "https://github.com/advisories/GHSA-wg6q-6289-32hp",
+          "summary": "Bouncy Castle Crypto Package For Java: Use of a Broken or Risky Cryptographic Algorithm vulnerability in bcpkix modules",
+          "description": ": Use of a Broken or Risky Cryptographic Algorithm vulnerability in Legion of the Bouncy Castle Inc. BC-JAVA bcpkix on all (pkix modules).\n\n\nPKIX draft CompositeVerifier accepts empty signature sequence as valid.\n\n\nThis issue affects BC-JAVA: from 1.49 before 1.84.",
+          "type": "reviewed",
+          "severity": "medium",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/bcgit/bc-java",
+          "identifiers": [
+            {
+              "value": "GHSA-wg6q-6289-32hp",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2026-5588",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-5588",
+            "https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902026%E2%80%905588",
+            "https://github.com/bcgit/bc-java/commit/656bae0dbd9b1521f840521ff786e78749fe3057",
+            "https://github.com/advisories/GHSA-wg6q-6289-32hp"
+          ],
+          "published_at": "2026-04-15T18:31:54Z",
+          "updated_at": "2026-04-16T21:32:20Z",
+          "github_reviewed_at": "2026-04-16T21:32:20Z",
+          "nvd_published_at": "2026-04-15T10:16:49Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-jdk15on"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-debug-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-debug-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcpkix-debug-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.49, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": null,
+              "score": 0.0
+            },
+            "cvss_v4": {
+              "vector_string": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/U:Green",
+              "score": 6.3
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-327",
+              "name": "Use of a Broken or Risky Cryptographic Algorithm"
+            }
+          ],
+          "credits": [],
+          "comments": 0,
+          "cvss": {
+            "vector_string": null,
+            "score": null
+          },
+          "epss": {
+            "percentage": 0.00687,
+            "percentile": 0.51577
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.bouncycastle:bcprov-jdk18on",
+      "version": "1.79",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-qp49-qgx5-5m26",
+          "cve_id": "CVE-2026-13506",
+          "url": "https://api.github.com/advisories/GHSA-qp49-qgx5-5m26",
+          "html_url": "https://github.com/advisories/GHSA-qp49-qgx5-5m26",
+          "summary": "Bouncy Castle: Lazy ASN.1 sequence forcing resets nesting-depth guard",
+          "description": "In Bouncy Castle for Java before 1.85, Lazy ASN.1 sequence forcing resets nesting-depth guard. This issue also affects Bouncy Castle for Java LTS before 2.73.12, and Bouncy Castle for Java FIPS (BC-FJA) before bc-fips 1.0.2.7 (1.0.X series), 2.0.2 (2.0.X series) and 2.1.3 (2.1.X series).",
+          "type": "reviewed",
+          "severity": "high",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/bcgit/bc-java",
+          "identifiers": [
+            {
+              "value": "GHSA-qp49-qgx5-5m26",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2026-13506",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-13506",
+            "https://github.com/bcgit/bc-java/commit/77454da9b3dcaaa2991412d1c3c1a6e1a338ff84",
+            "https://github.com/bcgit/bc-java/wiki/CVE-2026-13506",
+            "https://github.com/advisories/GHSA-qp49-qgx5-5m26"
+          ],
+          "published_at": "2026-08-03T06:31:44Z",
+          "updated_at": "2026-09-18T17:37:53Z",
+          "github_reviewed_at": "2026-09-18T17:37:51Z",
+          "nvd_published_at": "2026-08-03T04:16:39Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk18on"
+              },
+              "vulnerable_version_range": "< 1.85",
+              "first_patched_version": "1.85",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bc-fips"
+              },
+              "vulnerable_version_range": "< 1.0.2.7",
+              "first_patched_version": "1.0.2.7",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bc-fips"
+              },
+              "vulnerable_version_range": ">= 2.0.0, < 2.0.2",
+              "first_patched_version": "2.0.2",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bc-fips"
+              },
+              "vulnerable_version_range": ">= 2.1.0, < 2.1.3",
+              "first_patched_version": "2.1.3",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-lts8on"
+              },
+              "vulnerable_version_range": "< 2.73.12",
+              "first_patched_version": "2.73.12",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15to18"
+              },
+              "vulnerable_version_range": "< 1.85",
+              "first_patched_version": "1.85",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "score": 7.5
+            },
+            "cvss_v4": {
+              "vector_string": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/U:Amber",
+              "score": 8.7
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-674",
+              "name": "Uncontrolled Recursion"
+            }
+          ],
+          "credits": [],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+            "score": 7.5
+          },
+          "epss": {
+            "percentage": 0.00442,
+            "percentile": 0.36519
+          }
+        },
+        {
+          "ghsa_id": "GHSA-9pwp-9qqc-pr26",
+          "cve_id": "CVE-2026-8763",
+          "url": "https://api.github.com/advisories/GHSA-9pwp-9qqc-pr26",
+          "html_url": "https://github.com/advisories/GHSA-9pwp-9qqc-pr26",
+          "summary": "Bouncy Castle: Name Constraints bypass via trailing dot in rfc822Name and URI",
+          "description": "In Bouncy Castle for Java before 1.85, Name Constraints bypass via trailing dot in rfc822Name and URI. This issue also affects Bouncy Castle for Java LTS before 2.73.12, and Bouncy Castle for Java FIPS (BC-FJA) before bc-fips 1.0.2.7 (1.0.X series), 2.0.2 (2.0.X series) and 2.1.3 (2.1.X series).",
+          "type": "reviewed",
+          "severity": "critical",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/bcgit/bc-java",
+          "identifiers": [
+            {
+              "value": "GHSA-9pwp-9qqc-pr26",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2026-8763",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-8763",
+            "https://github.com/bcgit/bc-java/commit/2c28b253a44681fbbc562561eab6ad383d2ae558",
+            "https://github.com/bcgit/bc-java/wiki/CVE-2026-8763",
+            "https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902026%E2%80%908763",
+            "https://github.com/bcgit/bc-java/releases/tag/r1rv85v2",
+            "https://github.com/advisories/GHSA-9pwp-9qqc-pr26"
+          ],
+          "published_at": "2026-08-03T03:31:56Z",
+          "updated_at": "2026-09-18T17:36:32Z",
+          "github_reviewed_at": "2026-09-18T17:35:38Z",
+          "nvd_published_at": "2026-08-03T01:16:45Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bc-fips"
+              },
+              "vulnerable_version_range": "< 1.0.2.7",
+              "first_patched_version": "1.0.2.7",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bc-fips"
+              },
+              "vulnerable_version_range": ">= 2.0.0, < 2.0.2",
+              "first_patched_version": "2.0.2",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bc-fips"
+              },
+              "vulnerable_version_range": ">= 2.1.0, < 2.1.3",
+              "first_patched_version": "2.1.3",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk18on"
+              },
+              "vulnerable_version_range": "< 1.85",
+              "first_patched_version": "1.85",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-lts8on"
+              },
+              "vulnerable_version_range": "< 2.73.12",
+              "first_patched_version": "2.73.12",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15to18"
+              },
+              "vulnerable_version_range": "< 1.85",
+              "first_patched_version": "1.85",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+              "score": 9.1
+            },
+            "cvss_v4": {
+              "vector_string": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/U:Amber",
+              "score": 9.3
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-295",
+              "name": "Improper Certificate Validation"
+            }
+          ],
+          "credits": [],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+            "score": 9.1
+          },
+          "epss": {
+            "percentage": 0.0043,
+            "percentile": 0.35652
+          }
+        },
+        {
+          "ghsa_id": "GHSA-c3fc-8qff-9hwx",
+          "cve_id": "CVE-2026-0636",
+          "url": "https://api.github.com/advisories/GHSA-c3fc-8qff-9hwx",
+          "html_url": "https://github.com/advisories/GHSA-c3fc-8qff-9hwx",
+          "summary": "Bouncy Castle has an LDAP injection",
+          "description": "Improper neutralization of special elements used in an LDAP query ('LDAP injection') vulnerability in Legion of the Bouncy Castle Inc. BC-JAVA bcprov on all (prov modules). This vulnerability is associated with program files LDAPStoreHelper.\n\nThis issue affects BC-JAVA: from 1.74 before 1.84.",
+          "type": "reviewed",
+          "severity": "medium",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/bcgit/bc-java",
+          "identifiers": [
+            {
+              "value": "GHSA-c3fc-8qff-9hwx",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2026-0636",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-0636",
+            "https://github.com/bcgit/bc-java/commit/d20cdb8430e09224114fec0179a71859929fcbde",
+            "https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902026%E2%80%900636",
+            "https://github.com/advisories/GHSA-c3fc-8qff-9hwx"
+          ],
+          "published_at": "2026-04-17T18:31:50Z",
+          "updated_at": "2026-04-18T01:06:03Z",
+          "github_reviewed_at": "2026-04-18T01:06:02Z",
+          "nvd_published_at": "2026-04-15T10:16:38Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.74, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.74, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.74, < 1.84",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": null,
+              "score": 0.0
+            },
+            "cvss_v4": {
+              "vector_string": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P/RE:M/U:Amber",
+              "score": 5.5
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-90",
+              "name": "Improper Neutralization of Special Elements used in an LDAP Query ('LDAP Injection')"
+            }
+          ],
+          "credits": [],
+          "comments": 0,
+          "cvss": {
+            "vector_string": null,
+            "score": null
+          },
+          "epss": {
+            "percentage": 0.00527,
+            "percentile": 0.43526
+          }
+        },
+        {
+          "ghsa_id": "GHSA-574f-3g2m-x479",
+          "cve_id": "CVE-2025-14813",
+          "url": "https://api.github.com/advisories/GHSA-574f-3g2m-x479",
+          "html_url": "https://github.com/advisories/GHSA-574f-3g2m-x479",
+          "summary": "Bouncy Castle for Java GOST 28147 CTR mode reuses keystream after 255 blocks",
+          "description": "The GOST 28147-2015 CTR mode implementation (`G3413CTRBlockCipher`) in the Legion of the Bouncy Castle BC-JAVA `bcprov` core module only increments the final byte of the counter, so the counter wraps after 255 blocks and the keystream is reused. Reusing CTR keystream allows an attacker who can observe two ciphertexts produced with the same key/IV to recover the XOR of the plaintexts, breaking confidentiality. Affects BC-JAVA from 1.59 before 1.84 (with backported fixes in 1.80.2 and 1.81.1).",
+          "type": "reviewed",
+          "severity": "critical",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/bcgit/bc-java",
+          "identifiers": [
+            {
+              "value": "GHSA-574f-3g2m-x479",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2025-14813",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-14813",
+            "https://github.com/bcgit/bc-java/commit/701686cb0184cd9ae103c801b3581fdf95c6d4f3",
+            "https://github.com/bcgit/bc-java/commit/b42574345414e4b7c8051b16fa1fafe01c29871f",
+            "https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902025%E2%80%9014813",
+            "https://security.access.redhat.com/data/csaf/v2/vex/2025/cve-2025-14813.json",
+            "https://bugzilla.redhat.com/show_bug.cgi?id=2458640",
+            "https://access.redhat.com/security/cve/CVE-2025-14813",
+            "https://access.redhat.com/errata/RHSA-2026:24977",
+            "https://access.redhat.com/errata/RHSA-2026:21772",
+            "https://access.redhat.com/errata/RHSA-2026:18059",
+            "https://access.redhat.com/errata/RHSA-2026:18055",
+            "https://access.redhat.com/errata/RHSA-2026:18054",
+            "https://access.redhat.com/errata/RHSA-2026:17668",
+            "https://access.redhat.com/errata/RHSA-2026:14276",
+            "https://access.redhat.com/errata/RHSA-2026:14272",
+            "https://access.redhat.com/errata/RHSA-2026:13631",
+            "https://access.redhat.com/errata/RHSA-2026:11721",
+            "https://access.redhat.com/errata/RHSA-2026:11720",
+            "https://access.redhat.com/errata/RHSA-2026:60247",
+            "https://access.redhat.com/errata/RHSA-2026:60248",
+            "https://access.redhat.com/errata/RHSA-2026:60249",
+            "https://access.redhat.com/errata/RHSA-2026:60250",
+            "https://access.redhat.com/errata/RHSA-2026:60251",
+            "https://access.redhat.com/errata/RHSA-2026:60252",
+            "https://access.redhat.com/errata/RHSA-2026:60254",
+            "https://access.redhat.com/errata/RHSA-2026:60256",
+            "https://access.redhat.com/errata/RHSA-2026:60259",
+            "https://access.redhat.com/errata/RHSA-2026:66488",
+            "https://access.redhat.com/errata/RHSA-2026:53644",
+            "https://access.redhat.com/errata/RHSA-2026:53645",
+            "https://access.redhat.com/errata/RHSA-2026:53646",
+            "https://access.redhat.com/errata/RHSA-2026:53806",
+            "https://access.redhat.com/errata/RHSA-2026:60239",
+            "https://access.redhat.com/errata/RHSA-2026:60246",
+            "https://github.com/advisories/GHSA-574f-3g2m-x479"
+          ],
+          "published_at": "2026-04-17T18:31:50Z",
+          "updated_at": "2026-09-24T15:18:46Z",
+          "github_reviewed_at": "2026-06-30T19:45:20Z",
+          "nvd_published_at": "2026-04-15T10:16:38Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.80.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.80.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.80.1",
+              "first_patched_version": "1.80.2",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.80.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.80.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.80.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-ext-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.78.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-ext-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.78.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-ext-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.78.1",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-ext-debug-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.74",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-ext-debug-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.77",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-ext-debug-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.59, <= 1.77",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk14"
+              },
+              "vulnerable_version_range": "= 1.81.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15to18"
+              },
+              "vulnerable_version_range": "= 1.81.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk18on"
+              },
+              "vulnerable_version_range": "= 1.81.0",
+              "first_patched_version": "1.81.1",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk14"
+              },
+              "vulnerable_version_range": "= 1.81.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk15to18"
+              },
+              "vulnerable_version_range": "= 1.81.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk18on"
+              },
+              "vulnerable_version_range": "= 1.81.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.82, <= 1.83",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.82, <= 1.83",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.82, <= 1.83",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk14"
+              },
+              "vulnerable_version_range": ">= 1.82, <= 1.83",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk15to18"
+              },
+              "vulnerable_version_range": ">= 1.82, <= 1.83",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk18on"
+              },
+              "vulnerable_version_range": ">= 1.82, <= 1.83",
+              "first_patched_version": "1.84",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-debug-jdk15on"
+              },
+              "vulnerable_version_range": "<= 1.7.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.bouncycastle:bcprov-jdk15on"
+              },
+              "vulnerable_version_range": "<= 1.7.0",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "score": 7.5
+            },
+            "cvss_v4": {
+              "vector_string": "CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N/RE:M/U:Red",
+              "score": 9.3
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-323",
+              "name": "Reusing a Nonce, Key Pair in Encryption"
+            },
+            {
+              "cwe_id": "CWE-327",
+              "name": "Use of a Broken or Risky Cryptographic Algorithm"
+            }
+          ],
+          "credits": [
+            {
+              "user": {
+                "login": "simon-reisinger-dynatrace",
+                "id": 176280510,
+                "node_id": "U_kgDOCoHTvg",
+                "avatar_url": "https://avatars.githubusercontent.com/u/176280510?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/simon-reisinger-dynatrace",
+                "html_url": "https://github.com/simon-reisinger-dynatrace",
+                "followers_url": "https://api.github.com/users/simon-reisinger-dynatrace/followers",
+                "following_url": "https://api.github.com/users/simon-reisinger-dynatrace/following{/other_user}",
+                "gists_url": "https://api.github.com/users/simon-reisinger-dynatrace/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/simon-reisinger-dynatrace/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/simon-reisinger-dynatrace/subscriptions",
+                "organizations_url": "https://api.github.com/users/simon-reisinger-dynatrace/orgs",
+                "repos_url": "https://api.github.com/users/simon-reisinger-dynatrace/repos",
+                "events_url": "https://api.github.com/users/simon-reisinger-dynatrace/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/simon-reisinger-dynatrace/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            }
+          ],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+            "score": 7.5
+          },
+          "epss": {
+            "percentage": 0.0032,
+            "percentile": 0.23512
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.bouncycastle:bcutil-jdk18on",
+      "version": "1.79",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.checkerframework:checker-qual",
+      "version": "3.43.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.glassfish.jaxb:jaxb-runtime",
+      "version": "2.3.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.glassfish.jaxb:txw2",
+      "version": "2.3.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.hamcrest:hamcrest-core",
+      "version": "1.3",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jdom:jdom2",
+      "version": "2.0.6",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-2363-cqg2-863c",
+          "cve_id": "CVE-2021-33813",
+          "url": "https://api.github.com/advisories/GHSA-2363-cqg2-863c",
+          "html_url": "https://github.com/advisories/GHSA-2363-cqg2-863c",
+          "summary": "XML External Entity (XXE) Injection in JDOM",
+          "description": "An XXE issue in SAXBuilder in JDOM through 2.0.6 allows attackers to cause a denial of service via a crafted HTTP request. As a workaround, to avoid external entities being expanded, one can call `builder.setExpandEntities(false)` and they won't be expanded.",
+          "type": "reviewed",
+          "severity": "high",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/hunterhacker/jdom",
+          "identifiers": [
+            {
+              "value": "GHSA-2363-cqg2-863c",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2021-33813",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2021-33813",
+            "https://github.com/hunterhacker/jdom/pull/188",
+            "https://alephsecurity.com/vulns/aleph-2021003",
+            "https://lists.apache.org/thread.html/r89b3800cfabb1e773e49425e5d4239c28a659839a2eca6af3431482e@%3Cissues.solr.apache.org%3E",
+            "https://lists.apache.org/thread.html/r9974f64723875052e02787b2a5eda689ac5247c71b827d455e5dc9a6@%3Cissues.solr.apache.org%3E",
+            "https://lists.apache.org/thread.html/rbc075a4ac85e7a8e47420b7383f16ffa0af3b792b8423584735f369f@%3Cissues.solr.apache.org%3E",
+            "https://lists.debian.org/debian-lts-announce/2021/06/msg00026.html",
+            "https://lists.debian.org/debian-lts-announce/2021/07/msg00012.html",
+            "https://lists.apache.org/thread.html/r21c406c7ed88fe340db7dbae75e58355159e6c324037c7d5547bf40b@%3Cissues.solr.apache.org%3E",
+            "https://lists.apache.org/thread.html/r5674106135bb1a6ef57483f4c63a9c44bca85d0e2a8a05895a8f1d89@%3Cissues.solr.apache.org%3E",
+            "https://lists.apache.org/thread.html/r6db397ae7281ead825338200d1f62d2827585a70797cc9ac0c4bd23f@%3Cissues.solr.apache.org%3E",
+            "https://lists.apache.org/thread.html/r845e987b7cd8efe610284958e997b84583f5a98d3394adc09e3482fe@%3Cissues.solr.apache.org%3E",
+            "https://lists.apache.org/thread.html/rfb7a93e40ebeb1e0068cde0bf3834dcab46bb1ef06d6424db48ed9fd@%3Cdev.tika.apache.org%3E",
+            "https://github.com/hunterhacker/jdom/commit/dd4f3c2fc7893edd914954c73eb577f925a7d361",
+            "https://github.com/hunterhacker/jdom/releases",
+            "https://www.oracle.com/security-alerts/cpuapr2022.html",
+            "https://www.oracle.com/security-alerts/cpujul2022.html",
+            "https://github.com/hunterhacker/jdom/issues/189",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/EWFVYTHGILOQXUA7U3SPOERQXL7OPSZG",
+            "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/AH46QHE5GIMT6BL6C3GDTOYF27JYILXM",
+            "https://github.com/hunterhacker/jdom/releases/tag/JDOM-2.0.6.1",
+            "https://github.com/advisories/GHSA-2363-cqg2-863c"
+          ],
+          "published_at": "2021-07-27T19:02:56Z",
+          "updated_at": "2025-09-16T15:06:11Z",
+          "github_reviewed_at": "2021-07-27T19:02:41Z",
+          "nvd_published_at": "2021-06-16T12:15:00Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.jdom:jdom2"
+              },
+              "vulnerable_version_range": "< 2.0.6.1",
+              "first_patched_version": "2.0.6.1",
+              "vulnerable_functions": []
+            },
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.jdom:jdom"
+              },
+              "vulnerable_version_range": "<= 2.0.2",
+              "first_patched_version": null,
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "score": 7.5
+            },
+            "cvss_v4": {
+              "vector_string": null,
+              "score": 0.0
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-611",
+              "name": "Improper Restriction of XML External Entity Reference"
+            }
+          ],
+          "credits": [
+            {
+              "user": {
+                "login": "paradoxengine",
+                "id": 8309115,
+                "node_id": "MDQ6VXNlcjgzMDkxMTU=",
+                "avatar_url": "https://avatars.githubusercontent.com/u/8309115?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/paradoxengine",
+                "html_url": "https://github.com/paradoxengine",
+                "followers_url": "https://api.github.com/users/paradoxengine/followers",
+                "following_url": "https://api.github.com/users/paradoxengine/following{/other_user}",
+                "gists_url": "https://api.github.com/users/paradoxengine/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/paradoxengine/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/paradoxengine/subscriptions",
+                "organizations_url": "https://api.github.com/users/paradoxengine/orgs",
+                "repos_url": "https://api.github.com/users/paradoxengine/repos",
+                "events_url": "https://api.github.com/users/paradoxengine/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/paradoxengine/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            },
+            {
+              "user": {
+                "login": "AndrzejBiernacki2010",
+                "id": 124769069,
+                "node_id": "U_kgDOB2_TLQ",
+                "avatar_url": "https://avatars.githubusercontent.com/u/124769069?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/AndrzejBiernacki2010",
+                "html_url": "https://github.com/AndrzejBiernacki2010",
+                "followers_url": "https://api.github.com/users/AndrzejBiernacki2010/followers",
+                "following_url": "https://api.github.com/users/AndrzejBiernacki2010/following{/other_user}",
+                "gists_url": "https://api.github.com/users/AndrzejBiernacki2010/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/AndrzejBiernacki2010/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/AndrzejBiernacki2010/subscriptions",
+                "organizations_url": "https://api.github.com/users/AndrzejBiernacki2010/orgs",
+                "repos_url": "https://api.github.com/users/AndrzejBiernacki2010/repos",
+                "events_url": "https://api.github.com/users/AndrzejBiernacki2010/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/AndrzejBiernacki2010/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            }
+          ],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+            "score": 7.5
+          },
+          "epss": {
+            "percentage": 0.19442,
+            "percentile": 0.97022
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.jetbrains.kotlin:abi-tools-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:fus-statistics-gradle-plugin",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-build-statistics",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-build-tools-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-compiler-runner",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-daemon-client",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-annotations",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-idea",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-model",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-r937-wjx7-w2jp",
+          "cve_id": "CVE-2026-53914",
+          "url": "https://api.github.com/advisories/GHSA-r937-wjx7-w2jp",
+          "html_url": "https://github.com/advisories/GHSA-r937-wjx7-w2jp",
+          "summary": "JetBrains Kotlin: Unsafe Deserialization in Kotlin Build Cache Enables Code Execution",
+          "description": "In JetBrains Kotlin before 2.4.20 code execution was possible via unsafe deserialization in the build cache metadata",
+          "type": "reviewed",
+          "severity": "medium",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/JetBrains/kotlin",
+          "identifiers": [
+            {
+              "value": "GHSA-r937-wjx7-w2jp",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2026-53914",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-53914",
+            "https://www.jetbrains.com/privacy-security/issues-fixed",
+            "https://github.com/JetBrains/kotlin/commit/bf51df665b458fda7c3eaf436c4d88dc119d7ec6",
+            "https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1",
+            "https://github.com/advisories/GHSA-r937-wjx7-w2jp"
+          ],
+          "published_at": "2026-06-26T15:32:13Z",
+          "updated_at": "2026-08-12T19:25:24Z",
+          "github_reviewed_at": "2026-08-12T19:25:23Z",
+          "nvd_published_at": "2026-06-26T14:17:05Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.jetbrains.kotlin:kotlin-gradle-plugin"
+              },
+              "vulnerable_version_range": "< 2.4.20-Beta1",
+              "first_patched_version": "2.4.20-Beta1",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L",
+              "score": 6.7
+            },
+            "cvss_v4": {
+              "vector_string": null,
+              "score": 0.0
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-502",
+              "name": "Deserialization of Untrusted Data"
+            }
+          ],
+          "credits": [
+            {
+              "user": {
+                "login": "marcelstoer",
+                "id": 624195,
+                "node_id": "MDQ6VXNlcjYyNDE5NQ==",
+                "avatar_url": "https://avatars.githubusercontent.com/u/624195?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/marcelstoer",
+                "html_url": "https://github.com/marcelstoer",
+                "followers_url": "https://api.github.com/users/marcelstoer/followers",
+                "following_url": "https://api.github.com/users/marcelstoer/following{/other_user}",
+                "gists_url": "https://api.github.com/users/marcelstoer/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/marcelstoer/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/marcelstoer/subscriptions",
+                "organizations_url": "https://api.github.com/users/marcelstoer/orgs",
+                "repos_url": "https://api.github.com/users/marcelstoer/repos",
+                "events_url": "https://api.github.com/users/marcelstoer/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/marcelstoer/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            },
+            {
+              "user": {
+                "login": "Lueton",
+                "id": 42818194,
+                "node_id": "MDQ6VXNlcjQyODE4MTk0",
+                "avatar_url": "https://avatars.githubusercontent.com/u/42818194?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/Lueton",
+                "html_url": "https://github.com/Lueton",
+                "followers_url": "https://api.github.com/users/Lueton/followers",
+                "following_url": "https://api.github.com/users/Lueton/following{/other_user}",
+                "gists_url": "https://api.github.com/users/Lueton/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/Lueton/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/Lueton/subscriptions",
+                "organizations_url": "https://api.github.com/users/Lueton/orgs",
+                "repos_url": "https://api.github.com/users/Lueton/repos",
+                "events_url": "https://api.github.com/users/Lueton/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/Lueton/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            }
+          ],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L",
+            "score": 6.7
+          },
+          "epss": {
+            "percentage": 0.00333,
+            "percentile": 0.24524
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugins-bom",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-klib-commonizer-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-native-utils",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-reflect",
+      "version": "2.3.21",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+      "version": "2.2.10",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "1.9.10",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "1.9.10",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.2.10",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.3.21",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-tooling-core",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-util-io",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-util-klib-metadata",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-util-klib",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom",
+      "version": "1.9.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+      "version": "1.9.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.9.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains:annotations",
+      "version": "13.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains:annotations",
+      "version": "23.0.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jspecify:jspecify",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jvnet.staxex:stax-ex",
+      "version": "1.8.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:android-sdk-geojson",
+      "version": "6.0.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:android-sdk-turf",
+      "version": "6.0.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:android-sdk",
+      "version": "13.6.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:maplibre-android-gestures",
+      "version": "0.0.4",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-analysis",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-commons",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-tree",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-util",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.slf4j:slf4j-api",
+      "version": "1.7.30",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.tensorflow:tensorflow-lite-metadata",
+      "version": "0.2.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    }
+  ]
+}

@@ -1,0 +1,323 @@
+{
+  "schema": 1,
+  "version": "0.4.0-beta.1",
+  "version_code": 5,
+  "application_id": "dev.abhik.mockgps",
+  "source_namespace": "dev.burixon.mockgps",
+  "source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+  "validated_head_commit": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+  "source_url": "https://github.com/abhi-k9/MockGPS/tree/b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+  "source_archive": "MockGPS-source-b1a23cee4ed511046ebe33a6dc0f9a254d64f064.zip",
+  "variant": "signed beta release candidate",
+  "published": false,
+  "stable_production": false,
+  "tools": {
+    "java": "21 Temurin (CI)",
+    "gradle": "9.6.0",
+    "agp": "9.2.1",
+    "compile_sdk": 37,
+    "target_sdk": 37,
+    "min_sdk": 29,
+    "build_tools": "36.0.0"
+  },
+  "unit_tests": {
+    "tests": 82,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "Warning": 18
+  },
+  "github_android": {
+    "head_sha": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+    "artifact_source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+    "runtime_inputs_sha256": "39b8af802bf4189deec14b090c343e255928fa85218851b57c8909ea2e0d3c1a",
+    "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40068105244",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "id": 120795499317,
+        "name": "plan",
+        "conclusion": "success"
+      },
+      {
+        "id": 120795500031,
+        "name": "diagnostics",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 120795500328,
+        "name": "sign-release",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 120795581326,
+        "name": "build",
+        "conclusion": "success"
+      },
+      {
+        "id": 120795581352,
+        "name": "instrumentation API 36",
+        "conclusion": "success"
+      },
+      {
+        "id": 120795581367,
+        "name": "instrumentation API 37.0",
+        "conclusion": "failure"
+      }
+    ],
+    "device_results": [
+      {
+        "api": 36,
+        "status": "PASS",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "job_id": 120795581352
+      },
+      {
+        "api": 37,
+        "status": "BLOCKED_BEFORE_TEST_EXECUTION",
+        "tests": null,
+        "job_id": 120795581367,
+        "reason": "Guest Android input/display/native crash or transport failure before app tests; failed check remains visible"
+      }
+    ],
+    "build_identity": {
+      "runtime_inputs_sha256": "39b8af802bf4189deec14b090c343e255928fa85218851b57c8909ea2e0d3c1a",
+      "commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+      "tracked_worktree_clean": true,
+      "application_id": "dev.abhik.mockgps",
+      "version_code": 5,
+      "version_name": "0.4.0-beta.1",
+      "apk": "app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 59263500,
+      "sha256": "40f5189fd032e2c25a3cde9c175c121925c875c1615686a90508d155a678b971",
+      "signer_certificate_sha256": "b28ce57c3eea10329df98ea93a171cbd8866ee8cd75629ef08dcb1fa01e06e9d",
+      "signing": "Android development/debug certificate; unsigned release is not an installable release",
+      "unit_tests": {
+        "tests": 82,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Warning": 18
+      },
+      "lint_issues": [
+        {
+          "id": "InlinedApi",
+          "severity": "Warning",
+          "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
+        },
+        {
+          "id": "InlinedApi",
+          "severity": "Warning",
+          "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
+        },
+        {
+          "id": "InlinedApi",
+          "severity": "Warning",
+          "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
+        },
+        {
+          "id": "AndroidGradlePluginVersion",
+          "severity": "Warning",
+          "message": "A newer version of Gradle than 9.6.0 is available: 9.8.2"
+        },
+        {
+          "id": "AndroidGradlePluginVersion",
+          "severity": "Warning",
+          "message": "A newer version of com.android.application than 9.2.1 is available: 9.4.1"
+        },
+        {
+          "id": "GradleDependency",
+          "severity": "Warning",
+          "message": "A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1"
+        },
+        {
+          "id": "GradleDependency",
+          "severity": "Warning",
+          "message": "A newer version of androidx.activity:activity-ktx than 1.10.1 is available: 1.13.0"
+        },
+        {
+          "id": "NewerVersionAvailable",
+          "severity": "Warning",
+          "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
+        },
+        {
+          "id": "ExportedReceiver",
+          "severity": "Warning",
+          "message": "Exported receiver does not require permission"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        },
+        {
+          "id": "UseKtx",
+          "severity": "Warning",
+          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+        }
+      ]
+    },
+    "artifact_id": 12550466551,
+    "artifact_digest": "sha256:e0057cd6c90fbdbaac1060ee8a362d024c43e01999f16283a2f4aebcb7a57dac"
+  },
+  "signing": {
+    "status": "SIGNED",
+    "signer_certificate_sha256": "75d12be4cf8c52778061616d8b142c920c1040ddd591f09601331ec395a5254d",
+    "signed_apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+    "unsigned_apk_sha256": "40dd84a427cc6c51835ba3c409602245f205f18fb0212a77562ec7fba5959d89",
+    "receipt": "signing-receipt.json"
+  },
+  "dependencies": {
+    "coordinates": 174,
+    "findings": [
+      {
+        "package": "org.jetbrains.kotlin:kotlin-gradle-plugin",
+        "version": "2.2.10",
+        "id": "GHSA-r937-wjx7-w2jp",
+        "severity": "medium"
+      }
+    ],
+    "inventory_sha256": "fe73ebf153e2de711890c1ef812b2eaf52f78e39beb2e1cc7cd5686c0d9637d8",
+    "query_source": "86a13d595cfcc9bca73014077ba5b4aebeeb2229",
+    "queried_at_utc": "2026-10-24T06:11:04.194270+00:00",
+    "limits": [
+      "Maven coordinates only; excludes embedded/shaded native code and Gradle distribution internals",
+      "Includes buildscript plugin transitive dependencies; not an exhaustive inventory of SDK/system-image tools",
+      "Snapshot of published reviewed Maven advisories only; unknown/unreviewed vulnerabilities are not excluded",
+      "No native/shaded library, Android platform, SDK or firmware security clearance is implied",
+      "Does not replace the blocked GitHub PR dependency-diff review"
+    ]
+  },
+  "tasker": {
+    "status": "EXPERIMENTAL; actual import NOT RUN",
+    "source_commit": "d35c471ad0cfde915817b5618bdefb0a76b67f62"
+  },
+  "hardware": {
+    "samsung_matrix": "24 complete cases NOT RUN; user-reported partial observations recorded separately"
+  },
+  "release_gates": {
+    "dependency_review": "BLOCKED: repository feature/permission",
+    "api37": "BLOCKED: guest platform failed before tests; check remains failed",
+    "mandatory_hardware": "BLOCKED: incomplete physical matrix",
+    "persistent_signing": "READY: authorized repository key used and signature verified"
+  },
+  "attestation": "Self-recorded CI/source receipt; runtime fingerprint binds validated PR head and actual merge-build source; not a cryptographic SLSA attestation",
+  "assets": [
+    {
+      "name": "LICENSE.txt",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "name": "MockGPS-0.4.0-beta.1-unsigned.apk",
+      "bytes": 57326481,
+      "sha256": "40dd84a427cc6c51835ba3c409602245f205f18fb0212a77562ec7fba5959d89"
+    },
+    {
+      "name": "MockGPS-0.4.0-beta.1.apk",
+      "bytes": 57355946,
+      "sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998"
+    },
+    {
+      "name": "MockGPS-source-b1a23cee4ed511046ebe33a6dc0f9a254d64f064.zip",
+      "bytes": 1007858,
+      "sha256": "c75fc1e738814b84906e18b9191230a9f30e31938577a37653cdf0d45d20d001"
+    },
+    {
+      "name": "MockGPS.prj.xml",
+      "bytes": 12789,
+      "sha256": "72adaa40e79f33e860e0d297f06bf6d5d958946d8526a820b61ec69158bca02d"
+    },
+    {
+      "name": "RELEASE_NOTES.md",
+      "bytes": 6468,
+      "sha256": "2f5699e29833f747529d00fc48bc39b2b4b880dd97d369e3484c268ef176617c"
+    },
+    {
+      "name": "TASKER_IMPORT.md",
+      "bytes": 6867,
+      "sha256": "16cda041ca68fbe00bf1b3283bd5c36c62f47bdbdde0f9bfd3e17728632a338f"
+    },
+    {
+      "name": "advisory-report.json",
+      "bytes": 41409,
+      "sha256": "afd729e3dad10b4beab69b276c33df9b0636c92d9925c73ac5f0d4dc535a1537"
+    },
+    {
+      "name": "ci-evidence.json",
+      "bytes": 5477,
+      "sha256": "ba218eade4de09abcf9115d4c0ed0d4645d559b0bc4f8fbb207e74444443a3b8"
+    },
+    {
+      "name": "dependency-inventory.json",
+      "bytes": 38954,
+      "sha256": "fe73ebf153e2de711890c1ef812b2eaf52f78e39beb2e1cc7cd5686c0d9637d8"
+    },
+    {
+      "name": "sbom.cdx.json",
+      "bytes": 35415,
+      "sha256": "04523ed4c9e0a9853871ad38d0300aeb6dc11cb77f54aeb243bf0e722981466d"
+    },
+    {
+      "name": "signature.txt",
+      "bytes": 994,
+      "sha256": "8548bc24ecff48296ea3c76ed1554a29117cc440ba50f8400334993c5453dddc"
+    },
+    {
+      "name": "signing-receipt.json",
+      "bytes": 755,
+      "sha256": "54a21ff21f262a64d623465b60e745449e1fc65ea693d9db5b808d8c46b20e5c"
+    }
+  ],
+  "metadata_repair": {
+    "reason": "Remove checksum/manifest entry for optional apksigner v4 sidecar that was never uploaded; embedded APK signature unchanged",
+    "original_manifest_sha256": "17ec8d34e24c0fea8b474f0ee2a9b24273a60b006b316909b5c626ccafa80a77",
+    "original_checksums_sha256": "8cfcb339e5955346352476e8fdd64037f628da4f81e56091a10d6b4de2bad000",
+    "unchanged_signed_apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+    "source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+    "workflow_commit": "b472cc6bd54f65f10e465e934861f619bc06bd02",
+    "run_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077928953"
+  }
+}

@@ -1,400 +1,95 @@
-# MockGPS 🗺️
+# MockGPS — transparent developer location simulation
 
-![Banner](/banner.png)
+**Development revision:0.4.0-beta.1 / versionCode5, compile/target API37.** New source changes are not represented by the earlier signed APK. The [existing owner-only draft](https://github.com/abhi-k9/MockGPS/releases) retains that historical signed candidate and exact receipts; no release/tag is published and PR1 is draft/unmerged. Dependency Review now passes. API37 infrastructure and physical safety evidence still block a new signed release. See [fast local development and measurements](docs/DEVELOPMENT.md), [release status](docs/BETA_RELEASE.md), [Tasker import](tasker/README.md) and [Samsung availability](docs/SAMSUNG_INTEGRATION.md).
 
-MockGPS is an Android application for testing and simulating device location. It provides a foreground location-mocking service and exposes a dedicated **Android broadcast interface** for external control.
 
-The broadcast interface is a central part of the project: MockGPS can be controlled from scripts, Termux, ADB, automation tools, or another Android application without requiring the MockGPS UI to be open.
+A hardened native Kotlin fork of [BuriXon-code/MockGPS](https://github.com/BuriXon-code/MockGPS), preserving the MapLibre map, selected coordinates, camera position, clipboard control and optional bounded drift. Android's mock-location flags and foreground-service disclosures remain intact. No root, Shizuku, Accessibility service, network control server, cloud backend or detection bypass is used.
 
-Companion command-line project:
+Installed package: **`dev.abhik.mockgps`**; this is a fresh installation distinct from upstream/earlier engineering APKs. Stop the old app first, select the fork in Developer Options, add its tile and configure a new credential/API2 Tasker task. See [identity/signing](docs/IDENTITY_AND_SIGNING.md).
 
-**[BuriXon-code/termux-mockgps](https://github.com/BuriXon-code/termux-mockgps)**
+**Android 17 / Samsung One UI 9 behavior is not hardware validated.** This is an engineering build, not a production-readiness claim. A Tasker broadcast does not grant permission to launch a location foreground service in the background. Vehicle disconnection therefore requests visible user confirmation; it never silently starts injection.
 
-## Features
+## Modes and controls
 
-- Interactive Android UI with an OpenFreeMap/MapLibre map.
-- Select a mock location directly on the map.
-- Start and stop location mocking from the application.
-- Stores the last selected mock location locally.
-- Optional location drift for small, realistic movement around the selected point.
-- Foreground location service using Android's `gps` and `network` test providers.
-- Persistent state and automatic restoration after reboot when enabled.
-- Optional external broadcast control.
-- Companion POSIX shell command for Termux.
-- Quiet ongoing foreground-service notification showing the current coordinates.
-- GPL-3.0 licensed.
-- **COMPLETELY FREE AND AD-FREE!** (this is probably the most important information)
+| Mode | Behavior |
+| --- | --- |
+| FORCE_REAL | Persistent manual override; stops injection and cancels delayed starts. Only an explicit return to AUTO clears it; manual start is blocked while it is selected. “Stopped” does not mean a fresh genuine GPS fix was obtained. |
+| AUTO | Tasker reports the designated vehicle's state. Connected/unknown stops injection; disconnected waits at least the configured delay (default 120 seconds), rechecks current policy and requests confirmation. Reconnection cancels pending requests. |
+| MANUAL_MOCK | Explicit visible-app start after returning to AUTO. Fresh CONNECTED/UNKNOWN stops it; known CONNECTED blocks a new start. UNKNOWN permits an explicit start until another event arrives. Never selected by an external start command. |
 
-## Compatibility
+The native **MockGPS mode** Quick Settings tile switches FORCE_REAL and AUTO. The label is the selected policy; the subtitle reports observed/pending/error state. Returning to AUTO requires unlock and fresh Tasker reconciliation; selecting AUTO never proves simulation is active. Use the app's confirmation button to start after a request, or explicitly return to AUTO before using its manual-start button. Force Real remains available to retry cleanup after an error.
 
-- **Minimum Android version:** Android 10 (API 29).
-- **Target SDK:** 36.
-- **Compile SDK:** 36.
-- **Java:** 17.
-- **Tested:** Android 16.
+On process restart, reboot and upgrade, stale starts are invalidated and simulation does not automatically resume. Reopen the app and reconcile Tasker's specific-car state. An inexact alarm implements the minimum delay; Doze/OEM scheduling can postpone notification delivery. Disabling notifications leaves confirmation available in the visible app.
 
-The project currently has only been tested on a limited number of devices. OEM-specific background restrictions, battery-management policies, and mock-location behavior can therefore vary between devices.
+## Build and automated checks
 
-## Requirements
-
-Before MockGPS can inject locations, Android must allow it to operate as the mock-location application.
-
-You need:
-
-- Android 10 or newer.
-- Developer options enabled.
-- MockGPS selected as the system mock-location application.
-- Location permission granted to MockGPS.
-- Notification permission enabled on Android versions that require it.
-
-## Installation
-
-### Official release
-
-Check existing [releases](https://github.com/BuriXon-code/MockGPS/releases/), select any version and download the prepared APK installer.
-
-### Build with Gradle Wrapper
-
-Clone the repository and enter the project directory:
+Prerequisites: Java21 **JDK**, SDK platform37.0, build-tools36.0.0, Python3, Node and Bash. Minimum Android29; Java17 bytecode. SDK provisioning is a one-time step, separate from edits.
 
 ```sh
-git clone https://github.com/BuriXon-code/MockGPS.git
-cd MockGPS
+# Default FAST, no clean/lint/release/emulator/SDK install/Actions:
+scripts/dev.sh fast '*PolicyTest*'
+scripts/dev.sh compile
+scripts/dev.sh build
+# CHECK after meaningful edits:
+scripts/dev.sh check
+# Explicit expensive FULL and exact-SHA RELEASE preflight:
+scripts/dev.sh full
+VALIDATION_RUN_ID=RUN_ID scripts/dev.sh release
 ```
 
-Build a debug APK using the included Gradle Wrapper:
+[Development guide](docs/DEVELOPMENT.md) covers paths, CachyOS, warm emulator selection, quoting, prerequisites, security boundaries and timings. The old clean all-purpose script took97.2s; warm selected test runs took6.6s/4.4s, without enabling caches/incremental compilation. Full local CHECK after the policy/settings changes passed85 JVM tests and lint with zero errors/13warnings in23.2s, also compiling the device APK. Compilation is not device execution. Current runtime source also passed19 real API36 tests and Dependency Review in CI; API37 retains the pretest guest failure.
 
-```sh
-./gradlew assembleDebug
-```
+No feature-branch push/PR duplication; ordinary PRs use debug/JVM/lint and API36 when inputs change. The unresolved API37 check remains failed without an unchanged boot retry. A deliberate FULL validates both APIs and builds release. Metadata reuse is labelled, never current-SHA release proof. Artifacts expire after7days.
 
-The APK is generated under:
+## Install on Samsung / One UI
 
-```text
-app/build/outputs/apk/debug/app-debug.apk
-```
+1. If upgrading, **stop simulation in the old build first**. Keep the previous APK/source for rollback. Debug and release signing certificates must match for in-place updates; do not uninstall a still-injecting app as a cleanup strategy.
+2. Install the engineering debug APK with `adb install -r app/build/outputs/apk/debug/app-debug.apk`, or a package installer. Debug signing is for development only.
+3. Enable Android Developer Options and select **MockGPS** under **Select mock location app**.
+4. Open MockGPS; grant precise location for its location FGS and map, and notifications for service/failure/automation requests. No background-location permission is requested.
+5. Select a coordinate explicitly on the map; missing configuration never falls back to `(0,0)`. That point remains valid if intentionally selected. Legacy `(0,0)` requires reselection because old versions created it implicitly.
+6. Select AUTO, then test a manual start/stop in a safe location-testing workflow. Confirm status and a fresh non-mock fix in an independent location client; do not infer recovery from the tile.
+7. Edit Quick Settings to add **MockGPS mode**. If Samsung hides its subtitle or delays refresh, use the app screen as the state authority.
+8. Optionally enable authenticated automation, reveal/copy its credential and configure **only your specific paired vehicle** in Tasker following [docs/TASKER.md](docs/TASKER.md). Select AUTO and reconcile vehicle state. GUI delay range is 0–3600 seconds; default 120.
 
-Install it with ADB:
+Samsung sleeping/deep-sleeping apps, battery restrictions, force-stop and lock-screen behavior may prevent Tasker or notifications from running. Test both restrictive and unrestricted battery settings; changing battery settings does not grant missing Android foreground-service permissions. Full procedures and 24 unrun scenarios are in [docs/SAMSUNG_VALIDATION.md](docs/SAMSUNG_VALIDATION.md).
 
-```sh
-adb install app/build/outputs/apk/debug/app-debug.apk
-```
+## Automation and privacy
 
-You can also install the APK using an Android package installer.
+Tasker has an independent opt-in/revoke switch, disabled by default. Samsung Modes and Routines has a separate off/unavailable switch; no supported secure native contract was verified, so no Samsung endpoint is exposed. No built-in Bluetooth receiver, polling or third integration exists.
 
-### Android Studio
+External control is disabled by default. The old unauthenticated `on`, `set`, `boot` and direct-service interfaces are removed. The new API accepts only authenticated version-2 `vehicle_connected`, `vehicle_disconnected`, `vehicle_unknown`, `stop`, and `status` messages with fresh timestamps and an independent increasing mutation sequence. `stop` selects FORCE_REAL. Revoking the capability disables access and cancels automation; reenable to issue a new credential. Anyone holding the token can exercise this narrow API, so protect Tasker backups and clipboard contents.
 
-Open the cloned `MockGPS` directory in [Android Studio](https://developer.android.com/studio).
+Only selected mock coordinates/configuration and map camera position persist. Genuine location samples are filtered for mock flags/freshness and held in memory for the visible map; old persisted genuine coordinates are erased. Application backup and device transfer are explicitly excluded. Notifications/status omit coordinates and credentials. The map loads HTTPS OpenFreeMap styles/tiles/fonts; providers can observe your IP address and viewed area. No telemetry or advertisements were added; third-party network behavior has not been packet-captured. Attribution remains visible in the drawer and map controls.
 
-Allow Android Studio to synchronize Gradle, then use **Run** to build and install the application on a connected device, or use the standard **Build** actions to generate an APK.
+## Recovery and rollback
 
-The project already contains its Gradle Wrapper and required project configuration. Android Studio still needs a compatible Android SDK installation.
+Select **FORCE_REAL** in the app/tile. Verify that injection stopped; if cleanup is uncertain, keep/select MockGPS as mock-location app and retry Force Real. Then set Developer Options mock-location app to **None**, turn system location off/on, and reboot if needed. Seek a newly timestamped non-mock fix outdoors in a separate client. Android/fused/OEM clients may retain cached mock positions; this app cannot promise immediate reacquisition.
 
-## Android configuration
+Legacy unjournaled providers and competing mock apps cannot be conclusively identified. An upgrade from a legacy installation displays cleanup uncertainty until a successful journaled session replaces both providers and is stopped, or reboot clears legacy ambiguity. Stop before uninstalling/downgrading; matching signatures/version codes may prevent downgrade, so back up only nonsensitive configuration deliberately. Uninstall clears settings/tokens; never distribute private signing keys. Detailed recovery and rollback procedures are in the hardware validation guide.
 
-### 1. Grant location permission
+## Engineering evidence
 
-Open:
+- [Foundation comparison and gate](docs/FOUNDATION_REVIEW.md)
+- [Android/platform feasibility and source evidence](docs/PLATFORM_FEASIBILITY.md)
+- [Security audit and remediations](AUDIT.md)
+- [Architecture and state model](docs/ARCHITECTURE.md)
+- [Threat model and permissions](docs/SECURITY.md)
+- [Tasker integration](docs/TASKER.md)
+- [Testing evidence](TESTING.md)
 
-```text
-Settings
-→ Apps
-→ MockGPS
-→ Permissions
-→ Location
-```
+## License and attribution
 
-Grant location access.
+GPL-3.0; retain [LICENSE](LICENSE) and upstream copyright ©2026 Kamil BuriXon Burek. Fork hardening, tests and automation changes are documented in this repository. No alternative-project source was copied. Distribution of GPL binaries requires corresponding source and license notices; CI debug artifacts include no private release signing key. Map data ©OpenStreetMap contributors, tiles by OpenFreeMap, rendering by MapLibre. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
-### 2. Allow notifications
+## Historical0.3.2-dev checkpoint
 
-Open:
+Version **4 / 0.3.2-dev**, installed package `dev.abhik.mockgps`. The old 67-JVM/11-emulator checkpoint predates the manual-session safety correction and is not the revised candidate. Reviewed source `89e01d191a8a72c4d749f17846899731c7ec514f` passed [push Android](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820) and [PR Android](https://github.com/abhi-k9/MockGPS/actions/runs/40057434383): **79 JVM and15 real API36 emulator tests**, zero failures/errors/skips; lint0 errors/16 local and20 hosted warnings; see [current evidence](docs/VALIDATION.json) and [testing](TESTING.md).
 
-```text
-Settings
-→ Apps
-→ MockGPS
-→ Notifications
-```
+Fresh authenticated CONNECTED or UNKNOWN stops active or starting MANUAL_MOCK as well as AUTO, advances generation and cancels pending confirmation. FORCE_REAL stays selected; other modes become inactive AUTO. Known CONNECTED blocks manual start. An explicit visible manual start while UNKNOWN remains possible, but a later delivered UNKNOWN stops it. A later DISCONNECTED creates a new delay and visible-confirmation request; it cannot resurrect the old manual session.
 
-Enable notifications.
+Missing Tasker delivery cannot be inferred from silence: an active session may continue until an accepted event, runtime failure or local stop. Successful provider cleanup does not establish a fresh genuine fix; verify a new nonmock location in an independent client.
 
-MockGPS runs its location injector as a foreground service and therefore uses an ongoing notification while the service is active.
+The independent Maven scan covered 174 coordinates and found one remaining medium Kotlin build-cache advisory; no high/critical matches. Caches/incremental compilation are disabled as mitigation, not a patched-version claim. [Dependency review](docs/DEPENDENCY_REVIEW.md) remains externally blocked; the owner must check/enable Dependency graph and rerun it. Samsung OneUI9/Android17 and physical Tasker remain untested. [PR1](https://github.com/abhi-k9/MockGPS/pull/1) stays draft/unmerged; no production release is authorized. Use only exact reviewed source/APK provenance from [the release gate](docs/RELEASE_CANDIDATE.md).
 
-### 3. Select the mock-location application
-
-Open:
-
-```text
-Settings
-→ Developer options
-→ Select mock location app
-```
-
-Select:
-
-```text
-MockGPS
-```
-
-Without this setting Android will not accept the injected test locations.
-
-## External broadcast control
-
-**External broadcasts are one of the most important features of MockGPS.**
-
-The application exposes the exported receiver:
-
-```text
-dev.burixon.mockgps.MockGpsReceiver
-```
-
-External tools can send commands directly to this receiver. The companion Termux project uses exactly this interface.
-
-The broadcast command is supplied through the string extra:
-
-```text
-command
-```
-
-Supported commands are:
-
-| Command | Purpose |
-|---|---|
-| `on` | Start mocking using the stored coordinates. |
-| `off` | Stop mocking and disable persistent operation. |
-| `set` | Change the stored mock coordinates. If mocking is active, the new location is applied automatically. |
-| `drift` | Enable or disable location drift. |
-
-### Coordinate extras
-
-The `set` command accepts:
-
-```text
-lat
-lon
-```
-
-Both values are decimal degrees.
-
-Example:
-
-```sh
-adb shell am broadcast \
-  -n dev.burixon.mockgps/.MockGpsReceiver \
-  --es command set \
-  --es lat 50.06143 \
-  --es lon 19.93658
-```
-
-### Start
-
-```sh
-adb shell am broadcast \
-  -n dev.burixon.mockgps/.MockGpsReceiver \
-  --es command on
-```
-
-### Stop
-
-```sh
-adb shell am broadcast \
-  -n dev.burixon.mockgps/.MockGpsReceiver \
-  --es command off
-```
-
-### Drift
-
-The `drift` command uses the string extra:
-
-```text
-drifting
-```
-
-Accepted values include `enable`, `on`, `true`, `disable`, `off`, and `false`.
-
-Example:
-
-```sh
-adb shell am broadcast \
-  -n dev.burixon.mockgps/.MockGpsReceiver \
-  --es command drift \
-  --es drifting enable
-```
-
-### Boot behavior
-
-Boot behavior is controlled through the `boot` extra. Accepted values include `enable`, `on`, `disable`, and `off`.
-
-Example:
-
-```sh
-adb shell am broadcast \
-  -n dev.burixon.mockgps/.MockGpsReceiver \
-  --es boot enable
-```
-
-MockGPS stores this preference and attempts to restore the foreground service after boot when enabled.
-
-### Notification / toast behavior
-
-External commands may provide:
-
-```text
-toast
-```
-
-The current companion Termux script uses the `toast` extra to control whether command-related toast messages are shown.
-
-### Broadcast control switch
-
-The application's **Broadcast commands** setting can disable handling of external broadcasts.
-
-When this option is disabled, commands sent to `MockGpsReceiver` are ignored. Direct Android service operations are separate from this switch.
-
-## Companion Termux command
-
-The recommended command-line frontend is:
-
-**[BuriXon-code/termux-mockgps](https://github.com/BuriXon-code/termux-mockgps)**
-
-It wraps the broadcast/service interface into simple shell commands such as:
-
-```sh
-termux-mockgps start
-termux-mockgps set 50.06143 19.93658
-termux-mockgps stop
-```
-
-See the companion repository for installation and complete command documentation.
-
-## Location providers
-
-MockGPS creates Android test providers named:
-
-```text
-gps
-network
-```
-
-Both providers receive the selected mock coordinates.
-
-The `gps` provider uses fine-accuracy metadata, while the `network` provider uses coarse-accuracy metadata.
-
-MockGPS does not attempt to replace Google's fused location provider. Applications using other location sources may therefore behave differently.
-
-## Location drift
-
-When enabled, location drift adds small movement around the selected location. The current implementation uses periodic updates and keeps the simulated movement within a small radius.
-
-Drift can be enabled from the application UI or through the external `drift` broadcast command.
-
-## Reboot and persistence
-
-MockGPS stores:
-
-- the last mock latitude and longitude,
-- whether mocking should remain enabled,
-- the boot-autostart preference,
-- the external broadcast setting,
-- the location-drift setting,
-- the last real device location used by the UI.
-
-When boot restoration is enabled, MockGPS attempts to start the foreground service automatically after device boot.
-
-Some Android vendors may impose additional battery or background-execution restrictions.
-
-## Notification
-
-While mocking is active, Android displays a foreground-service notification containing the current location, for example:
-
-```text
-Running...
-Location: 50.06143, 19.93658
-```
-
-The application uses a low-importance channel to keep the notification as unobtrusive as possible. Exact notification presentation remains controlled by Android and the device manufacturer.
-
-## Updating during development
-
-MockGPS is still under active development.
-
-On some devices, repeated development installs or service restarts may leave stale application/service state behind. When a new development build behaves unexpectedly, a clean reinstall is a useful troubleshooting step:
-
-```text
-1. Stop MockGPS.
-2. Uninstall the existing MockGPS installation.
-3. Install the new APK.
-4. Select MockGPS again as the mock-location app.
-5. Re-grant required permissions.
-6. Reboot the device.
-```
-
-## Troubleshooting
-
-### MockGPS starts but applications do not see the mock location
-
-Check:
-
-```text
-Developer options
-→ Select mock location app
-→ MockGPS
-```
-
-Also verify that location permission has been granted.
-
-### External commands do nothing
-
-Check the **Broadcast commands** switch inside MockGPS.
-
-If it is disabled, `MockGpsReceiver` intentionally ignores external broadcast commands.
-
-### Automatic restoration does not happen after reboot
-
-Check the **Start on boot** setting in MockGPS.
-
-OEM battery-management or autostart restrictions can also interfere with background execution.
-
-### A new development build behaves strangely
-
-Try a complete uninstall/reinstall followed by a reboot, as described above.
-
-## Project structure
-
-The Android application contains the main activity, the exported broadcast receiver, the foreground location service, and persistent application state handling under:
-
-```text
-app/src/main/java/dev/burixon/mockgps/
-```
-
-The application UI and map are implemented using Android Views and MapLibre Android SDK.
-
-## Links
-
-- **MockGPS:** https://github.com/BuriXon-code/MockGPS
-- **termux-mockgps:** https://github.com/BuriXon-code/termux-mockgps
-- **Website:** https://burixon.dev/MockGPS/
-- **OpenFreeMap style:** https://tiles.openfreemap.org/styles/liberty
-- **Donations:** https://buycoffee.to/burixon-code
-
-## License
-
-GPL-3.0.
-
-See [`LICENSE`](LICENSE) for the full license text.
-
-## Support
-### Contact me:
-For any issues, suggestions, or questions, reach out via:
-
-- *Email:* support@burixon.dev
-- *Contact form:* [Click here](https://burixon.dev/contact/)
-- *Bug reports:* [Click here](https://burixon.dev/bugreport/#MockGPS)
-
-### Support me:
-If you find this script useful, consider supporting my work by making a donation:
-
-[**Donations**](https://burixon.dev/donate/)
-
-Your contributions help in developing new projects and improving existing tools!
+[Download the development-signed debug APK/reports artifact](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820/artifacts/12546211907) and extract app-debug.apk. Compare its checksum/public signer with [the recorded CI identity](docs/evidence/candidate-89e01d1/ci-build-identity.json). Keep this exact APK; CI development signing identities can differ between runs.

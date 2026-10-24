@@ -1,0 +1,12 @@
+{
+  "downloaded": true,
+  "signature_verified": true,
+  "application_id": "dev.abhik.mockgps",
+  "version_code": 5,
+  "version_name": "0.4.0-beta.1",
+  "min_sdk": 29,
+  "target_sdk": 37,
+  "debuggable": false,
+  "apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+  "signer_certificate_sha256": "75d12be4cf8c52778061616d8b142c920c1040ddd591f09601331ec395a5254d"
+}

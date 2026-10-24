@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# Boot the official SDK emulator, wait for readiness, then run actual device tests.
+set -euo pipefail
+project_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$project_root"
+: "${ANDROID_HOME:?Provision the SDK first with scripts/setup-android-sdk.sh --with-emulator}"
+: "${ANDROID_AVD_HOME:?Set ANDROID_AVD_HOME to a writable test-only AVD directory}"
+if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+  echo 'Hardware-accelerated emulator tests require readable/writable /dev/kvm; no device result is claimed.' >&2
+  exit 2
+fi
+export PATH="$ANDROID_HOME/cmdline-tools/19.0/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+# Compile before starting the VM: avoid compiler/guest startup memory and CPU contention.
+./gradlew :app:assembleDebug :app:assembleDebugAndroidTest --dependency-verification=strict --max-workers=2 --console=plain "$@"
+./gradlew --stop
+mkdir -p "$ANDROID_AVD_HOME" app/build/emulator-diagnostics
+test_api=${MOCKGPS_TEST_API:-36}
+[[ "$test_api" == 36 || "$test_api" == 37.0 ]] || { echo "Unsupported test API" >&2; exit 2; }
+avd_name="MockGPS_API${test_api//./_}"
+printf 'no\n' | avdmanager create avd --force --name "$avd_name" \
+  --package "system-images;android-${test_api};google_apis;x86_64" --device pixel_6
+emulator -avd "$avd_name" -port 5554 -no-window -no-audio -no-boot-anim \
+  -no-snapshot -wipe-data -gpu swiftshader -accel on -memory 2048 -cores 2 \
+  > app/build/emulator-diagnostics/emulator.log 2>&1 &
+emulator_pid=$!
+cleanup() {
+  # Raw guest crashes stay private; export only types/frames/signals, never messages/extras.
+  crash_private="$ANDROID_AVD_HOME/mockgps-crash-private.txt"
+  timeout 10 adb -s emulator-5554 logcat -b crash -d > "$crash_private" 2>/dev/null || true
+  python3 - "$crash_private" <<'PYCRASH'
+from pathlib import Path
+import json,re,sys
+s=Path(sys.argv[1]).read_text(errors='replace')
+r=dict(types=sorted(set(re.findall(r'\b([a-zA-Z_$][\w.$]*(?:Exception|Error))(?::|$)',s,re.M))),
+       frames=re.findall(r'\bat ((?:com\.android\.server|android|dev\.burixon\.mockgps)[\w.$]+\([\w.$]+:\d+\))',s)[:20],
+       signals=re.findall(r'Fatal signal (\d+) \(([A-Z0-9]+)\)',s))
+Path('app/build/emulator-diagnostics/guest-crash-sanitized.json').write_text(json.dumps(r,indent=2)+'\n')
+PYCRASH
+  rm -f "$crash_private"
+  adb -s emulator-5554 emu kill >/dev/null 2>&1 || true
+  kill "$emulator_pid" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+export ANDROID_SERIAL=emulator-5554
+booted=false
+for ((attempt=0; attempt<120; attempt++)); do
+  if ! kill -0 "$emulator_pid" 2>/dev/null; then
+    echo 'Emulator exited before readiness. Inspect emulator.log.' >&2
+    exit 1
+  fi
+  if [[ $(adb -s "$ANDROID_SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r') == 1 ]]; then
+    booted=true
+    break
+  fi
+  sleep 2
+done
+if [[ "$booted" != true ]]; then
+  echo 'Emulator did not complete boot within 240 seconds.' >&2
+  exit 1
+fi
+# Disposable emulator only: boot_completed does not imply CE storage is unlocked.
+# UTP/provider tests use user0; never move app credentials to device-protected storage.
+test_user=$(adb -s "$ANDROID_SERIAL" shell am get-current-user | tr -d '\r')
+[[ "$test_user" == 0 ]] || { echo 'Tests require a disposable single-user emulator with current user0.' >&2; exit 1; }
+adb -s "$ANDROID_SERIAL" shell input keyevent KEYCODE_WAKEUP
+adb -s "$ANDROID_SERIAL" shell wm dismiss-keyguard
+adb -s "$ANDROID_SERIAL" shell am unlock-user "$test_user"
+user_unlocked=false
+for ((attempt=0; attempt<60; attempt++)); do
+  user_state=$(adb -s "$ANDROID_SERIAL" shell am get-started-user-state "$test_user" | tr -d '\r')
+  if [[ "$user_state" == RUNNING_UNLOCKED ]]; then user_unlocked=true; break; fi
+  sleep 1
+done
+printf '%s\n' "$user_state" > app/build/emulator-diagnostics/user-readiness.txt
+[[ "$user_unlocked" == true ]] || { echo 'User credential storage did not unlock; no app/device result claimed.' >&2; exit 1; }
+adb -s "$ANDROID_SERIAL" shell input keyevent 82
+for scale in window_animation_scale transition_animation_scale animator_duration_scale; do
+  adb -s "$ANDROID_SERIAL" shell settings put global "$scale" 0
+done
+# Preserve Gradle/instrumentation's actual exit status. Compilation alone is insufficient.
+test_start=$(date +%s)
+export MOCKGPS_DEVICE_TEST_START="$test_start"
+if ./gradlew :app:connectedDebugAndroidTest --dependency-verification=strict --max-workers=1 --console=plain "$@"; then
+  :
+else
+  device_status=$?
+  # Public API diagnostics omit exception messages, stack traces, extras and locations.
+  python3 - <<'PYFAIL'
+from pathlib import Path
+import json,os,re,xml.etree.ElementTree as E
+failed=[]
+for p in Path('app/build/outputs/androidTest-results/connected').rglob('TEST-*.xml'):
+ if p.stat().st_mtime<int(os.environ['MOCKGPS_DEVICE_TEST_START']): continue
+ for test in E.parse(p).getroot().iter('testcase'):
+  for kind in ('failure','error'):
+   for failure in test.findall(kind):
+    frames=re.findall(r'\bat (dev\.burixon\.mockgps[\w.$]+\([\w.$]+:\d+\))',failure.text or '')[:3]
+    causes=re.findall(r'(?m)^Caused by: ([a-zA-Z_$][\w.$]*(?:Exception|Error))(?::|$)',failure.text or '')[:3]
+    failed.append({'class':test.get('classname'),'test':test.get('name'),'type':failure.get('type') or next(iter(re.findall(r'(?m)^([a-zA-Z_$][\w.$]*(?:Exception|Error))(?::|$)',failure.text or '')),None),'causes':causes,'app_frames':frames})
+payload=json.dumps(failed).replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+print(f'::error title=Device test failures (names/types only)::{payload}')
+PYFAIL
+  exit "$device_status"
+fi
+
+python3 - <<'PYTEST'
+from pathlib import Path
+import os,xml.etree.ElementTree as E
+files=list(Path('app/build/outputs/androidTest-results/connected').rglob('TEST-*.xml'))
+assert files,'No instrumentation result XML; compilation or a booted emulator is not a test pass'
+assert all(p.stat().st_mtime>=int(os.environ['MOCKGPS_DEVICE_TEST_START']) for p in files),'Stale instrumentation reports'
+tests=failures=errors=skipped=0
+executed=set()
+for p in files:
+ r=E.parse(p).getroot()
+ executed.update((t.get('classname'),t.get('name')) for t in r.iter('testcase'))
+ tests+=int(r.get('tests',0));failures+=int(r.get('failures',0));errors+=int(r.get('errors',0));skipped+=int(r.get('skipped',0))
+required={('dev.burixon.mockgps.VehicleSafetyInstrumentationTest',name) for name in (
+ 'authenticatedConnectedBroadcastStopsRealManualServiceAndRejectsLateCallbacks',
+ 'unknownStopsRealManualInjectionAndCancelsAnAsynchronousStart',
+ 'failedPlatformRemovalIsVisibleAndRetriedAfterAuthorizationRestored',
+ 'unknownInvalidatesActualPendingConfirmationAndForceRealWins',
+ 'repeatedManualStartKeepsTheRealSessionAndMalformedIpcCannotStopIt',
+ 'taskerIntentUriRecipePreservesTheFiveExactTypes',
+ 'newerSequenceCannotMakeStaleDisconnectionOverrideConnected',
+ 'taskerRevocationInvalidatesPendingWorkAndSamsungIsUnavailable')}
+assert required<=executed,('Missing required vehicle safety tests',sorted(required-executed))
+assert tests>=19 and failures==errors==skipped==0,(tests,failures,errors,skipped)
+print(f'Actual emulator instrumentation: {tests} tests, {failures} failures, {errors} errors, {skipped} skipped')
+if os.environ.get('GITHUB_ACTIONS')=='true':
+ print(f'::notice title=Actual emulator test results::tests={tests} failures={failures} errors={errors} skipped={skipped}')
+PYTEST

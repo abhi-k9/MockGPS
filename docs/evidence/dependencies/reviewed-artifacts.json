@@ -1,0 +1,146 @@
+[
+  {
+    "group": "org.apache",
+    "name": "apache",
+    "version": "35",
+    "artifact": "apache-35.pom",
+    "sha256": "ea297dcd114136e8b8e8b630230d52a76c2fc69f6c5db25d672b1857000728b8",
+    "source": "https://repo.maven.apache.org/maven2/org/apache/apache/35/apache-35.pom",
+    "review": "Published Maven Central SHA1, independently calculated SHA256 and byte-identical canonical TLS mirror"
+  },
+  {
+    "group": "org.apache.commons",
+    "name": "commons-lang3",
+    "version": "3.18.0",
+    "artifact": "commons-lang3-3.18.0.jar",
+    "sha256": "4eeeae8d20c078abb64b015ec158add383ac581571cddc45c68f0c9ae0230720",
+    "source": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar",
+    "review": "Published Maven Central SHA1, independently calculated SHA256 and byte-identical canonical TLS mirror"
+  },
+  {
+    "group": "org.apache.commons",
+    "name": "commons-lang3",
+    "version": "3.18.0",
+    "artifact": "commons-lang3-3.18.0.pom",
+    "sha256": "aa254b373b6f6d46bc9dca86331b072a8ab86eb25ea9921fd439618392e98a16",
+    "source": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.pom",
+    "review": "Published Maven Central SHA1, independently calculated SHA256 and byte-identical canonical TLS mirror"
+  },
+  {
+    "group": "org.apache.commons",
+    "name": "commons-parent",
+    "version": "85",
+    "artifact": "commons-parent-85.pom",
+    "sha256": "d189ff2c0027e96bb65d31e6f227ed2af966169b36af1e973dd5ba08926dc7b5",
+    "source": "https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/85/commons-parent-85.pom",
+    "review": "Published Maven Central SHA1, independently calculated SHA256 and byte-identical canonical TLS mirror"
+  },
+  {
+    "group": "org.bitbucket.b_c",
+    "name": "jose4j",
+    "version": "0.9.6",
+    "artifact": "jose4j-0.9.6.jar",
+    "sha256": "7314af50cde9c99e8eaf43eee617a23edcc6bb43036221064355094999d837ef",
+    "source": "https://repo.maven.apache.org/maven2/org/bitbucket/b_c/jose4j/0.9.6/jose4j-0.9.6.jar",
+    "review": "Published Maven Central SHA1, independently calculated SHA256 and byte-identical canonical TLS mirror"
+  },
+  {
+    "group": "org.bitbucket.b_c",
+    "name": "jose4j",
+    "version": "0.9.6",
+    "artifact": "jose4j-0.9.6.pom",
+    "sha256": "3fb7fa713e89d42784bdf4d192ece217400040bda7e933886a9f45ce8b9b557e",
+    "source": "https://repo.maven.apache.org/maven2/org/bitbucket/b_c/jose4j/0.9.6/jose4j-0.9.6.pom",
+    "review": "Published Maven Central SHA1, independently calculated SHA256 and byte-identical canonical TLS mirror"
+  },
+  {
+    "group": "org.bouncycastle",
+    "name": "bcpkix-jdk18on",
+    "version": "1.85",
+    "artifact": "bcpkix-jdk18on-1.85.jar",
+    "sha256": "c9f82b2d4e99c4bbdfccf684e52cc06ea06a0b567bfd0d08f9c5a3f417055996",
+    "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpkix-jdk18on/1.85/bcpkix-jdk18on-1.85.jar",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.bouncycastle",
+    "name": "bcpkix-jdk18on",
+    "version": "1.85",
+    "artifact": "bcpkix-jdk18on-1.85.pom",
+    "sha256": "9b052b0cb85cb7d8bb0956afcc74f31c814f1c67e03498e1ca74f8fe8611d957",
+    "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpkix-jdk18on/1.85/bcpkix-jdk18on-1.85.pom",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.bouncycastle",
+    "name": "bcprov-jdk18on",
+    "version": "1.85",
+    "artifact": "bcprov-jdk18on-1.85.jar",
+    "sha256": "20af26bf6060bb8005cc2389916812c1e0e998dc48d2ced7131b89461b54cff7",
+    "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.85/bcprov-jdk18on-1.85.jar",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.bouncycastle",
+    "name": "bcprov-jdk18on",
+    "version": "1.85",
+    "artifact": "bcprov-jdk18on-1.85.pom",
+    "sha256": "a48e978d6b24c183c4832f5c49d71c1f84156b99c6fa9a410aafb373a254be7c",
+    "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.85/bcprov-jdk18on-1.85.pom",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.bouncycastle",
+    "name": "bcutil-jdk18on",
+    "version": "1.85",
+    "artifact": "bcutil-jdk18on-1.85.jar",
+    "sha256": "590f55ed5d68529239898a4a5c4f730b6e37f45d1cfa3fbe51f8485abe32c42d",
+    "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcutil-jdk18on/1.85/bcutil-jdk18on-1.85.jar",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.bouncycastle",
+    "name": "bcutil-jdk18on",
+    "version": "1.85",
+    "artifact": "bcutil-jdk18on-1.85.pom",
+    "sha256": "9f1c79a12a7c03d78860e05750dcc44e855e20205c7af7cffbf29a69448d85ea",
+    "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcutil-jdk18on/1.85/bcutil-jdk18on-1.85.pom",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.jdom",
+    "name": "jdom2",
+    "version": "2.0.6.1",
+    "artifact": "jdom2-2.0.6.1.jar",
+    "sha256": "0b20f45e3a0fd8f0d12cdc5316b06776e902b1365db00118876f9175c60f302c",
+    "source": "https://repo.maven.apache.org/maven2/org/jdom/jdom2/2.0.6.1/jdom2-2.0.6.1.jar",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.jdom",
+    "name": "jdom2",
+    "version": "2.0.6.1",
+    "artifact": "jdom2-2.0.6.1.pom",
+    "sha256": "55795e1018b8ae647b937967cf810a99b08582c2374e7873c128734c8c914bf3",
+    "source": "https://repo.maven.apache.org/maven2/org/jdom/jdom2/2.0.6.1/jdom2-2.0.6.1.pom",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.junit",
+    "name": "junit-bom",
+    "version": "5.13.1",
+    "artifact": "junit-bom-5.13.1.module",
+    "sha256": "33c07ab9724790a6e5859ba07d69117ac530439724545a81c4179e3272c75de8",
+    "source": "https://repo.maven.apache.org/maven2/org/junit/junit-bom/5.13.1/junit-bom-5.13.1.module",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  },
+  {
+    "group": "org.junit",
+    "name": "junit-bom",
+    "version": "5.13.1",
+    "artifact": "junit-bom-5.13.1.pom",
+    "sha256": "fa68451ea830572ed43ffe51d75b6a05f7a5e665a602a51f49d6be02063a65f3",
+    "source": "https://repo.maven.apache.org/maven2/org/junit/junit-bom/5.13.1/junit-bom-5.13.1.pom",
+    "review": "Published Maven Central SHA256 and independent canonical TLS download"
+  }
+]

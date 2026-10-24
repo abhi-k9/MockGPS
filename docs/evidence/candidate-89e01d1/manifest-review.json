@@ -1,0 +1,61 @@
+{
+  "source_commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
+  "merged_manifest_sha256": "430936a390a043e1b36677e83f02bc013a463816381fae55cabcd32661b4018b",
+  "package": "dev.abhik.mockgps",
+  "components": [
+    {
+      "kind": "activity",
+      "name": "dev.burixon.mockgps.MainActivity",
+      "exported": "true"
+    },
+    {
+      "kind": "receiver",
+      "name": "dev.burixon.mockgps.MockGpsReceiver",
+      "exported": "true"
+    },
+    {
+      "kind": "receiver",
+      "name": "dev.burixon.mockgps.DelayReceiver",
+      "exported": "false"
+    },
+    {
+      "kind": "receiver",
+      "name": "dev.burixon.mockgps.BootReceiver",
+      "exported": "false"
+    },
+    {
+      "kind": "receiver",
+      "name": "androidx.profileinstaller.ProfileInstallReceiver",
+      "exported": "true",
+      "permission": "android.permission.DUMP"
+    },
+    {
+      "kind": "service",
+      "name": "dev.burixon.mockgps.MockLocationService",
+      "exported": "false",
+      "foregroundServiceType": "location"
+    },
+    {
+      "kind": "service",
+      "name": "dev.burixon.mockgps.ModeTileService",
+      "exported": "true",
+      "permission": "android.permission.BIND_QUICK_SETTINGS_TILE"
+    }
+  ],
+  "receiver_component": "dev.abhik.mockgps/dev.burixon.mockgps.MockGpsReceiver",
+  "action": "dev.abhik.mockgps.CONTROL",
+  "exact_api2_extras": {
+    "api": "Int",
+    "token": "String",
+    "command": "String",
+    "event_time": "Long",
+    "seq": "Long"
+  },
+  "commands": [
+    "vehicle_connected",
+    "vehicle_disconnected",
+    "vehicle_unknown",
+    "stop",
+    "status"
+  ]
+}

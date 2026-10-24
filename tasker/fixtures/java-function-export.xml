@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TaskerData sr="" dvi="1" tv="5.9.3.beta.5">
+  <Project sr="proj0" ve="2">
+    <cdate>1589558550116</cdate>
+    <name>TaskerLauncherShortcut</name>
+    <tids>901,874,958,925,955</tids>
+    <Share sr="Share">
+      <d>A project to start launcher shortcuts using the TaskerLauncherShortcut plugin.</d>
+      <p>false</p>
+      <t />
+    </Share>
+  </Project>
+  <Task sr="task1">
+    <id>1</id>
+    <nme>Fixture only - do not import</nme>
+    <Action sr="act8" ve="7">
+      <code>664</code>
+      <se>false</se>
+      <Str sr="arg0" ve="3" />
+      <Str sr="arg1" ve="3">Intent</Str>
+      <Str sr="arg2" ve="3">parseUri
+{Intent} (String, int)</Str>
+      <Str sr="arg3" ve="3">%shortcut_intent_uri</Str>
+      <Str sr="arg4" ve="3">0</Str>
+      <Str sr="arg5" ve="3" />
+      <Str sr="arg6" ve="3" />
+      <Str sr="arg7" ve="3" />
+      <Str sr="arg8" ve="3" />
+      <Str sr="arg9" ve="3" />
+    </Action>
+  </Task>
+</TaskerData>

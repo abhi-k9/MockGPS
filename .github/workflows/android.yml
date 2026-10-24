@@ -1,0 +1,228 @@
+name: Android validation
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      force_android:
+        description: Force a full Android validation instead of reusing matching evidence
+        type: boolean
+        default: false
+      sign_release:
+        description: Sign assets in an existing draft (no publication)
+        type: boolean
+        default: false
+      repair_draft_metadata:
+        description: Repair only the known missing optional sidecar entry in the historical draft metadata (no signing)
+        type: boolean
+        default: false
+      source_sha:
+        description: Exact validated APK source SHA for signing
+        type: string
+      validation_run_id:
+        description: Successful full Android run ID for signing
+        type: string
+      diagnostics_run_id:
+        description: Read only the saved API37 emulator diagnostics from this run
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+concurrency:
+  group: android-${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ (inputs.sign_release || inputs.repair_draft_metadata) && 'signing' || 'validation' }}
+  cancel-in-progress: ${{ !inputs.sign_release && !inputs.repair_draft_metadata }}
+
+jobs:
+  plan:
+    if: ${{ !inputs.sign_release && !inputs.repair_draft_metadata && !inputs.diagnostics_run_id }}
+    runs-on: ubuntu-24.04
+    outputs:
+      android_required: ${{ steps.plan.outputs.android_required }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fast source and Tasker checks
+        run: scripts/check-source.sh
+      - id: plan
+        name: Require Android runs only for unvalidated runtime inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORCE_ANDROID: ${{ inputs.force_android }}
+        run: python3 ci/plan.py
+      - name: Keep a matching failed validation visible
+        if: steps.plan.outputs.blocked == 'true'
+        run: |
+          echo 'Matching runtime validation failed; see the evidence URL in the summary. Explicit retry is available through force_android.' >&2
+          exit 1
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.android_required == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Use an isolated Gradle user home
+        run: echo "GRADLE_USER_HOME=$RUNNER_TEMP/mockgps-gradle-clean" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        with:
+          cache-disabled: true
+      - name: Provision pinned official Android command-line tools and SDK
+        run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-sdk"
+      - name: Validate scripts and experimental Tasker generator/model
+        run: scripts/check-source.sh
+      - name: CHECK debug, JVM and lint (no release packaging)
+        if: ${{ !inputs.force_android }}
+        run: scripts/check-android.sh
+      - name: FULL clean builds, JVM tests, lint and instrumentation packaging
+        if: ${{ inputs.force_android }}
+        run: scripts/android-build.sh
+      - name: Verify signed development APK and record exact source identity
+        env:
+          FULL_ANDROID: ${{ inputs.force_android }}
+        run: scripts/record-build-identity.sh
+      - name: Preserve APKs and validation reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: android-build-and-reports-${{ github.sha }}-attempt${{ github.run_attempt }}
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/release/*unsigned.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
+            app/build/reports/
+            app/build/test-results/
+            app/build/development-candidate/
+
+  instrumentation:
+    needs: plan
+    if: needs.plan.outputs.android_required == 'true'
+    name: instrumentation API ${{ matrix.api }}
+    strategy:
+      fail-fast: false
+      matrix:
+        api: ['36', '37.0']
+    env:
+      MOCKGPS_TEST_API: ${{ matrix.api }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      # Temporary infrastructure hold. A deliberate FULL dispatch can retry after
+      # a reviewed host/image/harness change; ordinary app edits don't cold-boot
+      # the unchanged guest that already crashed before any application tests.
+      - name: Retain unresolved API37 infrastructure failure without repeating boot
+        if: ${{ matrix.api == '37.0' && !inputs.force_android }}
+        run: |
+          echo '::error::API37 remains blocked before device tests. Saved guest diagnosis: run 40068773439; original failure: 40068105244. No new device execution. Use a reviewed FULL retry after changing the cause.'
+          exit 1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Use an isolated Gradle user home
+        run: echo "GRADLE_USER_HOME=$RUNNER_TEMP/mockgps-gradle-clean" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        with:
+          cache-disabled: true
+      - name: Provision official SDK, emulator and selected system image
+        run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-sdk" --with-emulator "$MOCKGPS_TEST_API"
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run Android instrumentation (not Samsung validation)
+        run: scripts/run-emulator-tests.sh
+      - name: Preserve device-test results and emulator diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: android-instrumentation-reports-API${{ matrix.api }}-${{ github.sha }}-attempt${{ github.run_attempt }}
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
+            app/build/emulator-diagnostics/
+
+  diagnostics:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.diagnostics_run_id != '' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Inspect saved emulator host diagnostics only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DIAGNOSTICS_RUN_ID: ${{ inputs.diagnostics_run_id }}
+        run: python3 ci/diagnostics.py
+
+  sign-release:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_release && !inputs.repair_draft_metadata }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+      checks: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Provision checksum-pinned signing tools
+        run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-signing-sdk"
+      - name: Prepare draft assets from verified CI APK bytes (no signing secrets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          VALIDATION_RUN_ID: ${{ inputs.validation_run_id }}
+        run: python3 ci/prepare_release.py
+      - name: Validate draft inputs and sign with the authorized persistent key
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          VALIDATION_RUN_ID: ${{ inputs.validation_run_id }}
+          MOCKGPS_SIGNING_KEYSTORE_BASE64: ${{ secrets.MOCKGPS_SIGNING_KEYSTORE_BASE64 }}
+          MOCKGPS_SIGNING_KEY_ALIAS: ${{ secrets.MOCKGPS_SIGNING_KEY_ALIAS }}
+          MOCKGPS_SIGNING_KEY_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_KEY_PASSWORD }}
+          MOCKGPS_SIGNING_STORE_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_STORE_PASSWORD }}
+        run: python3 ci/sign_release.py
+
+  repair-draft-metadata:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.repair_draft_metadata && !inputs.sign_release }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Repair only historical manifest and checksum entries; no APK build or signing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 ci/repair_draft_metadata.py

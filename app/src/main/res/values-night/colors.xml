@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ui_background">#121B24</color>
+    <color name="drawer_background">#18232E</color>
+    <color name="panel_background">#223343</color>
+    <color name="drawer_header_background">#293D50</color>
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#C3D1DE</color>
+    <color name="text_muted">#ADBECE</color>
+    <color name="divider">#536779</color>
+</resources>

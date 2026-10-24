@@ -1,0 +1,103 @@
+{
+  "commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
+  "tracked_worktree_clean": true,
+  "application_id": "dev.abhik.mockgps",
+  "version_code": 4,
+  "version_name": "0.3.2-dev",
+  "apk": "app/build/outputs/apk/debug/app-debug.apk",
+  "bytes": 59262884,
+  "sha256": "21b98c8f38118c18805dd3397cd537cd5f0a85f6780a48523d21d0c734bb9126",
+  "signer_certificate_sha256": "07418dde16f4fa5a9ab277e1ba2a2f660e50febf282261a54d44b2f52ba398cf",
+  "signing": "Android development/debug certificate; unsigned release is not an installable release",
+  "unit_tests": {
+    "tests": 79,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "Warning": 16
+  },
+  "lint_issues": [
+    {
+      "id": "InlinedApi",
+      "severity": "Warning",
+      "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
+    },
+    {
+      "id": "InlinedApi",
+      "severity": "Warning",
+      "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
+    },
+    {
+      "id": "InlinedApi",
+      "severity": "Warning",
+      "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
+    },
+    {
+      "id": "OldTargetApi",
+      "severity": "Warning",
+      "message": "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
+    },
+    {
+      "id": "GradleDependency",
+      "severity": "Warning",
+      "message": "A newer version of `compileSdk` than 36 is available: 37"
+    },
+    {
+      "id": "NewerVersionAvailable",
+      "severity": "Warning",
+      "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
+    },
+    {
+      "id": "ExportedReceiver",
+      "severity": "Warning",
+      "message": "Exported receiver does not require permission"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    },
+    {
+      "id": "UseKtx",
+      "severity": "Warning",
+      "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+    }
+  ]
+}

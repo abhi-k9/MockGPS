@@ -1,1 +1,13 @@
 *.apk
+*.aab
+.gradle/
+.kotlin/
+/build/
+/app/build/
+/local.properties
+*.jks
+*.keystore
+
+__pycache__/
+
+/work/

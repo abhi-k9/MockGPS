@@ -1,0 +1,173 @@
+{
+  "head_sha": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+  "artifact_source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+  "runtime_inputs_sha256": "39b8af802bf4189deec14b090c343e255928fa85218851b57c8909ea2e0d3c1a",
+  "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40068105244",
+  "conclusion": "failure",
+  "jobs": [
+    {
+      "id": 120795499317,
+      "name": "plan",
+      "conclusion": "success"
+    },
+    {
+      "id": 120795500031,
+      "name": "diagnostics",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120795500328,
+      "name": "sign-release",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 120795581326,
+      "name": "build",
+      "conclusion": "success"
+    },
+    {
+      "id": 120795581352,
+      "name": "instrumentation API 36",
+      "conclusion": "success"
+    },
+    {
+      "id": 120795581367,
+      "name": "instrumentation API 37.0",
+      "conclusion": "failure"
+    }
+  ],
+  "device_results": [
+    {
+      "api": 36,
+      "status": "PASS",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "job_id": 120795581352
+    },
+    {
+      "api": 37,
+      "status": "BLOCKED_BEFORE_TEST_EXECUTION",
+      "tests": null,
+      "job_id": 120795581367,
+      "reason": "Guest Android input/display/native crash or transport failure before app tests; failed check remains visible"
+    }
+  ],
+  "build_identity": {
+    "runtime_inputs_sha256": "39b8af802bf4189deec14b090c343e255928fa85218851b57c8909ea2e0d3c1a",
+    "commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+    "tracked_worktree_clean": true,
+    "application_id": "dev.abhik.mockgps",
+    "version_code": 5,
+    "version_name": "0.4.0-beta.1",
+    "apk": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 59263500,
+    "sha256": "40f5189fd032e2c25a3cde9c175c121925c875c1615686a90508d155a678b971",
+    "signer_certificate_sha256": "b28ce57c3eea10329df98ea93a171cbd8866ee8cd75629ef08dcb1fa01e06e9d",
+    "signing": "Android development/debug certificate; unsigned release is not an installable release",
+    "unit_tests": {
+      "tests": 82,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Warning": 18
+    },
+    "lint_issues": [
+      {
+        "id": "InlinedApi",
+        "severity": "Warning",
+        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
+      },
+      {
+        "id": "InlinedApi",
+        "severity": "Warning",
+        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
+      },
+      {
+        "id": "InlinedApi",
+        "severity": "Warning",
+        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
+      },
+      {
+        "id": "AndroidGradlePluginVersion",
+        "severity": "Warning",
+        "message": "A newer version of Gradle than 9.6.0 is available: 9.8.2"
+      },
+      {
+        "id": "AndroidGradlePluginVersion",
+        "severity": "Warning",
+        "message": "A newer version of com.android.application than 9.2.1 is available: 9.4.1"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.activity:activity-ktx than 1.10.1 is available: 1.13.0"
+      },
+      {
+        "id": "NewerVersionAvailable",
+        "severity": "Warning",
+        "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
+      },
+      {
+        "id": "ExportedReceiver",
+        "severity": "Warning",
+        "message": "Exported receiver does not require permission"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      }
+    ]
+  },
+  "artifact_id": 12550466551,
+  "artifact_digest": "sha256:e0057cd6c90fbdbaac1060ee8a362d024c43e01999f16283a2f4aebcb7a57dac"
+}

@@ -1,21 +1,23 @@
 plugins {
-    id("com.android.application")
+    alias(libs.plugins.android.application)
 }
 
 android {
     namespace = "dev.burixon.mockgps"
-    compileSdk = 36
+    compileSdk = 37
+    buildToolsVersion = "36.0.0"
 
     buildFeatures {
         buildConfig = true
     }
 
     defaultConfig {
-        applicationId = "dev.burixon.mockgps"
+        applicationId = "dev.abhik.mockgps"
         minSdk = 29
-        targetSdk = 36
-        versionCode = 1
-        versionName = "0.2.0"
+        targetSdk = 37
+        versionCode = 5
+        versionName = "0.4.0-beta.1"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -31,9 +33,13 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.17.0")
-    implementation("androidx.activity:activity-ktx:1.10.1")
-    implementation("androidx.drawerlayout:drawerlayout:1.2.0")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.drawerlayout)
 
-    implementation("org.maplibre.gl:android-sdk:13.6.1")
+    implementation(libs.maplibre)
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.runner)
 }

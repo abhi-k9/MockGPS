@@ -1,0 +1,219 @@
+{
+  "baseline-full": {
+    "label": "baseline clean outputs / warm dependencies and existing daemon",
+    "command": [
+      "scripts/android-build.sh",
+      "--offline",
+      "--profile"
+    ],
+    "seconds": 97.213,
+    "exit": 0
+  },
+  "warm-timings": [
+    {
+      "label": "configuration",
+      "command": [
+        "./gradlew",
+        "help",
+        "--offline",
+        "--profile",
+        "--console=plain"
+      ],
+      "seconds": 2.512,
+      "exit": 0
+    },
+    {
+      "label": "compile-warm",
+      "command": [
+        "scripts/dev.sh",
+        "compile",
+        "--offline"
+      ],
+      "seconds": 3.14,
+      "exit": 0
+    },
+    {
+      "label": "targeted-1",
+      "command": [
+        "scripts/dev.sh",
+        "fast",
+        "*PolicyTest*",
+        "--offline"
+      ],
+      "seconds": 6.554,
+      "exit": 0
+    },
+    {
+      "label": "targeted-2",
+      "command": [
+        "scripts/dev.sh",
+        "fast",
+        "*PolicyTest*",
+        "--offline"
+      ],
+      "seconds": 4.401,
+      "exit": 0
+    },
+    {
+      "label": "all-jvm",
+      "command": [
+        "./gradlew",
+        ":app:testDebugUnitTest",
+        "--rerun",
+        "--offline",
+        "--profile",
+        "--dependency-verification=strict",
+        "--max-workers=2",
+        "--console=plain"
+      ],
+      "seconds": 4.145,
+      "exit": 0
+    },
+    {
+      "label": "lint-warm",
+      "command": [
+        "./gradlew",
+        ":app:lintDebug",
+        "--offline",
+        "--profile",
+        "--dependency-verification=strict",
+        "--max-workers=2",
+        "--console=plain"
+      ],
+      "seconds": 2.853,
+      "exit": 0
+    },
+    {
+      "label": "debug-warm",
+      "command": [
+        "scripts/dev.sh",
+        "build",
+        "--offline"
+      ],
+      "seconds": 3.31,
+      "exit": 0
+    },
+    {
+      "label": "test-apk-warm",
+      "command": [
+        "./gradlew",
+        ":app:assembleDebugAndroidTest",
+        "--offline",
+        "--profile",
+        "--dependency-verification=strict",
+        "--max-workers=2",
+        "--console=plain"
+      ],
+      "seconds": 4.595,
+      "exit": 0
+    }
+  ],
+  "changed-kotlin-fast": {
+    "label": "real Kotlin policy/auth/UI edit, affected core JVM tests",
+    "seconds": 15.423,
+    "exit": 1,
+    "command": [
+      "scripts/dev.sh",
+      "fast",
+      "*core.*",
+      "--offline"
+    ]
+  },
+  "changed-kotlin-fast-fixed": {
+    "label": "affected core tests after safety-contract fixture correction",
+    "seconds": 3.879,
+    "exit": 0,
+    "command": [
+      "scripts/dev.sh",
+      "fast",
+      "*core.*",
+      "--offline"
+    ]
+  },
+  "missing-selector": {
+    "label": "missing-selector",
+    "command": [
+      "scripts/dev.sh",
+      "fast",
+      "*NoSuchMockGpsTestClass*",
+      "--offline"
+    ],
+    "seconds": 4.742,
+    "exit": 1
+  },
+  "final-check": {
+    "label": "final-check",
+    "command": [
+      "scripts/check-android.sh",
+      "--offline",
+      "--profile"
+    ],
+    "seconds": 23.248,
+    "exit": 0
+  },
+  "measured_at_utc": "2026-10-24",
+  "baseline_head": "d35c471ad0cfde915817b5618bdefb0a76b67f62",
+  "changed_source": "Uncommitted working tree during measured policy/auth/settings implementation",
+  "host": {
+    "os": "Debian13 / Linux6.18.55 x86_64",
+    "cpu": "Xeon Platinum8573C",
+    "visible_cpu": 3,
+    "cpu_quota": 2,
+    "memory_limit_bytes": 8589934592,
+    "kvm": false,
+    "device_attached": false
+  },
+  "toolchain": {
+    "java": 21,
+    "gradle": "9.6.0",
+    "agp": "9.2.1",
+    "kotlin": "2.2.10",
+    "compile_sdk": 37
+  },
+  "baseline_profile_seconds": {
+    "wall": 96.87,
+    "configuration": 0.395,
+    "dependency_resolution": 0.431,
+    "compile_debug_kotlin": 14.533,
+    "compile_release_kotlin": 5.285,
+    "lint_analyze_debug": 45.53,
+    "unit_test_task": 5.869
+  },
+  "local_check": {
+    "unit_tests": {
+      "tests": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Warning": 13
+    },
+    "instrumentation": "COMPILED ONLY: no KVM/attached device",
+    "full_release": "NOT RUN for new revision; API37/hardware still blocked"
+  },
+  "limits": [
+    "One run per row except two named targeted repeats",
+    "Dependencies and daemon warm; baseline clean outputs cold, not a cold machine/network",
+    "First changed-code run failed3 obsolete contract expectations; corrected run passed69 core tests",
+    "Task durations overlap; do not sum to wall time",
+    "No emulator boot/method/full runtime or reasoning-time measurement available"
+  ],
+  "final-small-delta": {
+    "command": [
+      "./gradlew",
+      ":app:testDebugUnitTest",
+      "--rerun",
+      "--tests",
+      "*ObservationOrderingTest*",
+      ":app:assembleDebugAndroidTest",
+      "--offline",
+      "--dependency-verification=strict",
+      "--max-workers=2",
+      "--console=plain"
+    ],
+    "seconds": 6.954,
+    "exit": 0,
+    "scope": "3 ordering JVM tests plus changed device-test compilation; app runtime unchanged from full85-JVM CHECK"
+  }
+}

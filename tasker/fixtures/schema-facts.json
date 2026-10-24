@@ -1,0 +1,533 @@
+{
+  "sources": [
+    {
+      "url": "https://github.com/agnostic-apollo/TaskerLauncherShortcut-Tasker-Project/blob/341a9dfc8925467e551750a6be03c51232affb30/projects/TaskerLauncherShortcut.prj.xml",
+      "blob": "f3ae2133a31f4231064f0db3a379de2c473a4ece",
+      "license": "MIT; notice adjacent; only structural fixture excerpt retained"
+    },
+    {
+      "url": "https://github.com/dipeshio/tasker-profiles/blob/e2fd5704a920d5cc16096e28ab12012f5dfb1bfc/datadef.xml",
+      "sha256": "762e5a2fbbc28407dceb13b59f076042b9c5ce9a3080bdb51f850519618ce87f",
+      "use": "Numeric schema facts only; no project or executable task copied"
+    }
+  ],
+  "definitions": [
+    {
+      "kind": "state",
+      "code": 3,
+      "name": "BT Connected",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Name",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "private",
+          "contentType": "str"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Address",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "private",
+          "contentType": "str"
+        }
+      ]
+    },
+    {
+      "kind": "state",
+      "code": 2,
+      "name": "BT Status",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Status",
+          "dataType": "int",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "option"
+        }
+      ]
+    },
+    {
+      "kind": "state",
+      "code": 165,
+      "name": "Variable Value",
+      "args": []
+    },
+    {
+      "kind": "event",
+      "code": 411,
+      "name": "Device Boot",
+      "args": []
+    },
+    {
+      "kind": "event",
+      "code": 307,
+      "name": "Monitor Start",
+      "args": []
+    },
+    {
+      "kind": "action",
+      "code": 664,
+      "name": "Java Function",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Return",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Class Or Object",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "2",
+          "nameLocal": "Function",
+          "dataType": "str",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "3",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "4",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "5",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "6",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "7",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "8",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "9",
+          "nameLocal": "Param",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "code": 341,
+      "name": "Test Net",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Type",
+          "dataType": "int",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "option"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Data",
+          "dataType": "str",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "2",
+          "nameLocal": "Store Result In",
+          "dataType": "str",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "str"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "code": 37,
+      "name": "If",
+      "args": []
+    },
+    {
+      "kind": "action",
+      "code": 38,
+      "name": "End If",
+      "args": []
+    },
+    {
+      "kind": "action",
+      "code": 129,
+      "name": "JavaScriptlet",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Code",
+          "dataType": "str",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Libraries",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "2",
+          "nameLocal": "Auto Exit",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "3",
+          "nameLocal": "Timeout (Seconds)",
+          "dataType": "int",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "valueOrVariable"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "code": 130,
+      "name": "Perform Task",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Name",
+          "dataType": "str",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Priority",
+          "dataType": "int",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "valueOrVariable"
+        },
+        {
+          "num": "2",
+          "nameLocal": "Parameter 1 (%par1)",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "3",
+          "nameLocal": "Parameter 2 (%par2)",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "4",
+          "nameLocal": "Return Value Variable",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "5",
+          "nameLocal": "Stop",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "6",
+          "nameLocal": "Local Variable Passthrough",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "7",
+          "nameLocal": "Limit Passthrough To",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "8",
+          "nameLocal": "Reset Return Variable",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "9",
+          "nameLocal": "Allow Overwrite Variables",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "10",
+          "nameLocal": "Structure Output (JSON, etc)",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "code": 137,
+      "name": "Stop",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "With Error",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Task",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "code": 548,
+      "name": "Flash",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Text",
+          "dataType": "str",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Long",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "2",
+          "nameLocal": "Tasker Layout",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "3",
+          "nameLocal": "Title",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "4",
+          "nameLocal": "Icon",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "5",
+          "nameLocal": "Icon Size",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "6",
+          "nameLocal": "Background Colour",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "7",
+          "nameLocal": "Task",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "8",
+          "nameLocal": "Timeout",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "9",
+          "nameLocal": "Continue Task Immediately",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "10",
+          "nameLocal": "Text Colour",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "11",
+          "nameLocal": "Dismiss On Click",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "12",
+          "nameLocal": "Show Over Everything",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "13",
+          "nameLocal": "Position",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "14",
+          "nameLocal": "Use HTML",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "15",
+          "nameLocal": "ID",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        }
+      ]
+    },
+    {
+      "kind": "action",
+      "code": 549,
+      "name": "Variable Clear",
+      "args": [
+        {
+          "num": "0",
+          "nameLocal": "Name",
+          "dataType": "str",
+          "optional": "true",
+          "privacy": "public",
+          "contentType": "str"
+        },
+        {
+          "num": "1",
+          "nameLocal": "Pattern Matching",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "2",
+          "nameLocal": "Local Variables Only",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        },
+        {
+          "num": "3",
+          "nameLocal": "Clear All Variables",
+          "dataType": "bool",
+          "optional": "false",
+          "privacy": "public",
+          "contentType": "bool"
+        }
+      ]
+    }
+  ]
+}
