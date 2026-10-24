@@ -43,6 +43,8 @@ All rows initially have result **NOT RUN**. For each row record timestamp, preco
 | 20 | Repeated transitions | Repeat start-stop-start-stop rapidly, then mix connection/reconnection/FORCE_REAL, duplicate/out-of-order sequences and stale pending intents. End with no pending work, no active owned providers and matching app/tile state—or an explicit error. | NOT RUN |
 | 21 | Other apps' recovery | In at least one Android LocationManager client and any separately chosen fused/OEM client, check fresh nonmock fixes after cleanup. Record cached-mock behavior and provider differences; app does not claim control over every source. | NOT RUN |
 | 22 | OS/app update | Record versions and signing identity. Upgrade with retained data when signatures permit; verify safe migration, integration disabled/revoked as defined, old restart/pending intents invalidated and selected mode coherent. Repeat #1–#8 after firmware update. | NOT RUN |
+| 23 | Selected car connects during MANUAL_MOCK/startup | Start manually, then deliver fresh typed API2 CONNECTED during injection and separately startup. Verify cleanup outcome, inactive AUTO unless FORCE_REAL, stale callbacks rejected, tile/app agreement; later DISCONNECTED requires a new delay/confirmation. Independently verify a fresh nonmock fix. | NOT RUN |
+| 24 | UNKNOWN during MANUAL_MOCK and missed delivery | Deliver fresh typed UNKNOWN during manual injection/startup; verify cleanup outcome, inactive AUTO unless FORCE_REAL, stale-work rejection and tile/app agreement. Compare intentionally missed delivery (no silence-based stop guarantee) with local FORCE_REAL. Later DISCONNECTED needs new delay/confirmation; verify genuine recovery independently. | NOT RUN |
 
 ## Additional security and reconciliation probes
 

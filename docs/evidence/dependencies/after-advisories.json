@@ -1,0 +1,1663 @@
+{
+  "schema": 1,
+  "source_commit": "6fd92d28706e453646bd03e32a420e673ad89e64",
+  "queried_at_utc": "2026-10-23T22:13:34.756325+00:00",
+  "source": "GitHub Advisory Database public REST API; type=reviewed, ecosystem=maven, affects=package@version",
+  "inventory_sha256": "fe73ebf153e2de711890c1ef812b2eaf52f78e39beb2e1cc7cd5686c0d9637d8",
+  "modules_scanned": 174,
+  "scopes": [
+    "::classpath",
+    ":app:classpath",
+    ":app:debugAndroidTestRuntimeClasspath",
+    ":app:debugRuntimeClasspath",
+    ":app:debugUnitTestRuntimeClasspath",
+    ":app:releaseRuntimeClasspath"
+  ],
+  "limitations": [
+    "Maven coordinates only; excludes embedded/shaded native code and Gradle distribution internals",
+    "Includes buildscript plugin transitive dependencies; not an exhaustive inventory of SDK/system-image tools",
+    "Snapshot of published reviewed Maven advisories only; unknown/unreviewed vulnerabilities are not excluded",
+    "No native/shaded library, Android platform, SDK or firmware security clearance is implied",
+    "Does not replace the blocked GitHub PR dependency-diff review"
+  ],
+  "positive_control": {
+    "package": "org.apache.logging.log4j:log4j-core@2.14.1",
+    "expected_ghsa": "GHSA-jfh8-c2jp-5v3q",
+    "passed": true
+  },
+  "results": [
+    {
+      "name": "androidx.activity:activity-ktx",
+      "version": "1.10.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.activity:activity",
+      "version": "1.10.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.annotation:annotation-experimental",
+      "version": "1.4.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.annotation:annotation-jvm",
+      "version": "1.8.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.annotation:annotation",
+      "version": "1.8.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.arch.core:core-common",
+      "version": "2.2.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.arch.core:core-runtime",
+      "version": "2.2.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.collection:collection-jvm",
+      "version": "1.4.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.collection:collection",
+      "version": "1.4.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.concurrent:concurrent-futures-ktx",
+      "version": "1.2.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.concurrent:concurrent-futures",
+      "version": "1.1.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.core:core-ktx",
+      "version": "1.17.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.core:core-viewtree",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.core:core",
+      "version": "1.17.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.customview:customview",
+      "version": "1.1.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.databinding:databinding-common",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.databinding:databinding-compiler-common",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.drawerlayout:drawerlayout",
+      "version": "1.2.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.fragment:fragment",
+      "version": "1.8.9",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.interpolator:interpolator",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-common",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata-core",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-livedata",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime-ktx",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-savedstate",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel",
+      "version": "2.6.2",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.loader:loader",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.profileinstaller:profileinstaller",
+      "version": "1.4.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.savedstate:savedstate-ktx",
+      "version": "1.2.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.savedstate:savedstate",
+      "version": "1.2.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.startup:startup-runtime",
+      "version": "1.1.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test.ext:junit",
+      "version": "1.3.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test.services:storage",
+      "version": "1.6.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test:core",
+      "version": "1.7.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test:monitor",
+      "version": "1.8.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.test:runner",
+      "version": "1.7.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.tracing:tracing",
+      "version": "1.2.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.versionedparcelable:versionedparcelable",
+      "version": "1.1.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "androidx.viewpager:viewpager",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.application:com.android.application.gradle.plugin",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.databinding:baseLibrary",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:crash",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:protos",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:shared",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.analytics-library:tracker",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build.jetifier:jetifier-core",
+      "version": "1.0.0-beta10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build.jetifier:jetifier-processor",
+      "version": "1.0.0-beta10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:aapt2-proto",
+      "version": "9.2.1-15009934",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:aaptcompiler",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:apksig",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:apkzlib",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:builder-model",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:builder-test-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:builder",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:bundletool",
+      "version": "1.18.3",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle-common-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle-settings-api",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:gradle",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.build:manifest-merger",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.ddms:ddmlib",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.layoutlib:layoutlib-api",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.lint:lint-model",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.lint:lint-typedef-remover",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools.utp:gradle-work-action-api",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:annotations",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:common",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:dvlib",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:repository",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:sdk-common",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android.tools:sdklib",
+      "version": "32.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android:signflinger",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.android:zipflinger",
+      "version": "9.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.auto.value:auto-value-annotations",
+      "version": "1.6.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.code.findbugs:jsr305",
+      "version": "3.0.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.code.gson:gson",
+      "version": "2.10.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.code.gson:gson",
+      "version": "2.11.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.crypto.tink:tink",
+      "version": "1.7.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.dagger:dagger",
+      "version": "2.28.3",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.errorprone:error_prone_annotations",
+      "version": "2.28.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.flatbuffers:flatbuffers-java",
+      "version": "1.12.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:failureaccess",
+      "version": "1.0.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:guava",
+      "version": "33.3.1-jre",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:listenablefuture",
+      "version": "1.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.guava:listenablefuture",
+      "version": "9999.0-empty-to-avoid-conflict-with-guava",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.j2objc:j2objc-annotations",
+      "version": "3.0.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.jimfs:jimfs",
+      "version": "1.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.protobuf:protobuf-java-util",
+      "version": "3.25.5",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.google.protobuf:protobuf-java",
+      "version": "3.25.5",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.googlecode.juniversalchardet:juniversalchardet",
+      "version": "1.0.3",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.jakewharton.timber:timber",
+      "version": "5.0.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup.okhttp3:okhttp",
+      "version": "4.12.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup.okio:okio-jvm",
+      "version": "3.6.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup.okio:okio",
+      "version": "3.6.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup:javapoet",
+      "version": "1.13.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.squareup:javawriter",
+      "version": "2.5.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.sun.istack:istack-commons-runtime",
+      "version": "3.0.8",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "com.sun.xml.fastinfoset:FastInfoset",
+      "version": "1.2.16",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "commons-codec:commons-codec",
+      "version": "1.17.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "commons-io:commons-io",
+      "version": "2.16.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "commons-logging:commons-logging",
+      "version": "1.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "jakarta.activation:jakarta.activation-api",
+      "version": "1.2.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+      "version": "2.3.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "javax.inject:javax.inject",
+      "version": "1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "junit:junit",
+      "version": "4.13.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.java.dev.jna:jna-platform",
+      "version": "5.6.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.java.dev.jna:jna",
+      "version": "5.6.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.sf.jopt-simple:jopt-simple",
+      "version": "4.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "net.sf.kxml:kxml2",
+      "version": "2.3.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.commons:commons-compress",
+      "version": "1.27.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.commons:commons-lang3",
+      "version": "3.18.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.httpcomponents:httpclient",
+      "version": "4.5.14",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.httpcomponents:httpcore",
+      "version": "4.4.16",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.apache.httpcomponents:httpmime",
+      "version": "4.5.6",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.bitbucket.b_c:jose4j",
+      "version": "0.9.6",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.bouncycastle:bcpkix-jdk18on",
+      "version": "1.85",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.bouncycastle:bcprov-jdk18on",
+      "version": "1.85",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.bouncycastle:bcutil-jdk18on",
+      "version": "1.85",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.checkerframework:checker-qual",
+      "version": "3.43.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.glassfish.jaxb:jaxb-runtime",
+      "version": "2.3.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.glassfish.jaxb:txw2",
+      "version": "2.3.2",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.hamcrest:hamcrest-core",
+      "version": "1.3",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jdom:jdom2",
+      "version": "2.0.6.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:abi-tools-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:fus-statistics-gradle-plugin",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-build-statistics",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-build-tools-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-compiler-runner",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-daemon-client",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-annotations",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-idea",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin-model",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugin",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": [
+        {
+          "ghsa_id": "GHSA-r937-wjx7-w2jp",
+          "cve_id": "CVE-2026-53914",
+          "url": "https://api.github.com/advisories/GHSA-r937-wjx7-w2jp",
+          "html_url": "https://github.com/advisories/GHSA-r937-wjx7-w2jp",
+          "summary": "JetBrains Kotlin: Unsafe Deserialization in Kotlin Build Cache Enables Code Execution",
+          "description": "In JetBrains Kotlin before 2.4.20 code execution was possible via unsafe deserialization in the build cache metadata",
+          "type": "reviewed",
+          "severity": "medium",
+          "repository_advisory_url": null,
+          "source_code_location": "https://github.com/JetBrains/kotlin",
+          "identifiers": [
+            {
+              "value": "GHSA-r937-wjx7-w2jp",
+              "type": "GHSA"
+            },
+            {
+              "value": "CVE-2026-53914",
+              "type": "CVE"
+            }
+          ],
+          "references": [
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-53914",
+            "https://www.jetbrains.com/privacy-security/issues-fixed",
+            "https://github.com/JetBrains/kotlin/commit/bf51df665b458fda7c3eaf436c4d88dc119d7ec6",
+            "https://github.com/JetBrains/kotlin/releases/tag/v2.4.20-Beta1",
+            "https://github.com/advisories/GHSA-r937-wjx7-w2jp"
+          ],
+          "published_at": "2026-06-26T15:32:13Z",
+          "updated_at": "2026-08-12T19:25:24Z",
+          "github_reviewed_at": "2026-08-12T19:25:23Z",
+          "nvd_published_at": "2026-06-26T14:17:05Z",
+          "withdrawn_at": null,
+          "vulnerabilities": [
+            {
+              "package": {
+                "ecosystem": "maven",
+                "name": "org.jetbrains.kotlin:kotlin-gradle-plugin"
+              },
+              "vulnerable_version_range": "< 2.4.20-Beta1",
+              "first_patched_version": "2.4.20-Beta1",
+              "vulnerable_functions": []
+            }
+          ],
+          "cvss_severities": {
+            "cvss_v3": {
+              "vector_string": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L",
+              "score": 6.7
+            },
+            "cvss_v4": {
+              "vector_string": null,
+              "score": 0.0
+            }
+          },
+          "cwes": [
+            {
+              "cwe_id": "CWE-502",
+              "name": "Deserialization of Untrusted Data"
+            }
+          ],
+          "credits": [
+            {
+              "user": {
+                "login": "marcelstoer",
+                "id": 624195,
+                "node_id": "MDQ6VXNlcjYyNDE5NQ==",
+                "avatar_url": "https://avatars.githubusercontent.com/u/624195?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/marcelstoer",
+                "html_url": "https://github.com/marcelstoer",
+                "followers_url": "https://api.github.com/users/marcelstoer/followers",
+                "following_url": "https://api.github.com/users/marcelstoer/following{/other_user}",
+                "gists_url": "https://api.github.com/users/marcelstoer/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/marcelstoer/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/marcelstoer/subscriptions",
+                "organizations_url": "https://api.github.com/users/marcelstoer/orgs",
+                "repos_url": "https://api.github.com/users/marcelstoer/repos",
+                "events_url": "https://api.github.com/users/marcelstoer/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/marcelstoer/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            },
+            {
+              "user": {
+                "login": "Lueton",
+                "id": 42818194,
+                "node_id": "MDQ6VXNlcjQyODE4MTk0",
+                "avatar_url": "https://avatars.githubusercontent.com/u/42818194?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/Lueton",
+                "html_url": "https://github.com/Lueton",
+                "followers_url": "https://api.github.com/users/Lueton/followers",
+                "following_url": "https://api.github.com/users/Lueton/following{/other_user}",
+                "gists_url": "https://api.github.com/users/Lueton/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/Lueton/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/Lueton/subscriptions",
+                "organizations_url": "https://api.github.com/users/Lueton/orgs",
+                "repos_url": "https://api.github.com/users/Lueton/repos",
+                "events_url": "https://api.github.com/users/Lueton/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/Lueton/received_events",
+                "type": "User",
+                "user_view_type": "public",
+                "site_admin": false
+              },
+              "type": "analyst"
+            }
+          ],
+          "comments": 0,
+          "cvss": {
+            "vector_string": "CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L",
+            "score": 6.7
+          },
+          "epss": {
+            "percentage": 0.00333,
+            "percentile": 0.24524
+          }
+        }
+      ]
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-gradle-plugins-bom",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-klib-commonizer-api",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-native-utils",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-reflect",
+      "version": "2.3.21",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+      "version": "2.2.10",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "1.9.10",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "1.9.10",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.2.10",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.3.21",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-tooling-core",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-util-io",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-util-klib-metadata",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-util-klib",
+      "version": "2.2.10",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom",
+      "version": "1.9.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm",
+      "version": "1.9.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.10.2",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "version": "1.9.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains:annotations",
+      "version": "13.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jetbrains:annotations",
+      "version": "23.0.0",
+      "scopes": [
+        ":app:debugAndroidTestRuntimeClasspath",
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jspecify:jspecify",
+      "version": "1.0.0",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.jvnet.staxex:stax-ex",
+      "version": "1.8.1",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:android-sdk-geojson",
+      "version": "6.0.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:android-sdk-turf",
+      "version": "6.0.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:android-sdk",
+      "version": "13.6.1",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.maplibre.gl:maplibre-android-gestures",
+      "version": "0.0.4",
+      "scopes": [
+        ":app:debugRuntimeClasspath",
+        ":app:debugUnitTestRuntimeClasspath",
+        ":app:releaseRuntimeClasspath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-analysis",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-commons",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-tree",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm-util",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.ow2.asm:asm",
+      "version": "9.9",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.slf4j:slf4j-api",
+      "version": "1.7.30",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    },
+    {
+      "name": "org.tensorflow:tensorflow-lite-metadata",
+      "version": "0.2.0",
+      "scopes": [
+        "::classpath"
+      ],
+      "advisories": []
+    }
+  ]
+}

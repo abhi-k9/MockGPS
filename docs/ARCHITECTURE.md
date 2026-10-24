@@ -57,3 +57,9 @@ Legacy upstream versions had no journal. An upgrade cannot prove ownership or ab
 Provider cleanup runs even when policy migration/persistence fails. Failed persistence disables desired injection in memory, invalidates its generation and cancels pending requests; a new service start never proceeds from an unpersisted transition. External acknowledgement requires the replay watermark to have committed. Stop attempts remain effective even if private storage is full; inability to persist the override is reported and cannot be promised across a future process restart. These paths have source review, not Android disk-fault execution evidence.
 
 Any nonempty legacy preferences conservatively mark prior provider state unverified, because old stopped flags were written before potentially failing cleanup. Old genuine-coordinate erasure is retried if needed. A successful new journaled injection of both named providers, followed by cleanup, or a real reboot can resolve legacy ambiguity; neither proves a consumer obtained a fresh genuine fix.
+
+## Manual-session vehicle safety
+
+Fresh authenticated CONNECTED or UNKNOWN stops active or starting MANUAL_MOCK as well as AUTO, advances generation and cancels pending confirmation. FORCE_REAL stays selected; other modes become inactive AUTO. Known CONNECTED blocks manual start. An explicit visible manual start while UNKNOWN remains possible, but a later delivered UNKNOWN stops it. A later DISCONNECTED creates a new delay and visible-confirmation request; it cannot resurrect the old manual session.
+
+Missing Tasker delivery cannot be inferred from silence: an active session may continue until an accepted event, runtime failure or local stop. Successful provider cleanup does not establish a fresh genuine fix; verify a new nonmock location in an independent client.

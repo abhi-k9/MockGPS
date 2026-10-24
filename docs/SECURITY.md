@@ -73,6 +73,12 @@ Physical Samsung Android 17 tests have not run in this environment. Background s
 
 ## Dependency integrity and storage failure
 
-SHA-256 Gradle verification metadata pins the resolved build/runtime/test artifact set. It was bootstrapped through verified HTTPS and tested in a separate strict run; initial trust is the package repositories, not independent artifact provenance. No advisory scan or third-party SDK packet capture completed locally. Review future metadata updates rather than blindly regenerating them.
+SHA-256 Gradle verification metadata pins the resolved build/runtime/test artifact set. It was bootstrapped through verified HTTPS and tested in a separate strict run; initial trust is the package repositories, not independent artifact provenance. The reviewed Maven advisory scan is recorded in DEPENDENCY_REVIEW.md; no third-party SDK packet capture completed locally. Review future metadata updates rather than blindly regenerating them.
 
 A policy persistence failure invalidates the in-memory generation, cancels pending requests, attempts provider cleanup and prevents the start path from proceeding. ACCEPTED external responses require a successfully committed replay watermark; credential-write failure is shown rather than toasted as successful revocation. Hardware storage-fault injection is still untested. Legacy migration retries erasing old genuine-coordinate preferences and treats any legacy installation as uncertain because old false running flags did not prove cleanup.
+
+## Manual-session vehicle safety
+
+Fresh authenticated CONNECTED or UNKNOWN stops active or starting MANUAL_MOCK as well as AUTO, advances generation and cancels pending confirmation. FORCE_REAL stays selected; other modes become inactive AUTO. Known CONNECTED blocks manual start. An explicit visible manual start while UNKNOWN remains possible, but a later delivered UNKNOWN stops it. A later DISCONNECTED creates a new delay and visible-confirmation request; it cannot resurrect the old manual session.
+
+Missing Tasker delivery cannot be inferred from silence: an active session may continue until an accepted event, runtime failure or local stop. Successful provider cleanup does not establish a fresh genuine fix; verify a new nonmock location in an independent client.
