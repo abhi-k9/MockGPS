@@ -8,7 +8,7 @@
 - Add an experimental fixture-checked Tasker project for Sportage Hybrid, with no token/counter initialization and documented one-sender migration/rollback.
 - Target/compile Android17/API37 using the supported AGP9.2.1 toolchain; wait for emulator credential storage unlock before instrumentation.
 - Expand Android instrumentation to negative IPC during real injection and Tasker's typed Intent URI recipe; validate API36 and API37.0 emulators.
-- Add unsigned candidate manifest, bounded CycloneDX inventory, fresh advisory evidence and owner-side signing instructions. No persistent signing key was supplied.
+- Add unsigned candidate manifest, bounded CycloneDX inventory, fresh advisory evidence and owner-side signing instructions. Authorized repository signing secrets are consumed only by an explicit isolated signing job; no key is generated/exported.
 - Preserve FORCE_REAL, safety generation cancellation, visible confirmation and strict supply-chain/security gates.
 
 Samsung matrix and Tasker import remain unverified except separately identified user-reported observations. Dependency graph support, authorized signing and mandatory hardware gates block publication/merge.

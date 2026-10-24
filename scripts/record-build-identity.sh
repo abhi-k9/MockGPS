@@ -23,7 +23,10 @@ assert (version_code,version_name)==(5,'0.4.0-beta.1'),(version_code,version_nam
 signature=(out/'signature.txt').read_text()
 assert 'Verifies' in signature
 cert=re.search(r'Signer #1 certificate SHA-256 digest: (\S+)',signature).group(1)
-identity=dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+import sys
+sys.path.insert(0,str(Path('ci').resolve()))
+from runtime_inputs import fingerprint
+identity=dict(runtime_inputs_sha256=fingerprint(),commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
     tracked_worktree_clean=not subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],text=True).strip(),
     application_id=package,version_code=version_code,version_name=version_name,
     apk=str(apk),bytes=apk.stat().st_size,

@@ -70,7 +70,7 @@ assets = [dict(name=f.name, bytes=f.stat().st_size, sha256=hashlib.sha256(f.read
 manifest = dict(schema=1, version='0.4.0-beta.1', version_code=5, source_commit=source,
  application_id='dev.abhik.mockgps', source_namespace='dev.burixon.mockgps', created_at_utc=now,
  variant='unsigned release candidate', signing=dict(status='UNSIGNED', signer_certificate_sha256=None,
- reason='No authorized persistent release key securely provided; not installable until owner signs'),
+ reason='Unsigned foundation; isolated Actions job consumes owner-provided signing secrets' ),
  published=False, stable_production=False, tools=dict(java=subprocess.check_output([os.environ['JAVA_HOME']+'/bin/javac','-version'],text=True).strip(),
  gradle='9.6.0',agp='9.2.1',compile_sdk=37,target_sdk=37,min_sdk=29,build_tools='36.0.0',
  sdk_platform_package='platforms;android-37.0',
@@ -80,7 +80,7 @@ manifest = dict(schema=1, version='0.4.0-beta.1', version_code=5, source_commit=
  limits=advisories['limitations']),
  tasker=dict(status='EXPERIMENTAL; actual Tasker import NOT RUN',schema_fixture='Captured MIT-licensed Java export; schema comparison and JS bridge model passed'),
  hardware=dict(samsung_matrix='24 cases NOT RUN as complete instrumented cases',user_reports='Partial manual acceptance recorded separately; no fresh isMock=false proof'),
- release_gates=dict(dependency_review='BLOCKED: repository dependency graph/permission support',persistent_signing='BLOCKED: no provided release credential',mandatory_hardware='BLOCKED: incomplete physical matrix'),
+ release_gates=dict(dependency_review='BLOCKED: repository dependency graph/permission support',persistent_signing='PENDING: isolated Actions signing job using configured owner secrets',mandatory_hardware='BLOCKED: incomplete physical matrix'),
  assets=assets,source_url='https://github.com/abhi-k9/MockGPS/tree/'+source,
  attestation='Self-recorded build/CI evidence, not a cryptographic SLSA or publisher-signing attestation')
 (out/'release-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
