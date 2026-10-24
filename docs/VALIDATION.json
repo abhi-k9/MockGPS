@@ -53,7 +53,8 @@
         "new_device_execution": false,
         "job_id": 120823101754
       }
-    }
+    },
+    "historical_draft_metadata_repair": "docs/evidence/beta/metadata-repair.json"
   },
   "historical_signed_candidate": {
     "version": "0.4.0-beta.1",

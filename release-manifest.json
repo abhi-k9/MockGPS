@@ -261,11 +261,6 @@
       "sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998"
     },
     {
-      "name": "MockGPS-0.4.0-beta.1.apk.idsig",
-      "bytes": 457286,
-      "sha256": "2bca1f3ce9d50d718947b8754e792991c1bc17484d2dc6fd8215798956245021"
-    },
-    {
       "name": "MockGPS-source-b1a23cee4ed511046ebe33a6dc0f9a254d64f064.zip",
       "bytes": 1007858,
       "sha256": "c75fc1e738814b84906e18b9191230a9f30e31938577a37653cdf0d45d20d001"
@@ -315,5 +310,14 @@
       "bytes": 755,
       "sha256": "54a21ff21f262a64d623465b60e745449e1fc65ea693d9db5b808d8c46b20e5c"
     }
-  ]
+  ],
+  "metadata_repair": {
+    "reason": "Remove checksum/manifest entry for optional apksigner v4 sidecar that was never uploaded; embedded APK signature unchanged",
+    "original_manifest_sha256": "17ec8d34e24c0fea8b474f0ee2a9b24273a60b006b316909b5c626ccafa80a77",
+    "original_checksums_sha256": "8cfcb339e5955346352476e8fdd64037f628da4f81e56091a10d6b4de2bad000",
+    "unchanged_signed_apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+    "source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+    "workflow_commit": "b472cc6bd54f65f10e465e934861f619bc06bd02",
+    "run_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077928953"
+  }
 }

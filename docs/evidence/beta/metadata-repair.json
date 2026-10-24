@@ -1,0 +1,21 @@
+{
+  "draft": true,
+  "prerelease": true,
+  "assets": 15,
+  "checksum_entries": 14,
+  "all_uploaded_asset_digests_match": true,
+  "source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+  "unchanged_signed_apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+  "release_manifest_sha256": "69f7b856dd795dffdfe63179bdeb2f50d2ffe240db2ffd8945fde13176be768d",
+  "checksums_sha256": "005f057140a824af1d21b4651c17e3b927d5f62a51512a383503bb98d585a532",
+  "repair": {
+    "reason": "Remove checksum/manifest entry for optional apksigner v4 sidecar that was never uploaded; embedded APK signature unchanged",
+    "original_manifest_sha256": "17ec8d34e24c0fea8b474f0ee2a9b24273a60b006b316909b5c626ccafa80a77",
+    "original_checksums_sha256": "8cfcb339e5955346352476e8fdd64037f628da4f81e56091a10d6b4de2bad000",
+    "unchanged_signed_apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+    "source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+    "workflow_commit": "b472cc6bd54f65f10e465e934861f619bc06bd02",
+    "run_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077928953"
+  },
+  "current_source_is_not_this_apk": true
+}
