@@ -1,5 +1,10 @@
 # Samsung One UI 9 / Android 17 validation
 
+## User-reported partial acceptance (not matrix PASS)
+
+The authorized beta prompt reports Google Maps' blue dot moved on manual injection and returned after FORCE_REAL; manually delivered authenticated API2 CONNECTED stopped active injection and DISCONNECTED produced pending/notification/confirmed resumption. Tasker Test Net returned `no` away from **Sportage Hybrid**. These are user observations without instrumented timestamp/mock flags or positive car-state testing. All24 complete matrix cases below remain NOT RUN. Test the exact paired address; verify positive/negative Test Net behavior before permitting disconnected automation in the experimental project. Actual Tasker XML import is NOT RUN.
+
+
 **Execution status: NOT RUN on physical hardware or an Android 17 emulator.** This document is a test procedure, not a passed compatibility certificate. The cloud environment has no attached test device and no `/dev/kvm`; build/unit/lint evidence belongs in [TESTING.md](../TESTING.md). Record exact device model, Android/API level, One UI version, firmware build, security patch, Tasker version and app commit before running. An SDK 36 build is not Android 17 API 37 validation.
 
 ## Prepare a reversible test

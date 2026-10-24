@@ -11,9 +11,11 @@ if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
 fi
 export PATH="$ANDROID_HOME/cmdline-tools/19.0/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
 mkdir -p "$ANDROID_AVD_HOME" app/build/emulator-diagnostics
-avd_name=MockGPS_API36
+test_api=${MOCKGPS_TEST_API:-36}
+[[ "$test_api" == 36 || "$test_api" == 37.0 ]] || { echo "Unsupported test API" >&2; exit 2; }
+avd_name="MockGPS_API${test_api//./_}"
 printf 'no\n' | avdmanager create avd --force --name "$avd_name" \
-  --package 'system-images;android-36;google_apis;x86_64' --device pixel_6
+  --package "system-images;android-${test_api};google_apis;x86_64" --device pixel_6
 emulator -avd "$avd_name" -port 5554 -no-window -no-audio -no-boot-anim \
   -no-snapshot -wipe-data -gpu swiftshader_indirect -accel on \
   > app/build/emulator-diagnostics/emulator.log 2>&1 &
@@ -86,9 +88,11 @@ required={('dev.burixon.mockgps.VehicleSafetyInstrumentationTest',name) for name
  'authenticatedConnectedBroadcastStopsRealManualServiceAndRejectsLateCallbacks',
  'unknownStopsRealManualInjectionAndCancelsAnAsynchronousStart',
  'failedPlatformRemovalIsVisibleAndRetriedAfterAuthorizationRestored',
- 'unknownInvalidatesActualPendingConfirmationAndForceRealWins')}
+ 'unknownInvalidatesActualPendingConfirmationAndForceRealWins',
+ 'repeatedManualStartKeepsTheRealSessionAndMalformedIpcCannotStopIt',
+ 'taskerIntentUriRecipePreservesTheFiveExactTypes')}
 assert required<=executed,('Missing required vehicle safety tests',sorted(required-executed))
-assert tests>=15 and failures==errors==skipped==0,(tests,failures,errors,skipped)
+assert tests>=17 and failures==errors==skipped==0,(tests,failures,errors,skipped)
 print(f'Actual emulator instrumentation: {tests} tests, {failures} failures, {errors} errors, {skipped} skipped')
 if os.environ.get('GITHUB_ACTIONS')=='true':
  print(f'::notice title=Actual emulator test results::tests={tests} failures={failures} errors={errors} skipped={skipped}')

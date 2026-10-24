@@ -4,8 +4,10 @@ set -euo pipefail
 
 sdk_root=${1:-${ANDROID_HOME:-}}
 with_emulator=${2:-}
+test_api=${3:-36}
+if [[ "$test_api" != 36 && "$test_api" != 37.0 ]]; then echo "Supported emulator APIs:36,37.0" >&2; exit 2; fi
 if [[ -z "$sdk_root" || "$sdk_root" != /* || ( -n "$with_emulator" && "$with_emulator" != --with-emulator ) ]]; then
-  echo 'Usage: scripts/setup-android-sdk.sh /absolute/sdk/path [--with-emulator]' >&2
+  echo 'Usage: scripts/setup-android-sdk.sh /absolute/sdk/path [--with-emulator] [36|37.0]' >&2
   exit 2
 fi
 if [[ $(uname -s) != Linux || $(uname -m) != x86_64 ]]; then
@@ -53,7 +55,7 @@ for ((answer=0; answer<40; answer++)); do printf 'y\n'; done > "$bootstrap_tmp/l
 "$tools_dir/bin/sdkmanager" --sdk_root="$sdk_root" --licenses < "$bootstrap_tmp/license-answers"
 packages=('platforms;android-36' 'build-tools;36.0.0' 'platform-tools')
 if [[ "$with_emulator" == --with-emulator ]]; then
-  packages+=('emulator' 'system-images;android-36;google_apis;x86_64')
+  packages+=('emulator' "system-images;android-${test_api};google_apis;x86_64")
 fi
 "$tools_dir/bin/sdkmanager" --sdk_root="$sdk_root" --channel=0 --install "${packages[@]}" < "$bootstrap_tmp/license-answers"
 [[ -f "$sdk_root/platforms/android-36/android.jar" && -x "$sdk_root/build-tools/36.0.0/apksigner" && -x "$sdk_root/platform-tools/adb" ]]

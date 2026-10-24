@@ -1,5 +1,8 @@
 # MockGPS — transparent developer location simulation
 
+**Current work:0.4.0-beta.1 / versionCode5 unsigned candidate.** Publication, merge and stable claims remain blocked by dependency-graph support, absent authorized release signing and incomplete mandatory physical evidence. See [beta changes and owner steps](docs/BETA_RELEASE.md), [review](docs/BETA_AUDIT.md), [experimental Tasker project/import guide](tasker/README.md) and [changelog](CHANGELOG.md). The older0.3.2-dev APK/provenance below is a historical tested checkpoint, not this candidate's hash or signer.
+
+
 A hardened native Kotlin fork of [BuriXon-code/MockGPS](https://github.com/BuriXon-code/MockGPS), preserving the MapLibre map, selected coordinates, camera position, clipboard control and optional bounded drift. Android's mock-location flags and foreground-service disclosures remain intact. No root, Shizuku, Accessibility service, network control server, cloud backend or detection bypass is used.
 
 Installed package: **`dev.abhik.mockgps`**; this is a fresh installation distinct from upstream/earlier engineering APKs. Stop the old app first, select the fork in Developer Options, add its tile and configure a new credential/API2 Tasker task. See [identity/signing](docs/IDENTITY_AND_SIGNING.md).

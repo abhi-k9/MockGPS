@@ -31,6 +31,8 @@ jobs:
           cache-disabled: true
       - name: Provision pinned official Android command-line tools and SDK
         run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-sdk"
+      - name: Validate scripts and experimental Tasker generator/model
+        run: scripts/check-source.sh
       - name: Clean builds, JVM tests, lint and instrumentation packaging (strict verification)
         run: scripts/android-build.sh
       - name: Verify signed development APK and record exact source identity
@@ -51,6 +53,13 @@ jobs:
             app/build/development-candidate/
 
   instrumentation:
+    name: instrumentation API ${{ matrix.api }}
+    strategy:
+      fail-fast: false
+      matrix:
+        api: ['36', '37.0']
+    env:
+      MOCKGPS_TEST_API: ${{ matrix.api }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -66,20 +75,20 @@ jobs:
       - uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
         with:
           cache-disabled: true
-      - name: Provision official SDK, emulator and Android 16 system image
-        run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-sdk" --with-emulator
+      - name: Provision official SDK, emulator and selected system image
+        run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-sdk" --with-emulator "$MOCKGPS_TEST_API"
       - name: Enable emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Run Android 16 instrumentation (not Samsung validation)
+      - name: Run Android instrumentation (not Samsung validation)
         run: scripts/run-emulator-tests.sh
       - name: Preserve device-test results and emulator diagnostics
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-instrumentation-reports-${{ github.sha }}
+          name: android-instrumentation-reports-API${{ matrix.api }}-${{ github.sha }}
           if-no-files-found: warn
           retention-days: 14
           path: |

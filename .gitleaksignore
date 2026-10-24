@@ -1,0 +1,9 @@
+# Exact historical false positives only, reviewed in docs/BETA_AUDIT.md.
+# Prose describing token validation; no actual credential.
+4cf1a04994fc772b1aa66e4aefc23039b92a9fe7:TESTING.md:generic-api-key:50
+# Deterministic synthetic test alphabet repeated four times, never a device capability.
+c192a13fe20aefd16f3ca95ba9a48e14cbef8fa0:app/src/test/java/dev/burixon/mockgps/core/CommandAuthTest.kt:generic-api-key:9
+# Public certificate/public-key digests emitted by apksigner, not private key material.
+209e49b1c92817a385175a99e95e045b4337f755:docs/evidence/candidate-89e01d1/local-signature.txt:generic-api-key:15
+209e49b1c92817a385175a99e95e045b4337f755:docs/evidence/candidate-89e01d1/local-signature.txt:generic-api-key:16
+209e49b1c92817a385175a99e95e045b4337f755:docs/evidence/candidate-89e01d1/local-signature.txt:generic-api-key:17

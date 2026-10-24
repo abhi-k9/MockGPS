@@ -1,5 +1,8 @@
 # Tasker integration: selected-car state, not unrestricted remote control
 
+Beta project: [EXPERIMENTAL import and safe one-sender migration](../tasker/README.md). Actual XML import is NOT RUN; preserve the working manual setup until verified. No counter/token is initialized by import.
+
+
 Protocol version: 2. **Breaking engineering update:** fresh fork package/token and updated Tasker tasks are required; API1 is rejected. This integration uses Android explicit broadcasts locally. It needs neither root nor Shizuku, an HTTP server, background-location permission, or a signature shared with Tasker. **The Tasker UI recipe and Bluetooth delivery have not been executed on a Samsung device.** No importable XML is supplied or claimed tested.
 
 ## What the automation does

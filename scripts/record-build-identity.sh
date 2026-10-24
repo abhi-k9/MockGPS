@@ -19,7 +19,7 @@ package=re.search(r"package: name='([^']+)'",badging).group(1)
 version_code=int(re.search(r"versionCode='(\d+)'",badging).group(1))
 version_name=re.search(r"versionName='([^']+)'",badging).group(1)
 assert package=='dev.abhik.mockgps',package
-assert (version_code,version_name)==(4,'0.3.2-dev'),(version_code,version_name)
+assert (version_code,version_name)==(5,'0.4.0-beta.1'),(version_code,version_name)
 signature=(out/'signature.txt').read_text()
 assert 'Verifies' in signature
 cert=re.search(r'Signer #1 certificate SHA-256 digest: (\S+)',signature).group(1)
