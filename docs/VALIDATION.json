@@ -75,6 +75,15 @@
       "debugAndroidTest"
     ],
     "device_tests": "NOT RUN locally: no /dev/kvm",
-    "independent_cold_build": "IN PROGRESS"
+    "independent_cold_build": "First attempt failed missing generated dex input due overlapping clean builds; sequential rerun required"
+  },
+  "diagnostic_checkpoint": {
+    "source_commit": "5963fd0910b479fde6d769574109042b3f7cd17f",
+    "push_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40056897938",
+    "build": "success",
+    "instrumentation": "failure",
+    "confirmed_exception": "android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException",
+    "root_cause": "Stopping queued startForegroundService before foreground promotion triggers Android16 deliberate crash",
+    "correction": "Focused Activity normal startService admission; service retains stale-generation checks and foreground location promotion before provider work"
   }
 }

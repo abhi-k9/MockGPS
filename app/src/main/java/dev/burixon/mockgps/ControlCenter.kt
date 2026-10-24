@@ -150,7 +150,12 @@ object ControlCenter {
         }
         if (!save(activity, next.copy(service = ServiceState.STARTING, providers = ProviderState.NONE, injection = InjectionState.NONE))) return
         try {
-            ContextCompat.startForegroundService(activity, Intent(activity, MockLocationService::class.java)
+            // This path already requires a focused visible Activity. Use its ordinary start
+            // admission, then promote in onStartCommand before touching any providers.
+            // startForegroundService creates a mandatory promotion obligation: Android can
+            // crash the process if a safety event cancels it before onStartCommand arrives.
+            // An ordinary visible start can be canceled without promoting a stale session.
+            activity.startService(Intent(activity, MockLocationService::class.java)
                 .putExtra(MockLocationService.EXTRA_GENERATION, next.generation))
         } catch (_: SecurityException) {
             serviceFailed(activity, next.generation, "START_PERMISSION_DENIED", false)

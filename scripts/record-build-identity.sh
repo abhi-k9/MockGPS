@@ -14,14 +14,19 @@ import xml.etree.ElementTree as E
 from collections import Counter
 apk=Path('app/build/outputs/apk/debug/app-debug.apk')
 out=Path('app/build/development-candidate')
-package=re.search(r"package: name='([^']+)'",(out/'apk-badging.txt').read_text()).group(1)
+badging=(out/'apk-badging.txt').read_text()
+package=re.search(r"package: name='([^']+)'",badging).group(1)
+version_code=int(re.search(r"versionCode='(\d+)'",badging).group(1))
+version_name=re.search(r"versionName='([^']+)'",badging).group(1)
 assert package=='dev.abhik.mockgps',package
+assert (version_code,version_name)==(4,'0.3.2-dev'),(version_code,version_name)
 signature=(out/'signature.txt').read_text()
 assert 'Verifies' in signature
 cert=re.search(r'Signer #1 certificate SHA-256 digest: (\S+)',signature).group(1)
 identity=dict(commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
     tracked_worktree_clean=not subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],text=True).strip(),
-    application_id=package,apk=str(apk),bytes=apk.stat().st_size,
+    application_id=package,version_code=version_code,version_name=version_name,
+    apk=str(apk),bytes=apk.stat().st_size,
     sha256=hashlib.sha256(apk.read_bytes()).hexdigest(),signer_certificate_sha256=cert,
     signing='Android development/debug certificate; unsigned release is not an installable release')
 assert identity['tracked_worktree_clean'],'Build identity must describe a clean reviewed source commit'

@@ -136,7 +136,10 @@ class VehicleSafetyInstrumentationTest {
         var startGeneration = -1L
         scenario!!.onActivity {
             ControlCenter.manualStart(it)
-            startGeneration = ControlCenter.snapshot(it).generation
+            val starting = ControlCenter.snapshot(it)
+            assertTrue("The race must cancel an admitted start, not a rejected request", starting.desired)
+            assertEquals(ServiceState.STARTING, starting.service)
+            startGeneration = starting.generation
             assertTrue(ControlCenter.external(it, request("vehicle_connected")).accepted)
         }
         instrumentation.waitForIdleSync()
