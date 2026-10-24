@@ -2,6 +2,8 @@
 
 This is an **unsigned release candidate**, versionCode5, package dev.abhik.mockgps. No persistent release key was securely provided. Do not install the unsigned APK or relabel a debug certificate as production signing. No stable release or completed Samsung compatibility claim is made. `release-manifest.json` records fresh source, hashes, tool versions, CI evidence, bounded CycloneDX inventory/advisories and explicit open gates. Its signing certificate is null by design. A draft release is not a public published release; `/releases/download/...` URLs do not work until the owner completes gates and publishes assets.
 
+Compile/target SDK37 opts into Android17 behavior, tested separately on API36 and37 emulators; physical OneUI9 remains unverified. Build-tools36.0.0, Java21, Gradle9.6.0 and AGP9.2.1 remain pinned under the AGP supported compatibility matrix.
+
 Changes from0.3.2-dev: repeated manual starts no longer restart an admitted/injecting session; bounded in-memory allowlisted API diagnostics show accepted command and last rejection without storing supplied values; the status timestamp is labelled as mutation time; controls scroll for large fonts/landscape; night resources improve readability. Safety generation cancellation, FORCE_REAL precedence, opt-in exact API2, provider journaling, mock flags and focused-Activity startup remain intact. The experimental Tasker project adds an importable scaffold for Sportage Hybrid with no embedded token/counter reset, explicit opt-in, BT-off/UNKNOWN behavior, read-only status, one mutation dispatcher and import/rollback checks. Tasker phone import is NOT RUN.
 
 ## Owner completion steps
@@ -21,3 +23,5 @@ The script aligns at16KB and invokes apksigner's interactive password prompt, ve
 ## Rollback
 
 Set local FORCE_REAL, disable experimental Tasker `%MockGPSReady` and profiles, verify provider cleanup and a fresh timestamped independent nonmock fix. Keep/restore mock-app authorization to retry uncertain cleanup; reboot if needed. Reinstall only a known APK with its matching signer, or deliberately uninstall/reconfigure after recovery. Restore exactly one Tasker sender with the current token's nondecreasing counter, or rotate to a new epoch; never restore stale credentials or run both projects.
+
+Target migration references: [AGP9.2 compatibility](https://developer.android.com/build/releases/agp-9-2-0-release-notes) supports API37.0 with default build-tools36.0.0; [Android17 setup](https://developer.android.com/about/versions/17/setup-sdk) documents compile/target37. The installed platform reports PreviewSdkInt=0. Runtime tests on Google emulator images remain distinct from Samsung compatibility.

@@ -15,8 +15,8 @@ if [[ ! "$java_version" =~ javac\ 21([.[:space:]]|$) ]]; then
   exit 2
 fi
 android_sdk_path=${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}
-if [[ -z "$android_sdk_path" || ! -f "$android_sdk_path/platforms/android-36/android.jar" || ! -d "$android_sdk_path/build-tools/36.0.0" ]]; then
-  echo 'Set ANDROID_HOME to an Android SDK containing platforms;android-36 and build-tools;36.0.0.' >&2
+if [[ -z "$android_sdk_path" || ! -f "$android_sdk_path/platforms/android-37.0/android.jar" || ! -d "$android_sdk_path/build-tools/36.0.0" ]]; then
+  echo 'Set ANDROID_HOME to an Android SDK containing platforms;android-37.0 and build-tools;36.0.0.' >&2
   exit 2
 fi
 export ANDROID_HOME="$android_sdk_path"

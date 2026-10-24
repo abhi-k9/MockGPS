@@ -53,12 +53,12 @@ mkdir -p "$ANDROID_USER_HOME" "$ANDROID_AVD_HOME"
 # Acceptance belongs to the operator running this explicit provisioning command.
 for ((answer=0; answer<40; answer++)); do printf 'y\n'; done > "$bootstrap_tmp/license-answers"
 "$tools_dir/bin/sdkmanager" --sdk_root="$sdk_root" --licenses < "$bootstrap_tmp/license-answers"
-packages=('platforms;android-36' 'build-tools;36.0.0' 'platform-tools')
+packages=('platforms;android-37.0' 'build-tools;36.0.0' 'platform-tools')
 if [[ "$with_emulator" == --with-emulator ]]; then
   packages+=('emulator' "system-images;android-${test_api};google_apis;x86_64")
 fi
 "$tools_dir/bin/sdkmanager" --sdk_root="$sdk_root" --channel=0 --install "${packages[@]}" < "$bootstrap_tmp/license-answers"
-[[ -f "$sdk_root/platforms/android-36/android.jar" && -x "$sdk_root/build-tools/36.0.0/apksigner" && -x "$sdk_root/platform-tools/adb" ]]
+[[ -f "$sdk_root/platforms/android-37.0/android.jar" && -x "$sdk_root/build-tools/36.0.0/apksigner" && -x "$sdk_root/platform-tools/adb" ]]
 
 # The same bootstrap works locally and in Actions; expose paths to later steps.
 if [[ -n "${GITHUB_ENV:-}" && -n "${GITHUB_PATH:-}" ]]; then
@@ -68,6 +68,6 @@ if [[ -n "${GITHUB_ENV:-}" && -n "${GITHUB_PATH:-}" ]]; then
 fi
 printf 'Provisioned SDK at %s with command-line tools %s\n' "$sdk_root" "$tools_version"
 "$tools_dir/bin/sdkmanager" --version
-for package_file in "$sdk_root/platforms/android-36/source.properties" "$sdk_root/build-tools/36.0.0/source.properties" "$sdk_root/platform-tools/source.properties"; do
+for package_file in "$sdk_root/platforms/android-37.0/source.properties" "$sdk_root/build-tools/36.0.0/source.properties" "$sdk_root/platform-tools/source.properties"; do
   sed -n '/^Pkg.Desc=/p; /^Pkg.Revision=/p' "$package_file"
 done

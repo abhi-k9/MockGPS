@@ -42,6 +42,21 @@ if [[ "$booted" != true ]]; then
   echo 'Emulator did not complete boot within 240 seconds.' >&2
   exit 1
 fi
+# Disposable emulator only: boot_completed does not imply CE storage is unlocked.
+# UTP/provider tests use user0; never move app credentials to device-protected storage.
+test_user=$(adb -s "$ANDROID_SERIAL" shell am get-current-user | tr -d '\r')
+[[ "$test_user" == 0 ]] || { echo 'Tests require a disposable single-user emulator with current user0.' >&2; exit 1; }
+adb -s "$ANDROID_SERIAL" shell input keyevent KEYCODE_WAKEUP
+adb -s "$ANDROID_SERIAL" shell wm dismiss-keyguard
+adb -s "$ANDROID_SERIAL" shell am unlock-user "$test_user"
+user_unlocked=false
+for ((attempt=0; attempt<60; attempt++)); do
+  user_state=$(adb -s "$ANDROID_SERIAL" shell am get-started-user-state "$test_user" | tr -d '\r')
+  if [[ "$user_state" == RUNNING_UNLOCKED ]]; then user_unlocked=true; break; fi
+  sleep 1
+done
+printf '%s\n' "$user_state" > app/build/emulator-diagnostics/user-readiness.txt
+[[ "$user_unlocked" == true ]] || { echo 'User credential storage did not unlock; no app/device result claimed.' >&2; exit 1; }
 adb -s "$ANDROID_SERIAL" shell input keyevent 82
 for scale in window_animation_scale transition_animation_scale animator_duration_scale; do
   adb -s "$ANDROID_SERIAL" shell settings put global "$scale" 0

@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "dev.burixon.mockgps"
-    compileSdk = 36
+    compileSdk = 37
     buildToolsVersion = "36.0.0"
 
     buildFeatures {
@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "dev.abhik.mockgps"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 5
         versionName = "0.4.0-beta.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
