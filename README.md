@@ -1,6 +1,6 @@
 # MockGPS — transparent developer location simulation
 
-**Development revision:0.4.0-beta.1 / versionCode5, compile/target API37.** New source changes are not represented by the earlier signed APK. The [existing owner-only draft](https://github.com/abhi-k9/MockGPS/releases/tag/untagged-a24e302549f679ab44f9) retains that historical signed candidate and exact receipts; no release/tag is published and PR1 is draft/unmerged. Dependency Review now passes. API37 infrastructure and physical safety evidence still block a new signed release. See [fast local development and measurements](docs/DEVELOPMENT.md), [release status](docs/BETA_RELEASE.md), [Tasker import](tasker/README.md) and [Samsung availability](docs/SAMSUNG_INTEGRATION.md).
+**Development revision:0.4.0-beta.1 / versionCode5, compile/target API37.** New source changes are not represented by the earlier signed APK. The [existing owner-only draft](https://github.com/abhi-k9/MockGPS/releases) retains that historical signed candidate and exact receipts; no release/tag is published and PR1 is draft/unmerged. Dependency Review now passes. API37 infrastructure and physical safety evidence still block a new signed release. See [fast local development and measurements](docs/DEVELOPMENT.md), [release status](docs/BETA_RELEASE.md), [Tasker import](tasker/README.md) and [Samsung availability](docs/SAMSUNG_INTEGRATION.md).
 
 
 A hardened native Kotlin fork of [BuriXon-code/MockGPS](https://github.com/BuriXon-code/MockGPS), preserving the MapLibre map, selected coordinates, camera position, clipboard control and optional bounded drift. Android's mock-location flags and foreground-service disclosures remain intact. No root, Shizuku, Accessibility service, network control server, cloud backend or detection bypass is used.
@@ -37,7 +37,7 @@ scripts/dev.sh full
 VALIDATION_RUN_ID=RUN_ID scripts/dev.sh release
 ```
 
-[Development guide](docs/DEVELOPMENT.md) covers paths, CachyOS, warm emulator selection, quoting, prerequisites, security boundaries and timings. The old clean all-purpose script took97.2s; warm selected test runs took6.6s/4.4s, without enabling caches/incremental compilation. Full local CHECK after the policy/settings changes passed85 JVM tests and lint with zero errors/13warnings in23.2s, also compiling the device APK. Compilation is not device execution. API36 current revision requires actual CI; API37 has a retained pretest guest failure.
+[Development guide](docs/DEVELOPMENT.md) covers paths, CachyOS, warm emulator selection, quoting, prerequisites, security boundaries and timings. The old clean all-purpose script took97.2s; warm selected test runs took6.6s/4.4s, without enabling caches/incremental compilation. Full local CHECK after the policy/settings changes passed85 JVM tests and lint with zero errors/13warnings in23.2s, also compiling the device APK. Compilation is not device execution. Current runtime source also passed19 real API36 tests and Dependency Review in CI; API37 retains the pretest guest failure.
 
 No feature-branch push/PR duplication; ordinary PRs use debug/JVM/lint and API36 when inputs change. The unresolved API37 check remains failed without an unchanged boot retry. A deliberate FULL validates both APIs and builds release. Metadata reuse is labelled, never current-SHA release proof. Artifacts expire after7days.
 

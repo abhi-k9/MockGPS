@@ -49,7 +49,7 @@ with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP'],prefix='mockgps-s
         call([str(sdk/'zipalign'),'-P','16','-f','4',str(unsigned),str(aligned)])
         sign_env=public_env.copy()
         for n in ('MOCKGPS_SIGNING_KEY_PASSWORD','MOCKGPS_SIGNING_STORE_PASSWORD'):sign_env[n]=os.environ[n]
-        call([str(sdk/'apksigner'),'sign','--ks',str(keystore),'--ks-key-alias',os.environ['MOCKGPS_SIGNING_KEY_ALIAS'],
+        call([str(sdk/'apksigner'),'sign','--v4-signing-enabled','false','--ks',str(keystore),'--ks-key-alias',os.environ['MOCKGPS_SIGNING_KEY_ALIAS'],
               '--ks-pass','env:MOCKGPS_SIGNING_STORE_PASSWORD','--key-pass','env:MOCKGPS_SIGNING_KEY_PASSWORD',
               '--out',str(signed),str(aligned)],env=sign_env)
     finally:

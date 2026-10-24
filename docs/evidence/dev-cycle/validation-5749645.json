@@ -1,0 +1,158 @@
+{
+  "head_sha": "574964549cb9b2e38020eb88b27664dcc2af5a09",
+  "artifact_source_commit": "cbaf70de910f8a8b354380be8bb40af0648bf439",
+  "runtime_inputs_sha256": "e3235db90b9766e2786f0d10175ee2ab6134f239d77bdd477dc2e16306abe71b",
+  "validation_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077194776",
+  "build_identity": {
+    "validation_scope": "check",
+    "runtime_inputs_sha256": "e3235db90b9766e2786f0d10175ee2ab6134f239d77bdd477dc2e16306abe71b",
+    "commit": "cbaf70de910f8a8b354380be8bb40af0648bf439",
+    "tracked_worktree_clean": true,
+    "application_id": "dev.abhik.mockgps",
+    "version_code": 5,
+    "version_name": "0.4.0-beta.1",
+    "apk": "app/build/outputs/apk/debug/app-debug.apk",
+    "bytes": 59265724,
+    "sha256": "7710766d8132717ad6a9374fa5d96e453afde87766a002b043d7587ae5f055d1",
+    "signer_certificate_sha256": "dc16824515b017e83c244e21368a5af87c76415a4feac9d7ceba090fc0bba488",
+    "signing": "Android development/debug certificate; unsigned release is not an installable release",
+    "unit_tests": {
+      "tests": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Warning": 18
+    },
+    "lint_issues": [
+      {
+        "id": "InlinedApi",
+        "severity": "Warning",
+        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
+      },
+      {
+        "id": "InlinedApi",
+        "severity": "Warning",
+        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
+      },
+      {
+        "id": "InlinedApi",
+        "severity": "Warning",
+        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
+      },
+      {
+        "id": "AndroidGradlePluginVersion",
+        "severity": "Warning",
+        "message": "A newer version of Gradle than 9.6.0 is available: 9.8.2"
+      },
+      {
+        "id": "AndroidGradlePluginVersion",
+        "severity": "Warning",
+        "message": "A newer version of com.android.application than 9.2.1 is available: 9.4.1"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1"
+      },
+      {
+        "id": "GradleDependency",
+        "severity": "Warning",
+        "message": "A newer version of androidx.activity:activity-ktx than 1.10.1 is available: 1.13.0"
+      },
+      {
+        "id": "NewerVersionAvailable",
+        "severity": "Warning",
+        "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
+      },
+      {
+        "id": "ExportedReceiver",
+        "severity": "Warning",
+        "message": "Exported receiver does not require permission"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      },
+      {
+        "id": "UseKtx",
+        "severity": "Warning",
+        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      }
+    ]
+  },
+  "api36_annotation": "tests=19 failures=0 errors=0 skipped=0",
+  "api36_job_id": 120823101736,
+  "api37": {
+    "status": "FAILED_RETAINED_INFRASTRUCTURE_HOLD",
+    "new_device_execution": false,
+    "job_id": 120823101754
+  },
+  "dependency_review": {
+    "status": "PASS",
+    "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077194777"
+  },
+  "jobs": [
+    {
+      "id": 120823000910,
+      "name": "plan",
+      "conclusion": "success",
+      "seconds": 28.0
+    },
+    {
+      "id": 120823101692,
+      "name": "build",
+      "conclusion": "success",
+      "seconds": 187.0
+    },
+    {
+      "id": 120823101736,
+      "name": "instrumentation API 36",
+      "conclusion": "success",
+      "seconds": 371.0
+    },
+    {
+      "id": 120823101754,
+      "name": "instrumentation API 37.0",
+      "conclusion": "failure",
+      "seconds": 9.0
+    }
+  ]
+}

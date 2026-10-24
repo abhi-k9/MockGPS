@@ -3,7 +3,7 @@
   "current_revision": {
     "version": "0.4.0-beta.1",
     "version_code": 5,
-    "source": "Current branch code; see commit containing these changes and PR1 for exact hosted results",
+    "source": "Runtime changes validated at head574964549cb9b2e38020eb88b27664dcc2af5a09; actual PR merge-build sourcecbaf70de910f8a8b354380be8bb40af0648bf439. Later metadata-only commits reuse this proof without claiming new device execution.",
     "local": {
       "unit_tests": {
         "tests": 85,
@@ -16,17 +16,44 @@
       },
       "check": "PASS: debug and instrumentation APK compilation, JVM, lint; no current device result yet"
     },
-    "api36": "PENDING current revision CI; historical signed source passed17",
+    "api36": "PASS:19 actual tests at5749645 / build sourcecbaf70d, run40077194776",
     "api37": "BLOCKED before tests in saved run40068105244; unchanged infrastructure not retried",
     "dependency_review": {
-      "status": "PASS at refreshed d35c471; new head must retain passing gate",
-      "run_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40069444728"
+      "status": "PASS",
+      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077194777"
     },
     "samsung_native": "UNAVAILABLE: no verified supported secure app action",
     "tasker_import": "NOT RUN",
     "physical_matrix": "24 complete cases NOT RUN",
     "signing": "No new signing: exact-source FULL/API36/API37 gates required",
-    "measurement_evidence": "docs/evidence/dev-cycle/timings.json"
+    "measurement_evidence": "docs/evidence/dev-cycle/timings.json",
+    "github": {
+      "validation_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40077194776",
+      "artifact_source_commit": "cbaf70de910f8a8b354380be8bb40af0648bf439",
+      "runtime_inputs_sha256": "e3235db90b9766e2786f0d10175ee2ab6134f239d77bdd477dc2e16306abe71b",
+      "unit_tests": {
+        "tests": 85,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "lint": {
+        "Warning": 18
+      },
+      "api36": {
+        "status": "PASS",
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "job_id": 120823101736
+      },
+      "api37": {
+        "status": "FAILED_RETAINED_INFRASTRUCTURE_HOLD",
+        "new_device_execution": false,
+        "job_id": 120823101754
+      }
+    }
   },
   "historical_signed_candidate": {
     "version": "0.4.0-beta.1",

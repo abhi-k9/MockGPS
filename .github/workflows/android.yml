@@ -15,6 +15,10 @@ on:
         description: Sign assets in an existing draft (no publication)
         type: boolean
         default: false
+      repair_draft_metadata:
+        description: Repair only the known missing optional sidecar entry in the historical draft metadata (no signing)
+        type: boolean
+        default: false
       source_sha:
         description: Exact validated APK source SHA for signing
         type: string
@@ -31,12 +35,12 @@ permissions:
   checks: read
 
 concurrency:
-  group: android-${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ inputs.sign_release && 'signing' || 'validation' }}
-  cancel-in-progress: ${{ !inputs.sign_release }}
+  group: android-${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ (inputs.sign_release || inputs.repair_draft_metadata) && 'signing' || 'validation' }}
+  cancel-in-progress: ${{ !inputs.sign_release && !inputs.repair_draft_metadata }}
 
 jobs:
   plan:
-    if: ${{ !inputs.sign_release && !inputs.diagnostics_run_id }}
+    if: ${{ !inputs.sign_release && !inputs.repair_draft_metadata && !inputs.diagnostics_run_id }}
     runs-on: ubuntu-24.04
     outputs:
       android_required: ${{ steps.plan.outputs.android_required }}
@@ -174,7 +178,7 @@ jobs:
         run: python3 ci/diagnostics.py
 
   sign-release:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_release }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_release && !inputs.repair_draft_metadata }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -207,3 +211,18 @@ jobs:
           MOCKGPS_SIGNING_KEY_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_KEY_PASSWORD }}
           MOCKGPS_SIGNING_STORE_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_STORE_PASSWORD }}
         run: python3 ci/sign_release.py
+
+  repair-draft-metadata:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.repair_draft_metadata && !inputs.sign_release }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Repair only historical manifest and checksum entries; no APK build or signing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 ci/repair_draft_metadata.py

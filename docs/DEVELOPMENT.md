@@ -90,3 +90,5 @@ Two later matching-failure plan runs used12s and10s and launched zero expensive 
 | Trusted local outputs / daemon | Retain existing compiled files and Gradle task up-to-date checks; never import from an untrusted checkout/cache |
 
 FAST explicitly enforces the three disabled settings as well as strict verification, even when user-level properties differ. FULL uses a fresh Gradle home and clean outputs. The acceleration comes from smaller task scope, warm daemon and unchanged local intermediates—not claiming the advisory patched. Revisit with a supported patched AGP/compiler release and repeat the security review before enabling incremental metadata.
+
+Current revised-source CI (40077194776): build187s, API36(19tests)371s, retained API37 hold9s, plan28s. Relative to the historical API37 job245s, the hold avoided236s of comparable provisioning/boot work. Combined heavy jobs were567s versus761s historically; these runs differ in source/tests/runner state, so this is an observation, not a controlled causal speedup. In particular the new build job was slower than the old166s job; no measured hosted-build speed gain is claimed from omitting release packaging alone.
