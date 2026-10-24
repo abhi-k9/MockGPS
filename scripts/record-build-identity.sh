@@ -26,8 +26,8 @@ cert=re.search(r'Signer #1 certificate SHA-256 digest: (\S+)',signature).group(1
 import sys
 sys.path.insert(0,str(Path('ci').resolve()))
 from runtime_inputs import fingerprint
-identity=dict(runtime_inputs_sha256=fingerprint(),commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
-    tracked_worktree_clean=not subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],text=True).strip(),
+identity=dict(validation_scope='full' if __import__('os').environ.get('FULL_ANDROID')=='true' else 'check',runtime_inputs_sha256=fingerprint(),commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+    tracked_worktree_clean=not subprocess.check_output(['git','status','--porcelain','--untracked-files=normal'],text=True).strip(),
     application_id=package,version_code=version_code,version_name=version_name,
     apk=str(apk),bytes=apk.stat().st_size,
     sha256=hashlib.sha256(apk.read_bytes()).hexdigest(),signer_certificate_sha256=cert,

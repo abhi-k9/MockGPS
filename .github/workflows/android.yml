@@ -21,10 +21,6 @@ on:
       validation_run_id:
         description: Successful full Android run ID for signing
         type: string
-      allow_api37_blocker:
-        description: Prepare only a private draft when API37 has a reviewed infrastructure failure (does not clear checks)
-        type: boolean
-        default: false
       diagnostics_run_id:
         description: Read only the saved API37 emulator diagnostics from this run
         type: string
@@ -85,17 +81,23 @@ jobs:
         run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-sdk"
       - name: Validate scripts and experimental Tasker generator/model
         run: scripts/check-source.sh
-      - name: Clean builds, JVM tests, lint and instrumentation packaging (strict verification)
+      - name: CHECK debug, JVM and lint (no release packaging)
+        if: ${{ !inputs.force_android }}
+        run: scripts/check-android.sh
+      - name: FULL clean builds, JVM tests, lint and instrumentation packaging
+        if: ${{ inputs.force_android }}
         run: scripts/android-build.sh
       - name: Verify signed development APK and record exact source identity
+        env:
+          FULL_ANDROID: ${{ inputs.force_android }}
         run: scripts/record-build-identity.sh
       - name: Preserve APKs and validation reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-build-and-reports-${{ github.sha }}
+          name: android-build-and-reports-${{ github.sha }}-attempt${{ github.run_attempt }}
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
           path: |
             app/build/outputs/apk/debug/*.apk
             app/build/outputs/apk/release/*unsigned.apk
@@ -117,6 +119,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
+      # Temporary infrastructure hold. A deliberate FULL dispatch can retry after
+      # a reviewed host/image/harness change; ordinary app edits don't cold-boot
+      # the unchanged guest that already crashed before any application tests.
+      - name: Retain unresolved API37 infrastructure failure without repeating boot
+        if: ${{ matrix.api == '37.0' && !inputs.force_android }}
+        run: |
+          echo '::error::API37 remains blocked before device tests. Saved guest diagnosis: run 40068773439; original failure: 40068105244. No new device execution. Use a reviewed FULL retry after changing the cause.'
+          exit 1
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
@@ -142,9 +152,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: android-instrumentation-reports-API${{ matrix.api }}-${{ github.sha }}
+          name: android-instrumentation-reports-API${{ matrix.api }}-${{ github.sha }}-attempt${{ github.run_attempt }}
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
           path: |
             app/build/reports/androidTests/
             app/build/outputs/androidTest-results/
@@ -186,14 +196,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ inputs.source_sha }}
           VALIDATION_RUN_ID: ${{ inputs.validation_run_id }}
-          ALLOW_API37_BLOCKER: ${{ inputs.allow_api37_blocker }}
         run: python3 ci/prepare_release.py
       - name: Validate draft inputs and sign with the authorized persistent key
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ inputs.source_sha }}
           VALIDATION_RUN_ID: ${{ inputs.validation_run_id }}
-          ALLOW_API37_BLOCKER: ${{ inputs.allow_api37_blocker }}
           MOCKGPS_SIGNING_KEYSTORE_BASE64: ${{ secrets.MOCKGPS_SIGNING_KEYSTORE_BASE64 }}
           MOCKGPS_SIGNING_KEY_ALIAS: ${{ secrets.MOCKGPS_SIGNING_KEY_ALIAS }}
           MOCKGPS_SIGNING_KEY_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_KEY_PASSWORD }}

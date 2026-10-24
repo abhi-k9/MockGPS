@@ -58,7 +58,7 @@ def main():
         "limitations": inventory["limitations"] + [
             "Snapshot of published reviewed Maven advisories only; unknown/unreviewed vulnerabilities are not excluded",
             "No native/shaded library, Android platform, SDK or firmware security clearance is implied",
-            "Does not replace the blocked GitHub PR dependency-diff review"],
+            "Does not replace GitHub PR dependency-diff review"],
         "positive_control": {"package": "org.apache.logging.log4j:log4j-core@2.14.1",
                              "expected_ghsa": "GHSA-jfh8-c2jp-5v3q", "passed": True},
         "results": results,

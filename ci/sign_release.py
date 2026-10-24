@@ -2,6 +2,7 @@
 """Manually invoked, draft-only persistent signing; private material never becomes an asset."""
 import base64,hashlib,json,os,re,subprocess,tempfile
 from pathlib import Path
+from release_gate import require_run, require_dependency_review, require_checkout
 
 repo=os.environ['GITHUB_REPOSITORY']; source=os.environ['SOURCE_SHA']; run=os.environ['VALIDATION_RUN_ID']
 assert re.fullmatch(r'[0-9a-f]{40}',source) and run.isdecimal(), 'Require exact source SHA/run ID'
@@ -16,19 +17,9 @@ def call(args,env=None):
 def api(path):return json.loads(call(['gh','api',path]))
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
-validation=api(f'repos/{repo}/actions/runs/{run}')
-assert validation['head_sha']==source and validation['status']=='completed'
-assert validation['head_repository']['full_name']==repo
-jobs=api(f'repos/{repo}/actions/runs/{run}/jobs')['jobs']; byname={j['name']:j for j in jobs}
-assert byname['build']['conclusion']=='success' and byname['instrumentation API 36']['conclusion']=='success'
-for name in ('instrumentation API 36','instrumentation API 37.0'):
-    notes=api(f'repos/{repo}/check-runs/{byname[name]["id"]}/annotations')
-    passed=any(n.get('title')=='Actual emulator test results' and re.fullmatch(r'tests=(?:1[7-9]|[2-9]\d|\d{3,}) failures=0 errors=0 skipped=0',n['message']) for n in notes)
-    if not passed:
-        assert name=='instrumentation API 37.0' and os.environ.get('ALLOW_API37_BLOCKER')=='true'
-        assert byname[name]['conclusion']=='failure'
-        for n in notes:
-            if n.get('title')=='Device test failures (names/types only)': assert not json.loads(n['message'])
+require_checkout(source,os.environ['GITHUB_SHA'])
+validation,jobs=require_run(api,repo,source,run)
+require_dependency_review(api,repo,source)
 releases=[r for r in api(f'repos/{repo}/releases?per_page=100') if r['tag_name']==tag]
 assert len(releases)==1, 'Require the one matching draft'
 release=releases[0]
@@ -42,7 +33,7 @@ with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP'],prefix='mockgps-s
         expected,name=line.split('  ',1);assert Path(name).name==name and re.fullmatch(r'[0-9a-f]{64}',expected)
         assert digest(out/name)==expected, 'Draft asset integrity mismatch'
     manifest=json.loads((out/'release-manifest.json').read_text())
-    assert manifest.get('validated_head_commit',manifest['source_commit'])==source and manifest['version']=='0.4.0-beta.1'
+    assert manifest['validated_head_commit']==manifest['source_commit']==source and manifest['version']=='0.4.0-beta.1'
     unsigned=out/'MockGPS-0.4.0-beta.1-unsigned.apk'; signed=out/'MockGPS-0.4.0-beta.1.apk'
     sdk=Path(os.environ['ANDROID_HOME'])/'build-tools/36.0.0'
     badging=call([str(sdk/'aapt'),'dump','badging',str(unsigned)])
@@ -67,6 +58,9 @@ with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP'],prefix='mockgps-s
     signature=call([str(sdk/'apksigner'),'verify','--verbose','--print-certs',str(signed)])
     assert 'Verifies' in signature and 'CN=Android Debug' not in signature, 'Refusing to label a debug certificate as release signing'
     certificate=re.search(r'Signer #1 certificate SHA-256 digest: ([0-9a-fA-F]{64})',signature).group(1).lower()
+    expected=json.loads(Path('ci/release-policy.json').read_text())['signer_certificate_sha256']
+    assert certificate==expected, 'Signing certificate differs from the authorized persistent identity'
+    call([str(sdk/'zipalign'),'-c','-P','16','4',str(signed)])
     (out/'signature.txt').write_text(signature)
     receipt=dict(source_commit=manifest['source_commit'],validated_head_commit=source,validation_url=validation['html_url'],unsigned_apk_sha256=digest(unsigned),
                  signed_apk_sha256=digest(signed),signer_certificate_sha256=certificate,
@@ -96,5 +90,5 @@ with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP'],prefix='mockgps-s
         call(args)
         assert all(digest(verified/n)==digest(out/n) for n in updated), 'Downloaded asset integrity mismatch'
     receipt['draft_url']=release['html_url']
-    with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write('Signed private draft candidate only. API37, dependency-review and physical-device blockers remain as recorded; no publication or merge.\n')
+    with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write('Signed private draft candidate only. Automated exact-SHA gates passed; physical-device gates remain as recorded; no publication or merge.\n')
     print('::notice title=Signed beta candidate::'+json.dumps(receipt,separators=(',',':')))

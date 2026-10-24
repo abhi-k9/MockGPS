@@ -11,6 +11,8 @@ for base in ['scripts','ci']:
 for p in Path('app/src').rglob('*.xml'): E.parse(p)
 PY
 python3 ci/test_plan.py
+python3 ci/test_release_gate.py
+python3 scripts/test-dev.py
 python3 scripts/generate-tasker-project.py
 node scripts/test-tasker-dispatch.cjs
 git diff --exit-code -- tasker/MockGPS.prj.xml

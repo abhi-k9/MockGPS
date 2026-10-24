@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory() as folder:
     def fixture(conclusion='success',tests=82,fork=False):
         return {runpath:{'workflow_runs':[dict(id=1,status='completed',event='push',head_sha=sha,conclusion=conclusion,
                html_url='https://example.invalid/run/1',head_repository={'full_name':'other/repo' if fork else repo})]},
-          f'repos/{repo}/actions/runs/1/jobs':{'jobs':[dict(id=i,name=n,conclusion='failure' if conclusion=='failure' and i==3 else 'success') for i,n in enumerate(['build','instrumentation API 36','instrumentation API 37.0'],1)]},
+          f'repos/{repo}/actions/runs/1/jobs?filter=all&per_page=100':{'jobs':[dict(id=i,name=n,conclusion='failure' if conclusion=='failure' and i==3 else 'success') for i,n in enumerate(['build','instrumentation API 36','instrumentation API 37.0'],1)]},
           f'repos/{repo}/check-runs/1/annotations':[dict(title='Development candidate provenance',message=json.dumps(dict(unit_tests=dict(tests=tests,failures=0,errors=0,skipped=0))))]}
     def plan(data,force='false'):
         path=t/'responses.json';path.write_text(json.dumps(data));out=t/'out';out.write_text('')

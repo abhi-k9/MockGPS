@@ -1,0 +1,129 @@
+[
+  {
+    "run_id": 40068105244,
+    "jobs": [
+      {
+        "id": 120795499317,
+        "name": "plan",
+        "conclusion": "success",
+        "started_at": "2026-10-24T05:54:47Z",
+        "completed_at": "2026-10-24T05:55:11Z"
+      },
+      {
+        "id": 120795500031,
+        "name": "diagnostics",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T05:54:46Z",
+        "completed_at": "2026-10-24T05:54:46Z"
+      },
+      {
+        "id": 120795500328,
+        "name": "sign-release",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T05:54:46Z",
+        "completed_at": "2026-10-24T05:54:46Z"
+      },
+      {
+        "id": 120795581326,
+        "name": "build",
+        "conclusion": "success",
+        "started_at": "2026-10-24T05:55:13Z",
+        "completed_at": "2026-10-24T05:57:59Z"
+      },
+      {
+        "id": 120795581352,
+        "name": "instrumentation API 36",
+        "conclusion": "success",
+        "started_at": "2026-10-24T05:55:13Z",
+        "completed_at": "2026-10-24T06:01:03Z"
+      },
+      {
+        "id": 120795581367,
+        "name": "instrumentation API 37.0",
+        "conclusion": "failure",
+        "started_at": "2026-10-24T05:55:13Z",
+        "completed_at": "2026-10-24T05:59:18Z"
+      }
+    ]
+  },
+  {
+    "run_id": 40069444717,
+    "jobs": [
+      {
+        "id": 120799511893,
+        "name": "plan",
+        "conclusion": "failure",
+        "started_at": "2026-10-24T06:15:00Z",
+        "completed_at": "2026-10-24T06:15:12Z"
+      },
+      {
+        "id": 120799512610,
+        "name": "diagnostics",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:14:58Z",
+        "completed_at": "2026-10-24T06:14:58Z"
+      },
+      {
+        "id": 120799512688,
+        "name": "sign-release",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:14:58Z",
+        "completed_at": "2026-10-24T06:14:58Z"
+      },
+      {
+        "id": 120799562516,
+        "name": "build",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:15:13Z",
+        "completed_at": "2026-10-24T06:15:13Z"
+      },
+      {
+        "id": 120799562786,
+        "name": "instrumentation API ${{ matrix.api }}",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:15:13Z",
+        "completed_at": "2026-10-24T06:15:13Z"
+      }
+    ]
+  },
+  {
+    "run_id": 40068775813,
+    "jobs": [
+      {
+        "id": 120797504368,
+        "name": "plan",
+        "conclusion": "failure",
+        "started_at": "2026-10-24T06:04:54Z",
+        "completed_at": "2026-10-24T06:05:04Z"
+      },
+      {
+        "id": 120797505117,
+        "name": "sign-release",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:04:53Z",
+        "completed_at": "2026-10-24T06:04:52Z"
+      },
+      {
+        "id": 120797505353,
+        "name": "diagnostics",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:04:53Z",
+        "completed_at": "2026-10-24T06:04:52Z"
+      },
+      {
+        "id": 120797543218,
+        "name": "instrumentation API ${{ matrix.api }}",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:05:04Z",
+        "completed_at": "2026-10-24T06:05:04Z"
+      },
+      {
+        "id": 120797543250,
+        "name": "build",
+        "conclusion": "skipped",
+        "started_at": "2026-10-24T06:05:04Z",
+        "completed_at": "2026-10-24T06:05:04Z"
+      }
+    ]
+  }
+]

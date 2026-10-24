@@ -3,6 +3,7 @@
 import datetime,hashlib,json,os,re,shutil,subprocess,tempfile,urllib.request
 from pathlib import Path
 from runtime_inputs import fingerprint
+from release_gate import require_run, require_dependency_review, require_checkout
 repo=os.environ['GITHUB_REPOSITORY'];head=os.environ['SOURCE_SHA'];run=os.environ['VALIDATION_RUN_ID']
 assert re.fullmatch('[0-9a-f]{40}',head) and run.isdecimal()
 tag='v0.4.0-beta.1'
@@ -12,31 +13,24 @@ def call(args):
     return r.stdout
 def api(path):return json.loads(call(['gh','api',path]))
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-validation=api(f'repos/{repo}/actions/runs/{run}')
-assert validation['head_sha']==head and validation['status']=='completed' and validation['head_repository']['full_name']==repo
-jobs=api(f'repos/{repo}/actions/runs/{run}/jobs')['jobs'];byname={j['name']:j for j in jobs}
-assert byname['build']['conclusion']=='success' and byname['instrumentation API 36']['conclusion']=='success'
+require_checkout(head,os.environ['GITHUB_SHA'])
+validation,byname=require_run(api,repo,head,run)
+dependency_url=require_dependency_review(api,repo,head)
+jobs=list(byname.values())
 devices=[]
 for name in ('instrumentation API 36','instrumentation API 37.0'):
     job=byname[name];notes=api(f'repos/{repo}/check-runs/{job["id"]}/annotations')
-    passed=next((n for n in notes if n.get('title')=='Actual emulator test results'),None)
-    if passed:
-        m=re.fullmatch(r'tests=(\d+) failures=0 errors=0 skipped=0',passed['message']);assert m and int(m[1])>=17
-        devices.append(dict(api=36 if name.endswith('36') else 37,status='PASS',tests=int(m[1]),failures=0,errors=0,skipped=0,job_id=job['id']))
-    else:
-        assert name.endswith('37.0') and os.environ.get('ALLOW_API37_BLOCKER')=='true'
-        assert job['conclusion']=='failure'
-        # A named application-test regression cannot be waived as an infrastructure blocker.
-        for note in notes:
-            if note.get('title')=='Device test failures (names/types only)':assert not json.loads(note['message'])
-        devices.append(dict(api=37,status='BLOCKED_BEFORE_TEST_EXECUTION',tests=None,job_id=job['id'],reason='Guest Android input/display/native crash or transport failure before app tests; failed check remains visible'))
+    passed=next(n for n in notes if n.get('title')=='Actual emulator test results')
+    m=re.fullmatch(r'tests=(\d+) failures=0 errors=0 skipped=0',passed['message']);assert m and int(m[1])>=17
+    devices.append(dict(api=36 if name.endswith('36') else 37,status='PASS',tests=int(m[1]),failures=0,errors=0,skipped=0,job_id=job['id']))
 release=next(r for r in api(f'repos/{repo}/releases?per_page=100') if r['tag_name']==tag)
 assert release['draft'] and release['prerelease'] and release['target_commitish']==head
-artifact=next(a for a in api(f'repos/{repo}/actions/runs/{run}/artifacts')['artifacts'] if a['name'].startswith('android-build-and-reports-'))
+artifact=next(a for a in api(f'repos/{repo}/actions/runs/{run}/artifacts?per_page=100')['artifacts'] if a['name']==f'android-build-and-reports-{head}-attempt{byname["build"].get("run_attempt",1)}' and not a['expired'])
 with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as folder:
     folder=Path(folder);build=folder/'build';out=folder/'assets';out.mkdir()
     call(['gh','run','download',run,'--repo',repo,'--name',artifact['name'],'--dir',str(build)])
     identity=json.loads(next(build.rglob('build-identity.json')).read_text())
+    assert identity['commit']==head, 'Require exact source, not a matching runtime fingerprint'
     assert identity['runtime_inputs_sha256']==fingerprint(head)
     assert identity['application_id']=='dev.abhik.mockgps' and identity['version_code']==5 and identity['version_name']=='0.4.0-beta.1'
     assert identity['unit_tests']['tests']>=82 and all(identity['unit_tests'][k]==0 for k in ('failures','errors','skipped'))
@@ -69,7 +63,7 @@ with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as folder:
       tools=dict(java='21 Temurin (CI)',gradle='9.6.0',agp='9.2.1',compile_sdk=37,target_sdk=37,min_sdk=29,build_tools='36.0.0'),unit_tests=identity['unit_tests'],lint=identity['lint'],github_android=evidence,
       signing=dict(status='UNSIGNED',signer_certificate_sha256=None),dependencies=dict(coordinates=len(inv['modules']),findings=findings,inventory_sha256=sha(inv_path),query_source=adv['source_commit'],queried_at_utc=adv['queried_at_utc'],limits=adv['limitations']),
       tasker=dict(status='EXPERIMENTAL; actual import NOT RUN',source_commit=os.environ['GITHUB_SHA']),hardware=dict(samsung_matrix='24 complete cases NOT RUN; user-reported partial observations recorded separately'),
-      release_gates=dict(dependency_review='BLOCKED: repository feature/permission',api37='PASS' if devices[1]['status']=='PASS' else 'BLOCKED: guest platform failed before tests; check remains failed',mandatory_hardware='BLOCKED: incomplete physical matrix',persistent_signing='PENDING: isolated signing step'),
+      release_gates=dict(dependency_review='PASS: '+dependency_url,api37='PASS' if devices[1]['status']=='PASS' else 'BLOCKED: guest platform failed before tests; check remains failed',mandatory_hardware='BLOCKED: incomplete physical matrix',persistent_signing='PENDING: isolated signing step'),
       attestation='Self-recorded CI/source receipt; runtime fingerprint binds validated PR head and actual merge-build source; not a cryptographic SLSA attestation')
     manifest['assets']=[dict(name=f.name,bytes=f.stat().st_size,sha256=sha(f)) for f in sorted(out.iterdir())]
     (out/'release-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

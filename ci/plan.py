@@ -18,8 +18,8 @@ if os.environ.get('FORCE_ANDROID')!='true':
         for run in runs:
             if run['id']==int(os.environ['GITHUB_RUN_ID']) or run['status']!='completed': continue
             if run.get('head_repository',{}).get('full_name')!=repo:continue
-            jobs=api(f'repos/{repo}/actions/runs/{run["id"]}/jobs')['jobs']
-            byname={j['name']:j for j in jobs}
+            jobs=api(f'repos/{repo}/actions/runs/{run["id"]}/jobs?filter=all&per_page=100')['jobs']
+            byname={j['name']:j for j in sorted(jobs,key=lambda j:(j.get('run_attempt',1),j.get('started_at',''),j['id']))}
             if not {'build','instrumentation API 36','instrumentation API 37.0'} <= byname.keys(): continue
             build=byname['build']
             proof=None
