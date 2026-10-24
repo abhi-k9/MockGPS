@@ -13,3 +13,6 @@ with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as folder:
         print('Emulator host log (filtered):')
         for l in wanted[-100:]: print(l[:500])
     for p in Path(folder).rglob('user-readiness.txt'): print('User readiness:',p.read_text().strip())
+
+    for p in Path(folder).rglob('guest-crash-sanitized.json'):
+        print('Sanitized guest crash:',p.read_text())

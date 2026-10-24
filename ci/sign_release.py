@@ -24,7 +24,9 @@ assert all(byname[n]['conclusion']=='success' for n in ('build','instrumentation
 for name in ('instrumentation API 36','instrumentation API 37.0'):
     notes=api(f'repos/{repo}/check-runs/{byname[name]["id"]}/annotations')
     assert any(n.get('title')=='Actual emulator test results' and re.fullmatch(r'tests=(?:1[7-9]|[2-9]\d|\d{3,}) failures=0 errors=0 skipped=0',n['message']) for n in notes)
-release=api(f'repos/{repo}/releases/tags/{tag}')
+releases=[r for r in api(f'repos/{repo}/releases?per_page=100') if r['tag_name']==tag]
+assert len(releases)==1, 'Require the one matching draft'
+release=releases[0]
 assert release['draft'] and release['prerelease'] and release['target_commitish']==source, 'Only the matching owner-reviewable draft may be updated'
 secret_names=['MOCKGPS_SIGNING_KEYSTORE_BASE64','MOCKGPS_SIGNING_KEY_ALIAS','MOCKGPS_SIGNING_KEY_PASSWORD','MOCKGPS_SIGNING_STORE_PASSWORD']
 assert all(os.environ.get(n) for n in secret_names), 'Required signing secret bindings are missing'
