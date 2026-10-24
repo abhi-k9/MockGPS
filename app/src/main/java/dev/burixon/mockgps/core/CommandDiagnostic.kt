@@ -20,7 +20,7 @@ data class CommandDiagnostic(
                 when (code) {
                     "UNSUPPORTED_ACTION", "MALFORMED_REQUEST", "DISABLED", "UNSUPPORTED_API", "UNAUTHORIZED",
                     "UNSUPPORTED_COMMAND", "EXPIRED_EVENT", "INVALID_SEQUENCE", "REPLAYED_EVENT",
-                    "STORAGE_UNAVAILABLE",
+                    "STORAGE_UNAVAILABLE", "STALE_VEHICLE_OBSERVATION",
                     -> code
                     else -> "REJECTED"
                 },

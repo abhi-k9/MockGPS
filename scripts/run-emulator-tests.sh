@@ -121,9 +121,11 @@ required={('dev.burixon.mockgps.VehicleSafetyInstrumentationTest',name) for name
  'failedPlatformRemovalIsVisibleAndRetriedAfterAuthorizationRestored',
  'unknownInvalidatesActualPendingConfirmationAndForceRealWins',
  'repeatedManualStartKeepsTheRealSessionAndMalformedIpcCannotStopIt',
- 'taskerIntentUriRecipePreservesTheFiveExactTypes')}
+ 'taskerIntentUriRecipePreservesTheFiveExactTypes',
+ 'newerSequenceCannotMakeStaleDisconnectionOverrideConnected',
+ 'taskerRevocationInvalidatesPendingWorkAndSamsungIsUnavailable')}
 assert required<=executed,('Missing required vehicle safety tests',sorted(required-executed))
-assert tests>=17 and failures==errors==skipped==0,(tests,failures,errors,skipped)
+assert tests>=19 and failures==errors==skipped==0,(tests,failures,errors,skipped)
 print(f'Actual emulator instrumentation: {tests} tests, {failures} failures, {errors} errors, {skipped} skipped')
 if os.environ.get('GITHUB_ACTIONS')=='true':
  print(f'::notice title=Actual emulator test results::tests={tests} failures={failures} errors={errors} skipped={skipped}')

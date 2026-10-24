@@ -54,7 +54,7 @@ All rows initially have result **NOT RUN**. For each row record timestamp, preco
 ## Additional security and reconciliation probes
 
 * Disabled integration, missing/incorrect token, unsupported action/API/command, string-typed numeric extras, expired/future timestamp, equal/older sequence, legacy `on` and direct external service start must not enable injection.
-* Read-only `status` authenticates/freshness-checks but does not consume mutation ordering. Equal timestamps with increasing sequences must work; replayed mutation sequences must fail without leaking coordinates/token.
+* Read-only `status` authenticates/freshness-checks but does not consume mutation ordering. Safety events with equal timestamps and increasing sequences must stop; contradictory same-timestamp DISCONNECTED must fail closed. Older disconnection with a higher counter must fail; replayed mutation sequences must fail without leaking coordinates/token.
 * Revoke while a confirmation is pending. Clicking an old notification cannot start. Reenable and ensure the prior token no longer works.
 * Select FORCE_REAL during a delayed request and while the activity is opening from a notification. Old extras must not override the new mode.
 * Start Tasker when the car was already connected; the initial current-state reconciliation must send CONNECTED. A different Bluetooth device must not cause a selected-car disconnect.
@@ -170,3 +170,7 @@ adb wait-for-device
 Do not call a no-op am kill a passed process-death test. Crash/force-stop/reboot are different outcomes and must be recorded separately. For diagnostics, record source SHA/APK SHA/signer, OS/build, exact scenario, mode, vehicle, sanitized transition code, sequence and times. Never include the capability, Tasker URI/tasks containing it, full intents, dumpsys location, raw coordinates or unreviewed full logcat. App/controller status and ordered authenticated responses omit coordinates/token. If a crash trace is necessary, inspect it locally and redact any token/URI/coordinates before sharing; do not automatically upload device logs. Use a separate client only to record timestamp/mock flag and PASS/FAIL/INCONCLUSIVE, not the real location itself.
 
 Recovery: FORCE_REAL → inspect/retry while fork remains selected → select mock app None → toggle location if appropriate → reboot if uncertain → independently verify a fresh non-mock fix. Never treat uninstall, a stopped service, tile selection or old cached position as proof of genuine recovery. Remove the fork tile/Tasker profiles and reconfigure the correctly signed old app only after safe cleanup if rolling back.
+
+## Native Samsung integration gate
+
+The separate Samsung setting is disabled/unavailable; no supported secure One UI9 app action has been verified. Native Samsung action execution is **NOT RUN**, and no working Samsung integration is claimed. See [feasibility findings](SAMSUNG_INTEGRATION.md). Keep Tasker as the sole configured source. Inspect both settings with TalkBack, large text, landscape and dark mode on the phone; actual accessibility rendering remains NOT RUN.

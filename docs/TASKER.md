@@ -3,7 +3,7 @@
 Beta project: [EXPERIMENTAL import and safe one-sender migration](../tasker/README.md). Actual XML import is NOT RUN; preserve the working manual setup until verified. No counter/token is initialized by import.
 
 
-Protocol version: 2. **Breaking engineering update:** fresh fork package/token and updated Tasker tasks are required; API1 is rejected. This integration uses Android explicit broadcasts locally. It needs neither root nor Shizuku, an HTTP server, background-location permission, or a signature shared with Tasker. **The Tasker UI recipe and Bluetooth delivery have not been executed on a Samsung device.** No importable XML is supplied or claimed tested.
+Protocol version: 2. **Breaking engineering update:** fresh fork package/token and updated Tasker tasks are required; API1 is rejected. This integration uses Android explicit broadcasts locally. It needs neither root nor Shizuku, an HTTP server, background-location permission, or a signature shared with Tasker. **The Tasker UI recipe and Bluetooth delivery have not been executed on a Samsung device.** An experimental importable project is supplied; actual phone import remains NOT RUN.
 
 ## What the automation does
 
@@ -39,7 +39,7 @@ Send an explicit broadcast with action `dev.abhik.mockgps.CONTROL` and component
 
 | Command | Effect |
 | --- | --- |
-| `vehicle_connected` | Record selected-car connection; cancel pending starts and stop injection when governed by AUTO. FORCE_REAL remains dominant. |
+| `vehicle_connected` | Record selected-car connection; cancel pending starts and stop manual/starting/AUTO injection. FORCE_REAL remains dominant. |
 | `vehicle_disconnected` | Record selected-car disconnection; schedule a delayed confirmation request only when policy allows. |
 | `vehicle_unknown` | Invalidate untrusted connection knowledge and cancel pending activation. Use for radio off and uncertain/recovery states. |
 | `stop` | Select FORCE_REAL and request injection shutdown/cancellation; never grants permission to restart or clear the override. |
@@ -72,7 +72,7 @@ Create a reusable Tasker task with a command parameter `%par1`:
 
 Android's Intent URI prefixes here are `i.` for integer, `l.` for long and `S.` for string. This grammar was verified in [AOSP Intent.parseUri source](https://github.com/aosp-mirror/platform_frameworks_base/blob/1cdfff555f4a21f71ccc978290e2e212e2f8b168/core/java/android/content/Intent.java); executing the Tasker action sequence on the target phone is still required. The token and allowed command strings contain no URI separators. Do not generalize this URI construction to arbitrary unescaped user text. Alternatively, a Tasker version with reliably typed native extras may use them after validation; the exact contract above is the authority.
 
-Use one serialized sender/counter owner for this credential. The documented Tasker collision modes are ignore-new (default), abort-existing, or simultaneous; there is no separate native queue setting. [Tasker execution/collision documentation](https://tasker.joaoapps.com/userguide/en/tasks.html) was fetched and reviewed. Avoid Wait/dialog actions in the dispatcher, let the latest current-state reconciliation win, and do not replay historical edge parameters as current truth. The sequence orders sender events, not Android delivery: an older disconnect delivered after a newer connection is rejected. Two events may share a timestamp; their counter values distinguish them. Do not give a stale queued disconnection a newly allocated sequence after a later connection. If Tasker cannot maintain a durable counter and current-car truth, send UNKNOWN and use manual controls. Counter gaps are safe; resetting/reusing values is rejected. Reconciliation always describes current state, not historical queued triggers.
+Use one serialized sender/counter owner for this credential. The documented Tasker collision modes are ignore-new (default), abort-existing, or simultaneous; there is no separate native queue setting. [Tasker execution/collision documentation](https://tasker.joaoapps.com/userguide/en/tasks.html) was fetched and reviewed. Avoid Wait/dialog actions in the dispatcher, let the latest current-state reconciliation win, and do not replay historical edge parameters as current truth. The sequence orders sender events, not Android delivery: an older disconnect delivered after a newer connection is rejected. Counters distinguish replayed events; a DISCONNECTED timestamp must also be newer than the retained safety watermark. CONNECTED/UNKNOWN wins a same-millisecond contradiction. A new current-state query may be retried; never retimestamp an old queued observation. Do not give a stale queued disconnection a newly allocated sequence after a later connection. If Tasker cannot maintain a durable counter and current-car truth, send UNKNOWN and use manual controls. Counter gaps are safe; resetting/reusing values is rejected. Reconciliation always describes current state, not historical queued triggers.
 
 ## Create the specific-vehicle profile
 
@@ -114,3 +114,5 @@ Tasker backup/export may include variables, task text and the capability token. 
 ## Package/signing migration
 
 This candidate installs as `dev.abhik.mockgps`, while Kotlin component classes retain `dev.burixon.mockgps`. Stop/recover the old installation before changing mock-app selection. Configure fresh permissions, selected point, token, Tasker explicit component/action and sequence epoch; remove the old tile and add the fork tile. No cross-package private-data/credential migration occurs. See [IDENTITY_AND_SIGNING.md](IDENTITY_AND_SIGNING.md).
+
+A higher counter alone cannot authorize an older disconnected observation. The app returns `STALE_VEHICLE_OBSERVATION` without changing policy/order/provider state. The newest accepted mutation timestamp is a nondecreasing watermark, including during clock rollback; connected/unknown safety stops still work with a fresh sequence. Restore a correct clock and reconcile before requesting disconnection. Samsung native integration is [unavailable](SAMSUNG_INTEGRATION.md); do not share this Tasker credential with another sender.

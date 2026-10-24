@@ -247,7 +247,8 @@
             <!-- BROADCAST COMMANDS -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="76dp"
+                android:layout_height="wrap_content"
+                android:minHeight="76dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="22dp"
@@ -278,10 +279,39 @@
 
                 <android.widget.Switch
                     android:id="@+id/broadcastSwitch"
+                    android:contentDescription="@string/control_ui_text_9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="22dp"
+                android:text="@string/integration_source_status"
+                android:textColor="@color/text_muted" />
+
+            <android.widget.Switch
+                android:id="@+id/samsungIntegrationSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginHorizontal="22dp"
+                android:text="@string/samsung_integration"
+                android:textColor="@color/text_primary"
+                android:contentDescription="@string/samsung_switch_description"
+                android:checked="false"
+                android:enabled="false"
+                android:saveEnabled="false" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="22dp"
+                android:paddingBottom="12dp"
+                android:text="@string/samsung_unavailable"
+                android:textColor="@color/text_muted" />
 
             <Button
                 android:id="@+id/showTokenButton"

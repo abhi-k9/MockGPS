@@ -45,6 +45,44 @@ class VehicleSafetyInstrumentationTest {
         command, System.currentTimeMillis(), ++sequence)
     private fun command(command: String) = main { ControlCenter.external(context, request(command)) }
 
+    @Test fun newerSequenceCannotMakeStaleDisconnectionOverrideConnected() {
+        main {
+            val connected = request("vehicle_connected")
+            assertTrue(ControlCenter.external(context, connected).accepted)
+            val safe = ControlCenter.snapshot(context)
+            for (time in listOf(connected.eventTime - 1, connected.eventTime)) {
+                val stale = request("vehicle_disconnected").copy(eventTime = time)
+                assertEquals("STALE_VEHICLE_OBSERVATION", ControlCenter.external(context, stale).code)
+                assertEquals(safe, ControlCenter.snapshot(context))
+            }
+        }
+    }
+
+    @Test fun taskerRevocationInvalidatesPendingWorkAndSamsungIsUnavailable() {
+        scenario!!.onActivity {
+            val samsung = it.findViewById<android.widget.Switch>(R.id.samsungIntegrationSwitch)
+            assertFalse(samsung.isEnabled)
+            assertFalse(samsung.isChecked)
+        }
+        main {
+            val oldToken = AutomationAccess.token(context)
+            assertTrue(ControlCenter.external(context, request("vehicle_disconnected")).accepted)
+            val pending = ControlCenter.snapshot(context)
+            assertNotNull(pending.pendingAtElapsed)
+            assertTrue(ControlCenter.setIntegrationEnabled(context, false))
+            assertNull(AutomationAccess.token(context))
+            assertNull(ControlCenter.snapshot(context).pendingAtElapsed)
+            assertFalse(ControlCenter.snapshot(context).desired)
+            ControlCenter.deadline(context, pending.generation)
+            assertFalse(ControlCenter.snapshot(context).needsConfirmation)
+            assertTrue(ControlCenter.setIntegrationEnabled(context, true))
+            assertNotEquals(oldToken, AutomationAccess.token(context))
+            assertEquals("UNAUTHORIZED", ControlCenter.external(context,
+                ExternalRequest(2, oldToken, "vehicle_disconnected", System.currentTimeMillis(), ++sequence)).code)
+            assertEquals(VehicleState.UNKNOWN, ControlCenter.snapshot(context).vehicle)
+        }
+    }
+
     @Before fun prepareDisposableEmulator() {
         check(Build.HARDWARE in setOf("ranchu", "goldfish")) { "Provider tests require a disposable emulator" }
         shell("appops set ${context.packageName} android:mock_location allow")

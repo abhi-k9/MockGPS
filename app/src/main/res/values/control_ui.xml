@@ -31,6 +31,10 @@
     <string name="control_ui_text_8">Settings</string>
     <string name="control_ui_text_9">Tasker integration</string>
     <string name="control_ui_text_10">Off by default. Requires an explicit credential.</string>
+    <string name="samsung_integration">Samsung Modes and Routines</string>
+    <string name="samsung_unavailable">Unavailable — a supported secure app action has not been verified for One UI 9. This option cannot be enabled in this build. Use Tasker or manual controls.</string>
+    <string name="samsung_switch_description">Samsung Modes and Routines integration off and unavailable</string>
+    <string name="integration_source_status">Tasker is the only enabled-capable event source. Revoke stops injection and requires fresh reconciliation. Samsung has no control endpoint.</string>
     <string name="control_ui_text_11">Location drift</string>
     <string name="control_ui_text_12">Bounded coordinate variation for testing</string>
     <string name="control_ui_text_13">Map</string>
@@ -42,7 +46,7 @@
     <string name="control_ui_text_19">MockGPS
 © 2026 Kamil BuriXon Burek
 GPL-3.0</string>
-    <string name="mode_status">%1$s\n%2$s\nRecorded vehicle: %3$s\nLast accepted mutation time: %4$s\nTransition: %5$s\nLast accepted API command: %6$s\nLast API rejection: %7$s</string>
+    <string name="mode_status">%1$s\n%2$s\nRecorded vehicle: %3$s\nNewest accepted mutation time: %4$s\nTransition: %5$s\nLast accepted Tasker API command: %6$s\nLast API rejection: %7$s</string>
     <string name="credential_unavailable">Credential unavailable. Disable integration, then enable it to create a new credential.</string>
     <string name="select_mock_app">Select MockGPS as the mock-location app in Developer options.</string>
     <string name="version_attribution">MockGPS %1$s\n© 2026 Kamil BuriXon Burek\nGPL-3.0</string>

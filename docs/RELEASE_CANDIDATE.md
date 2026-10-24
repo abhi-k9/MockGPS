@@ -1,25 +1,7 @@
-# Development candidate gate
+# Historical signed draft; current source awaiting release gates
 
-The current version is 4 / 0.3.2-dev, installed package `dev.abhik.mockgps`, source namespace `dev.burixon.mockgps`, on `harden/android17-automation`. Keep PR1 draft/unmerged. Do not publish a production release.
+The [owner-only draft](https://github.com/abhi-k9/MockGPS/releases/tag/untagged-a24e302549f679ab44f9) contains a proper nondebug0.4.0-beta.1/5 signed APK from actual sourceb1a23cee4ed511046ebe33a6dc0f9a254d64f064, validated headffb2be066d425a6e1d3396ed19271ab21ad54468 (equal full trees). It is unpublished; no version tag exists. Later source changes are **not** in that binary.
 
-The historical 67-JVM/11-emulator candidate contains the manual-session vehicle-safety defect and is not this candidate. Revised source `89e01d191a8a72c4d749f17846899731c7ec514f` passed79 JVM tests and15 actual emulator tests in both [push](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820) and [PR](https://github.com/abhi-k9/MockGPS/actions/runs/40057434383) Android workflows. Local strict full/isolated-cache builds passed: use [VALIDATION.json](VALIDATION.json) for actual source/results, never substitute a historical hash or signer.
+APK SHA256 `92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998`; authorized certificate `75d12be4cf8c52778061616d8b142c920c1040ddd591f09601331ec395a5254d` (RSA4096). Independent downloaded signature/hash/manifest verification passed. Exact historical receipts live under evidence/beta and root release-manifest.json. The source archive, bounded SBOM, inventory/advisory limitations, checksum and signing-receipt assets are retained. Draft assets require owner access.
 
-The successful build artifact must include the signed debug APK and `development-candidate/build-identity.json`, `signature.txt`, test/lint reports, exact source SHA, clean tracked-worktree status, APK SHA256 and public signer SHA256. The unsigned release APK is not an installable signed release. Debug signing is development-only and can change between CI runs. Compare the downloaded APK hash and signer against that exact artifact's identity; matching package alone cannot authorize an update.
-
-Before changing the selected mock app or uninstalling, select FORCE_REAL in the previous simulator, inspect/retry cleanup, and independently obtain a fresh nonmock fix. Keep the fork selected until owned-provider cleanup succeeds; use the documented recovery/reboot procedure if uncertain. Fresh installation requires permissions, Developer options mock-app selection, synthetic test point, new capability/sequence state, exact typed API2 Tasker configuration and the fork's native tile.
-
-The manual safety gate requires accepted CONNECTED/UNKNOWN to stop active and starting manual sessions, invalidate stale work and leave inactive AUTO unless FORCE_REAL was selected. Later disconnection must create a new delay/visible confirmation. Missing delivery may leave simulation running; local FORCE_REAL remains necessary. Successful cleanup is not a genuine-fix observation.
-
-All 24 physical Samsung cases are NOT RUN. Prioritize manual CONNECTED, manual UNKNOWN, startup race, cleanup denial/recovery, independent fresh nonmock fix, real native tile, physical typed API2 Tasker delivery, disconnection delay/confirmation, rapid reconnect, process death, force-stop and reboot. Android16/API36 emulator execution is not Samsung OneUI9/Android17 validation.
-
-GitHub dependency review remains a blocking repository feature/permission issue. The owner must check/enable Dependency graph at https://github.com/abhi-k9/MockGPS/settings/security_analysis and rerun the check. The independent Maven scan reports 174 coordinates, one medium Kotlin build-cache advisory and zero high/critical matches in those scopes. Disabled caches/incremental compilation mitigate but do not patch it. Native/shaded code, SDK/firmware and unknown advisories remain outside that coverage; see DEPENDENCY_REVIEW.md.
-
-## Exact development artifact
-
-[Download signed debug APK/reports](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820/artifacts/12546211907); extract app-debug.apk. Source `89e01d191a8a72c4d749f17846899731c7ec514f`; package dev.abhik.mockgps; versionCode4 /0.3.2-dev.
-
-APK SHA256: `c8a1757797da4f0483d0b768eb4d413f3655d9646f8867e258a9392b8656ebce`
-
-Signer certificate SHA256: `f273ee09d405d1421a2466c2c0ba27f9d8863a54b841c02980d6ab66ba7c8c4d`
-
-CI apksigner/package/version assertions and public provenance were inspected. Direct independent archive/APK download is blocked at the observed sa4 Azure host; no extra download/hash verification is claimed. The separately verified local APK has its own identity and is not substituted for this artifact. Later documentation-only commits do not change this immutable code checkpoint.
+Current source adds faster development, stronger observation ordering and unavailable Samsung settings. Future signing requires exact checkout/workflow/build source, successful FULL+actual API36/API37 and Dependency Review. The old private infrastructure exception is removed. Dependency Review now passes; API37 pretest infrastructure failure and physical evidence remain blockers. No replacement signature/hash is claimed. [Release completion](BETA_RELEASE.md), [commands/timings](DEVELOPMENT.md), [Samsung gate](SAMSUNG_INTEGRATION.md).

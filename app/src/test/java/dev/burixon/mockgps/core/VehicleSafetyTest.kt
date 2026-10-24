@@ -4,8 +4,8 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class VehicleSafetyTest {
-    private fun event(s: PolicySnapshot, vehicle: VehicleState, seq: Long) =
-        Policy.reduce(s, PolicyEvent.Vehicle(vehicle, 1000, seq), 2000)
+    private fun event(s: PolicySnapshot, vehicle: VehicleState, seq: Long, time: Long = 1000 + seq) =
+        Policy.reduce(s, PolicyEvent.Vehicle(vehicle, time, seq), 2000)
     private fun active(mode: OperatingMode) = PolicySnapshot(mode = mode, desired = true,
         service = ServiceState.INJECTING, providers = ProviderState.READY,
         injection = InjectionState.CONFIRMED, vehicle = VehicleState.DISCONNECTED, generation = 9)
@@ -91,10 +91,11 @@ class VehicleSafetyTest {
     }
 
     @Test fun sameMillisecondOrderingRejectsOlderDisconnectAfterManualSafetyStop() {
-        val connected = event(active(OperatingMode.MANUAL_MOCK), VehicleState.CONNECTED, 20)
-        assertEquals(connected, event(connected, VehicleState.DISCONNECTED, 19))
-        val disconnected = event(connected, VehicleState.DISCONNECTED, 21)
-        val reconnected = event(disconnected, VehicleState.CONNECTED, 22)
+        val connected = event(active(OperatingMode.MANUAL_MOCK), VehicleState.CONNECTED, 20, time = 1000)
+        assertEquals(connected, event(connected, VehicleState.DISCONNECTED, 19, time = 1000))
+        val disconnected = event(connected, VehicleState.DISCONNECTED, 21, time = 1000)
+        assertEquals(connected, disconnected) // safety wins a same-millisecond contradiction
+        val reconnected = event(disconnected, VehicleState.CONNECTED, 22, time = 1000)
         assertFalse(reconnected.desired)
         assertNull(reconnected.pendingAtElapsed)
         assertEquals(1000L, reconnected.lastEventTime)

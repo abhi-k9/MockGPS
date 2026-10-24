@@ -1,6 +1,6 @@
 # MockGPS — transparent developer location simulation
 
-**Current work:0.4.0-beta.1 / versionCode5 unsigned candidate.** Publication, merge and stable claims remain blocked by dependency-graph support, absent authorized release signing and incomplete mandatory physical evidence. See [beta changes and owner steps](docs/BETA_RELEASE.md), [review](docs/BETA_AUDIT.md), [experimental Tasker project/import guide](tasker/README.md) and [changelog](CHANGELOG.md). The older0.3.2-dev APK/provenance below is a historical tested checkpoint, not this candidate's hash or signer.
+**Development revision:0.4.0-beta.1 / versionCode5, compile/target API37.** New source changes are not represented by the earlier signed APK. The [existing owner-only draft](https://github.com/abhi-k9/MockGPS/releases/tag/untagged-a24e302549f679ab44f9) retains that historical signed candidate and exact receipts; no release/tag is published and PR1 is draft/unmerged. Dependency Review now passes. API37 infrastructure and physical safety evidence still block a new signed release. See [fast local development and measurements](docs/DEVELOPMENT.md), [release status](docs/BETA_RELEASE.md), [Tasker import](tasker/README.md) and [Samsung availability](docs/SAMSUNG_INTEGRATION.md).
 
 
 A hardened native Kotlin fork of [BuriXon-code/MockGPS](https://github.com/BuriXon-code/MockGPS), preserving the MapLibre map, selected coordinates, camera position, clipboard control and optional bounded drift. Android's mock-location flags and foreground-service disclosures remain intact. No root, Shizuku, Accessibility service, network control server, cloud backend or detection bypass is used.
@@ -23,24 +23,23 @@ On process restart, reboot and upgrade, stale starts are invalidated and simulat
 
 ## Build and automated checks
 
-Prerequisites: a **Java 21 JDK** (Gradle daemon), Android SDK platform 36/build tools 36.0.0/platform-tools, Bash, and the usual HTTPS access to Google/Maven/Gradle repositories. App bytecode targets Java 17; minimum Android is 10/API29; compile/target SDK is 36. API36 targeting is not evidence of Android17 compatibility.
+Prerequisites: Java21 **JDK**, SDK platform37.0, build-tools36.0.0, Python3, Node and Bash. Minimum Android29; Java17 bytecode. SDK provisioning is a one-time step, separate from edits.
 
 ```sh
-export JAVA_HOME=/path/to/jdk-21
-export ANDROID_HOME=/path/to/android-sdk
-scripts/setup-android-sdk.sh "$ANDROID_HOME" # pinned official Linux x86_64 bootstrap
-./scripts/android-build.sh
+# Default FAST, no clean/lint/release/emulator/SDK install/Actions:
+scripts/dev.sh fast '*PolicyTest*'
+scripts/dev.sh compile
+scripts/dev.sh build
+# CHECK after meaningful edits:
+scripts/dev.sh check
+# Explicit expensive FULL and exact-SHA RELEASE preflight:
+scripts/dev.sh full
+VALIDATION_RUN_ID=RUN_ID scripts/dev.sh release
 ```
 
-This runs a clean debug build, unsigned release build, JVM unit tests, Android lint and instrumentation APK compilation using the checked-in Gradle wrapper and pinned distribution checksum. It does not run device tests. To run those on a disposable connected Android device/emulator:
+[Development guide](docs/DEVELOPMENT.md) covers paths, CachyOS, warm emulator selection, quoting, prerequisites, security boundaries and timings. The old clean all-purpose script took97.2s; warm selected test runs took6.6s/4.4s, without enabling caches/incremental compilation. Full local CHECK after the policy/settings changes passed85 JVM tests and lint with zero errors/13warnings in23.2s, also compiling the device APK. Compilation is not device execution. API36 current revision requires actual CI; API37 has a retained pretest guest failure.
 
-```sh
-./gradlew :app:connectedDebugAndroidTest --max-workers=2
-```
-
-In this managed cloud environment, first `source /workspace/setup/android-env.sh`; pass `--project-cache-dir=/workspace/.cache/mockgps-project` to the build script. This activates retained JDK/SDK paths and the required Java proxy configuration. Keep TLS verification enabled.
-
-Outputs: `app/build/outputs/apk/debug/app-debug.apk`, `app/build/outputs/apk/release/app-release-unsigned.apk`, and test/lint reports under `app/build/`. CI retains debug APK/reports and separately runs API36 emulator instrumentation; that CI job is not Samsung validation. See [TESTING.md](TESTING.md) for actual local evidence and gaps.
+No feature-branch push/PR duplication; ordinary PRs use debug/JVM/lint and API36 when inputs change. The unresolved API37 check remains failed without an unchanged boot retry. A deliberate FULL validates both APIs and builds release. Metadata reuse is labelled, never current-SHA release proof. Artifacts expire after7days.
 
 ## Install on Samsung / One UI
 
@@ -56,6 +55,8 @@ Outputs: `app/build/outputs/apk/debug/app-debug.apk`, `app/build/outputs/apk/rel
 Samsung sleeping/deep-sleeping apps, battery restrictions, force-stop and lock-screen behavior may prevent Tasker or notifications from running. Test both restrictive and unrestricted battery settings; changing battery settings does not grant missing Android foreground-service permissions. Full procedures and 24 unrun scenarios are in [docs/SAMSUNG_VALIDATION.md](docs/SAMSUNG_VALIDATION.md).
 
 ## Automation and privacy
+
+Tasker has an independent opt-in/revoke switch, disabled by default. Samsung Modes and Routines has a separate off/unavailable switch; no supported secure native contract was verified, so no Samsung endpoint is exposed. No built-in Bluetooth receiver, polling or third integration exists.
 
 External control is disabled by default. The old unauthenticated `on`, `set`, `boot` and direct-service interfaces are removed. The new API accepts only authenticated version-2 `vehicle_connected`, `vehicle_disconnected`, `vehicle_unknown`, `stop`, and `status` messages with fresh timestamps and an independent increasing mutation sequence. `stop` selects FORCE_REAL. Revoking the capability disables access and cancels automation; reenable to issue a new credential. Anyone holding the token can exercise this narrow API, so protect Tasker backups and clipboard contents.
 
@@ -81,7 +82,7 @@ Legacy unjournaled providers and competing mock apps cannot be conclusively iden
 
 GPL-3.0; retain [LICENSE](LICENSE) and upstream copyright ©2026 Kamil BuriXon Burek. Fork hardening, tests and automation changes are documented in this repository. No alternative-project source was copied. Distribution of GPL binaries requires corresponding source and license notices; CI debug artifacts include no private release signing key. Map data ©OpenStreetMap contributors, tiles by OpenFreeMap, rendering by MapLibre. See [ATTRIBUTION.md](ATTRIBUTION.md).
 
-## Post-review development candidate
+## Historical0.3.2-dev checkpoint
 
 Version **4 / 0.3.2-dev**, installed package `dev.abhik.mockgps`. The old 67-JVM/11-emulator checkpoint predates the manual-session safety correction and is not the revised candidate. Reviewed source `89e01d191a8a72c4d749f17846899731c7ec514f` passed [push Android](https://github.com/abhi-k9/MockGPS/actions/runs/40057430820) and [PR Android](https://github.com/abhi-k9/MockGPS/actions/runs/40057434383): **79 JVM and15 real API36 emulator tests**, zero failures/errors/skips; lint0 errors/16 local and20 hosted warnings; see [current evidence](docs/VALIDATION.json) and [testing](TESTING.md).
 

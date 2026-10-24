@@ -82,3 +82,15 @@ A policy persistence failure invalidates the in-memory generation, cancels pendi
 Fresh authenticated CONNECTED or UNKNOWN stops active or starting MANUAL_MOCK as well as AUTO, advances generation and cancels pending confirmation. FORCE_REAL stays selected; other modes become inactive AUTO. Known CONNECTED blocks manual start. An explicit visible manual start while UNKNOWN remains possible, but a later delivered UNKNOWN stops it. A later DISCONNECTED creates a new delay and visible-confirmation request; it cannot resurrect the old manual session.
 
 Missing Tasker delivery cannot be inferred from silence: an active session may continue until an accepted event, runtime failure or local stop. Successful provider cleanup does not establish a fresh genuine fix; verify a new nonmock location in an independent client.
+
+## Beta follow-up
+
+Version5/0.4.0-beta.1 adds idempotent manual starts, bounded in-memory allowlisted command diagnostics, scrollable/night controls and an experimental Tasker project. Compile/target37 is enabled. The release APK was signed through owner-provided repository secrets in a manual isolated job; key material never enters source, logs, caches or assets. API36 passed17 device tests, while API37 has a guest-platform crash before app tests and remains a failed check. No Samsung/Tasker-import or production claim follows from signing. See [BETA_AUDIT.md](BETA_AUDIT.md) and the exact current VALIDATION/RELEASE_CANDIDATE receipts.
+
+## Performance-first security delta
+
+Local FAST reuses trusted compiled outputs/daemon, with strict checksums and task/configuration/incremental caches still explicitly disabled. The advisory patch concerns KAPT cache ObjectInputStream; lack of configured KAPT is not used as blanket clearance. Untrusted hosted checkouts keep isolated homes. See DEVELOPMENT.md for exact mechanism/prerequisites and measured costs.
+
+Tasker remains capability authentication, not caller package authentication. Higher counters cannot override a newer connected/unknown timestamp with old DISCONNECTED. Diagnostics expose only STALE_VEHICLE_OBSERVATION; invalid events do not consume ordering or change policy/provider state. Samsung has no endpoint/credential and remains unavailable until supported caller authentication and redistribution terms are verified. No new permissions or dependency was introduced.
+
+Dependency Review is now PASS (40069444728 actual action), superseding historical graph/403 failures. Future signing requires full exact-source API36/API37 passes plus Dependency Review, without the old infrastructure waiver, and pins the persistent certificate from40069442731. Earlier signed assets retain their original source and blocker receipts; they are not current source release evidence.

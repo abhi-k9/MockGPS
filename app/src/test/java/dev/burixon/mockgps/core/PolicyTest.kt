@@ -290,11 +290,11 @@ class PolicyTest {
         assertEquals(connected, reduce(connected, PolicyEvent.Deadline(disconnected.generation), now + 200_000))
     }
 
-    @Test fun newerSequenceSurvivesWallClockRollback() {
+    @Test fun newerSafetySequenceSurvivesWallClockRollbackWithoutRegressingWatermark() {
         val first = reduce(auto(), PolicyEvent.Vehicle(VehicleState.DISCONNECTED, 100_000, 1))
         val second = reduce(first, PolicyEvent.Vehicle(VehicleState.CONNECTED, 1_000, 2))
         assertEquals(VehicleState.CONNECTED, second.vehicle)
-        assertEquals(1_000, second.lastEventTime)
+        assertEquals(100_000, second.lastEventTime)
         assertEquals(2, second.lastSequence)
     }
 

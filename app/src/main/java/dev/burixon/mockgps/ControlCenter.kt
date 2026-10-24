@@ -214,9 +214,9 @@ object ControlCenter {
     fun external(context: Context, request: ExternalRequest): AuthResult {
         val s = ensure(context)
         val auth = CommandAuth.authorize(AutomationAccess.isEnabled(context), AutomationAccess.token(context), request,
-            System.currentTimeMillis(), s.lastSequence)
+            System.currentTimeMillis(), s.lastSequence, s.lastEventTime, s.vehicle)
         if (!auth.accepted) { rejected(context, auth.code); return auth }
-        val consumed = s.copy(lastEventTime = request.eventTime, lastSequence = request.sequence)
+        val consumed = s.copy(lastEventTime = maxOf(s.lastEventTime, request.eventTime), lastSequence = request.sequence)
         when (request.command) {
             "stop" -> stopAndReport(context, consumed.copy(mode = OperatingMode.FORCE_REAL,
                 generation = s.generation + 1, pendingAtElapsed = null, result = "STOPPED"))

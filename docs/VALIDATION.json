@@ -1,372 +1,314 @@
 {
-  "date": "2026-10-23",
-  "branch": "harden/android17-automation",
-  "application_id": "dev.abhik.mockgps",
-  "source_namespace": "dev.burixon.mockgps",
-  "version": "0.3.2-dev",
-  "version_code": 4,
-  "tools": {
-    "java": "21 (CI Temurin; local21.0.12.1 Debian)",
-    "gradle": "9.6.0",
-    "agp": "9.2.1",
-    "commandline_tools": "19.0 / archive13114758",
-    "compile_sdk": 36,
-    "target_sdk": 36,
-    "min_sdk": 29,
-    "build_tools": "36.0.0"
-  },
-  "prior_inspected_checkpoint": {
-    "source_commit": "6fd92d28706e453646bd03e32a420e673ad89e64",
-    "push": {
-      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40031986917",
-      "conclusion": "failure",
-      "build": "success",
-      "instrumentation": "failure"
-    },
-    "pull_request": {
-      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40031991045",
-      "conclusion": "failure"
-    },
-    "device_failure": "VehicleSafetyInstrumentationTest.unknownStopsRealManualInjectionAndCancelsAnAsynchronousStart; ControlCenter.begin:153; full cause pending artifact access"
-  },
-  "current_validation": "PASS: strict local full builds including isolated Gradle/project-cache rerun; both hosted Android build/emulator workflows successful",
-  "dependencies": {
-    "coordinates": 174,
-    "high_critical_matches": 0,
-    "medium_matches": 1,
-    "remaining_advisory": "GHSA-r937-wjx7-w2jp",
-    "mitigation": "Task/configuration caches and Kotlin incremental compilation disabled; not patched",
-    "evidence": "docs/evidence/dependencies/after-advisories.json",
-    "github_dependency_review": "External repository feature/permission blocker; owner must check/enable Dependency graph and rerun; gate unchanged",
-    "current_scan": "docs/evidence/dependencies/current-advisories.json",
-    "final_source_inventory_comparison": "Strict export at89e01d1 is byte-identical to current-inventory.json (174 modules); existing source5963fd0 advisory snapshot applies unchanged"
-  },
-  "hardware": {
-    "samsung_oneui9_android17": "NOT RUN",
-    "physical_tasker": "NOT RUN",
-    "secure_lock_screen": "NOT RUN",
-    "genuine_location_reacquisition": "NOT RUN",
-    "matrix_scenarios_not_run": 24
-  },
-  "pull_request": {
-    "url": "https://github.com/abhi-k9/MockGPS/pull/1",
-    "draft": true,
-    "merged": false,
-    "production_release_published": false
-  },
-  "historical_evidence": "docs/evidence/historical-validation-a6dc017.json; historical candidate has manual-session defect and is not the revised candidate",
-  "local": {
-    "source_commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
-    "tracked_worktree_clean": true,
-    "strict_verification": true,
-    "unit_tests": {
-      "tests": 79,
-      "failures": 0,
-      "errors": 0,
-      "skipped": 0
-    },
-    "lint": {
-      "errors": 0,
-      "warnings": 16
-    },
-    "builds": [
-      "debug",
-      "unsigned release",
-      "debugAndroidTest"
-    ],
-    "device_tests": "NOT RUN locally: no /dev/kvm",
-    "regular_full_build": "Passed; scripts/android-build.sh --project-cache-dir=/workspace/final-safety-project-cache --no-watch-fs",
-    "independent_isolated_cache": {
-      "result": "Passed all133 tasks sequentially",
-      "gradle_home": "/workspace/MockGPS/work/cold-gradle (initially empty this continuation; no cache copied from prior workspace)",
-      "project_cache": "/workspace/MockGPS/work/cold-project",
-      "initial_attempt": "Failed missing generated dex input after overlapping clean builds; not counted as pass",
-      "final_command": "scripts/android-build.sh --project-cache-dir=/workspace/MockGPS/work/cold-project --no-watch-fs"
-    },
-    "debug_apk": {
-      "commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
-      "tracked_worktree_clean": true,
-      "application_id": "dev.abhik.mockgps",
-      "version_code": 4,
-      "version_name": "0.3.2-dev",
-      "apk": "app/build/outputs/apk/debug/app-debug.apk",
-      "bytes": 59262884,
-      "sha256": "21b98c8f38118c18805dd3397cd537cd5f0a85f6780a48523d21d0c734bb9126",
-      "signer_certificate_sha256": "07418dde16f4fa5a9ab277e1ba2a2f660e50febf282261a54d44b2f52ba398cf",
-      "signing": "Android development/debug certificate; unsigned release is not an installable release",
+  "schema": 2,
+  "current_revision": {
+    "version": "0.4.0-beta.1",
+    "version_code": 5,
+    "source": "Current branch code; see commit containing these changes and PR1 for exact hosted results",
+    "local": {
       "unit_tests": {
-        "tests": 79,
+        "tests": 85,
         "failures": 0,
         "errors": 0,
         "skipped": 0
       },
       "lint": {
-        "Warning": 16
+        "Warning": 13
       },
-      "lint_issues": [
-        {
-          "id": "InlinedApi",
-          "severity": "Warning",
-          "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
-        },
-        {
-          "id": "InlinedApi",
-          "severity": "Warning",
-          "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
-        },
-        {
-          "id": "InlinedApi",
-          "severity": "Warning",
-          "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
-        },
-        {
-          "id": "OldTargetApi",
-          "severity": "Warning",
-          "message": "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
-        },
-        {
-          "id": "GradleDependency",
-          "severity": "Warning",
-          "message": "A newer version of `compileSdk` than 36 is available: 37"
-        },
-        {
-          "id": "NewerVersionAvailable",
-          "severity": "Warning",
-          "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
-        },
-        {
-          "id": "ExportedReceiver",
-          "severity": "Warning",
-          "message": "Exported receiver does not require permission"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        },
-        {
-          "id": "UseKtx",
-          "severity": "Warning",
-          "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-        }
-      ]
+      "check": "PASS: debug and instrumentation APK compilation, JVM, lint; no current device result yet"
     },
-    "signature_evidence": "docs/evidence/candidate-89e01d1/local-signature.txt"
+    "api36": "PENDING current revision CI; historical signed source passed17",
+    "api37": "BLOCKED before tests in saved run40068105244; unchanged infrastructure not retried",
+    "dependency_review": {
+      "status": "PASS at refreshed d35c471; new head must retain passing gate",
+      "run_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40069444728"
+    },
+    "samsung_native": "UNAVAILABLE: no verified supported secure app action",
+    "tasker_import": "NOT RUN",
+    "physical_matrix": "24 complete cases NOT RUN",
+    "signing": "No new signing: exact-source FULL/API36/API37 gates required",
+    "measurement_evidence": "docs/evidence/dev-cycle/timings.json"
   },
-  "diagnostic_checkpoint": {
-    "source_commit": "5963fd0910b479fde6d769574109042b3f7cd17f",
-    "push_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40056897938",
-    "build": "success",
-    "instrumentation": "failure",
-    "confirmed_exception": "android.app.RemoteServiceException$ForegroundServiceDidNotStartInTimeException",
-    "root_cause": "Stopping queued startForegroundService before foreground promotion triggers Android16 deliberate crash",
-    "correction": "Focused Activity normal startService admission; service retains stale-generation checks and foreground location promotion before provider work"
-  },
-  "validated_source_commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
-  "manifest_review": "docs/evidence/candidate-89e01d1/manifest-review.json",
-  "ci_debug_apk": {
-    "commit": "89e01d191a8a72c4d749f17846899731c7ec514f",
-    "tracked_worktree_clean": true,
+  "historical_signed_candidate": {
+    "version": "0.4.0-beta.1",
+    "version_code": 5,
     "application_id": "dev.abhik.mockgps",
-    "version_code": 4,
-    "version_name": "0.3.2-dev",
-    "apk": "app/build/outputs/apk/debug/app-debug.apk",
-    "bytes": 59262884,
-    "sha256": "c8a1757797da4f0483d0b768eb4d413f3655d9646f8867e258a9392b8656ebce",
-    "signer_certificate_sha256": "f273ee09d405d1421a2466c2c0ba27f9d8863a54b841c02980d6ab66ba7c8c4d",
-    "signing": "Android development/debug certificate; unsigned release is not an installable release",
-    "unit_tests": {
-      "tests": 79,
-      "failures": 0,
-      "errors": 0,
-      "skipped": 0
-    },
-    "lint": {
-      "Warning": 20
-    },
-    "lint_issues": [
-      {
-        "id": "InlinedApi",
-        "severity": "Warning",
-        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
+    "source_namespace": "dev.burixon.mockgps",
+    "branch": "harden/android17-automation",
+    "validated_head_commit": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+    "apk_source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+    "artifact_source_tree_equals_validated_head": true,
+    "local": {
+      "unit_tests": {
+        "tests": 82,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
       },
-      {
-        "id": "InlinedApi",
-        "severity": "Warning",
-        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
+      "lint": {
+        "Warning": 14
       },
-      {
-        "id": "InlinedApi",
-        "severity": "Warning",
-        "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
-      },
-      {
-        "id": "OldTargetApi",
-        "severity": "Warning",
-        "message": "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
-      },
-      {
-        "id": "AndroidGradlePluginVersion",
-        "severity": "Warning",
-        "message": "A newer version of Gradle than 9.6.0 is available: 9.8.2"
-      },
-      {
-        "id": "AndroidGradlePluginVersion",
-        "severity": "Warning",
-        "message": "A newer version of com.android.application than 9.2.1 is available: 9.4.1"
-      },
-      {
-        "id": "GradleDependency",
-        "severity": "Warning",
-        "message": "A newer version of `compileSdk` than 36 is available: 37"
-      },
-      {
-        "id": "GradleDependency",
-        "severity": "Warning",
-        "message": "A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1"
-      },
-      {
-        "id": "GradleDependency",
-        "severity": "Warning",
-        "message": "A newer version of androidx.activity:activity-ktx than 1.10.1 is available: 1.13.0"
-      },
-      {
-        "id": "NewerVersionAvailable",
-        "severity": "Warning",
-        "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
-      },
-      {
-        "id": "ExportedReceiver",
-        "severity": "Warning",
-        "message": "Exported receiver does not require permission"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
-      },
-      {
-        "id": "UseKtx",
-        "severity": "Warning",
-        "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+      "strict_verification": true,
+      "complete_build": "PASS from initially isolated Gradle home; fresh final-source full validation",
+      "device_tests": "NOT RUN locally: no /dev/kvm",
+      "unsigned_reproducibility": {
+        "source": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+        "sha256": "76f6ab618743a0b42aa006c1aa782fc8e7cf4a77a0b8728299b6f64b41d902a8",
+        "repeat_sha256": "76f6ab618743a0b42aa006c1aa782fc8e7cf4a77a0b8728299b6f64b41d902a8",
+        "result": "PASS same-source repeat release packaging after clean full build; no cross-host identity claim",
+        "qualification": "Delivered CI APK embeds actual merge source, not the local branch Git commit; its unsigned digest therefore differs"
       }
-    ],
-    "artifact_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40057430820/artifacts/12546211907",
-    "artifact_id": 12546211907,
-    "artifact_archive_digest": "sha256:2bcc78cd1eea0d0798afbadcf60dcfc7d077ff24ae691d3f21e2f3fe3e908cb8",
-    "independent_download_and_hash": "Not claimed: direct download blocked at productionresultssa4.blob.core.windows.net; successful CI apksigner, package/version assertions and public check-run provenance inspected"
-  },
-  "github_actions": {
-    "push": {
-      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40057430820",
-      "build": "success",
-      "instrumentation": "success",
-      "conclusion": "success",
-      "build_job": 120763401191,
-      "instrumentation_job": 120763400928
+    },
+    "github_android": {
+      "head_sha": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+      "artifact_source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+      "runtime_inputs_sha256": "39b8af802bf4189deec14b090c343e255928fa85218851b57c8909ea2e0d3c1a",
+      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40068105244",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "id": 120795499317,
+          "name": "plan",
+          "conclusion": "success"
+        },
+        {
+          "id": 120795500031,
+          "name": "diagnostics",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 120795500328,
+          "name": "sign-release",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 120795581326,
+          "name": "build",
+          "conclusion": "success"
+        },
+        {
+          "id": 120795581352,
+          "name": "instrumentation API 36",
+          "conclusion": "success"
+        },
+        {
+          "id": 120795581367,
+          "name": "instrumentation API 37.0",
+          "conclusion": "failure"
+        }
+      ],
+      "device_results": [
+        {
+          "api": 36,
+          "status": "PASS",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "job_id": 120795581352
+        },
+        {
+          "api": 37,
+          "status": "BLOCKED_BEFORE_TEST_EXECUTION",
+          "tests": null,
+          "job_id": 120795581367,
+          "reason": "Guest Android input/display/native crash or transport failure before app tests; failed check remains visible"
+        }
+      ],
+      "build_identity": {
+        "runtime_inputs_sha256": "39b8af802bf4189deec14b090c343e255928fa85218851b57c8909ea2e0d3c1a",
+        "commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+        "tracked_worktree_clean": true,
+        "application_id": "dev.abhik.mockgps",
+        "version_code": 5,
+        "version_name": "0.4.0-beta.1",
+        "apk": "app/build/outputs/apk/debug/app-debug.apk",
+        "bytes": 59263500,
+        "sha256": "40f5189fd032e2c25a3cde9c175c121925c875c1615686a90508d155a678b971",
+        "signer_certificate_sha256": "b28ce57c3eea10329df98ea93a171cbd8866ee8cd75629ef08dcb1fa01e06e9d",
+        "signing": "Android development/debug certificate; unsigned release is not an installable release",
+        "unit_tests": {
+          "tests": 82,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "lint": {
+          "Warning": 18
+        },
+        "lint_issues": [
+          {
+            "id": "InlinedApi",
+            "severity": "Warning",
+            "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#POWER_USAGE_LOW`"
+          },
+          {
+            "id": "InlinedApi",
+            "severity": "Warning",
+            "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_COARSE`"
+          },
+          {
+            "id": "InlinedApi",
+            "severity": "Warning",
+            "message": "Field requires API level 31 (current min is 29): `android.location.provider.ProviderProperties#ACCURACY_FINE`"
+          },
+          {
+            "id": "AndroidGradlePluginVersion",
+            "severity": "Warning",
+            "message": "A newer version of Gradle than 9.6.0 is available: 9.8.2"
+          },
+          {
+            "id": "AndroidGradlePluginVersion",
+            "severity": "Warning",
+            "message": "A newer version of com.android.application than 9.2.1 is available: 9.4.1"
+          },
+          {
+            "id": "GradleDependency",
+            "severity": "Warning",
+            "message": "A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.1"
+          },
+          {
+            "id": "GradleDependency",
+            "severity": "Warning",
+            "message": "A newer version of androidx.activity:activity-ktx than 1.10.1 is available: 1.13.0"
+          },
+          {
+            "id": "NewerVersionAvailable",
+            "severity": "Warning",
+            "message": "A newer version of org.maplibre.gl:android-sdk than 13.6.1 is available: 13.7.1"
+          },
+          {
+            "id": "ExportedReceiver",
+            "severity": "Warning",
+            "message": "Exported receiver does not require permission"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          },
+          {
+            "id": "UseKtx",
+            "severity": "Warning",
+            "message": "Use the KTX extension function `SharedPreferences.edit` instead?"
+          }
+        ]
+      },
+      "artifact_id": 12550466551,
+      "artifact_digest": "sha256:e0057cd6c90fbdbaac1060ee8a362d024c43e01999f16283a2f4aebcb7a57dac"
+    },
+    "signing": {
+      "source_commit": "b1a23cee4ed511046ebe33a6dc0f9a254d64f064",
+      "validated_head_commit": "ffb2be066d425a6e1d3396ed19271ab21ad54468",
+      "validation_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40068105244",
+      "unsigned_apk_sha256": "40dd84a427cc6c51835ba3c409602245f205f18fb0212a77562ec7fba5959d89",
+      "signed_apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+      "signer_certificate_sha256": "75d12be4cf8c52778061616d8b142c920c1040ddd591f09601331ec395a5254d",
+      "variant": "non-debug release, signed with authorized repository keystore",
+      "draft": true,
+      "signing_workflow_commit": "d35c471ad0cfde915817b5618bdefb0a76b67f62",
+      "signing_run_url": "https://github.com/abhi-k9/MockGPS/actions/runs/40069442731",
+      "independent_download_and_signature_verification": {
+        "downloaded": true,
+        "signature_verified": true,
+        "application_id": "dev.abhik.mockgps",
+        "version_code": 5,
+        "version_name": "0.4.0-beta.1",
+        "min_sdk": 29,
+        "target_sdk": 37,
+        "debuggable": false,
+        "apk_sha256": "92dc58e65bb84ad480d3d1b1a22342c5d0d6fbafa823da7bddb9bd1e0bd11998",
+        "signer_certificate_sha256": "75d12be4cf8c52778061616d8b142c920c1040ddd591f09601331ec395a5254d",
+        "public_key_algorithm": "RSA",
+        "public_key_bits": 4096
+      }
+    },
+    "dependencies": {
+      "coordinates": 174,
+      "medium": 1,
+      "high_critical": 0,
+      "remaining_advisory": "GHSA-r937-wjx7-w2jp",
+      "mitigation": "Task/configuration/incremental caches disabled; not patched",
+      "scan": "docs/evidence/beta/release-advisories.json",
+      "dependency_review": "BLOCKED: unsupported repository graph feature; dependency-diff403 and administrative integration restriction; threshold unchanged"
+    },
+    "tasker": {
+      "project": "tasker/MockGPS.prj.xml",
+      "sha256": "72adaa40e79f33e860e0d297f06bf6d5d958946d8526a820b61ec69158bca02d",
+      "status": "EXPERIMENTAL",
+      "actual_import": "NOT RUN",
+      "schema_model": "PASS against captured MIT Java export, schema facts and JS bridge model; typed Intent URI tested on API36"
+    },
+    "hardware": {
+      "samsung_matrix_complete_cases": "24 NOT RUN",
+      "user_reported_partial": "Maps blue dot moved/returned; manual connected/disconnected accepted; Test Net no away from Sportage Hybrid; not fresh isMock=false proof"
+    },
+    "release": {
+      "url": "https://github.com/abhi-k9/MockGPS/releases/tag/untagged-a24e302549f679ab44f9",
+      "id": 422548757,
+      "tag_name": "v0.4.0-beta.1",
+      "draft": true,
+      "prerelease": true,
+      "published": false
+    },
+    "ci_optimization": {
+      "duplicate_branch_push_removed": true,
+      "metadata_changes": "Fast checks plus reuse of matching successful runtime proof; matching failures retained without rerunning unchanged suites",
+      "key_access": "Manual sign job only; temporary private file outside assets, removed before upload",
+      "failed_job_retries": "All attempts considered; attempt-specific artifact names prevent collision"
+    },
+    "static": {
+      "actionlint": "1.7.7 PASS",
+      "ktlint": "1.7.1 PASS for two new Kotlin files",
+      "scripts_xml": "PASS",
+      "secret_scan": "Gitleaks8.30.1; full history, five exact historical false positives; final outcome in security evidence"
+    },
+    "publication_gates": {
+      "dependency_review": "BLOCKED: repository feature/permission",
+      "api37": "BLOCKED: guest platform failed before tests; check remains failed",
+      "mandatory_hardware": "BLOCKED: incomplete physical matrix",
+      "persistent_signing": "READY: authorized repository key used and signature verified"
     },
     "pull_request": {
-      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40057434383",
-      "conclusion": "success",
-      "build": "success",
-      "instrumentation": "success",
-      "build_job": 120763412317,
-      "instrumentation_job": 120763412473
+      "url": "https://github.com/abhi-k9/MockGPS/pull/1",
+      "draft": true,
+      "merged": false
     },
-    "dependency_review": {
-      "url": "https://github.com/abhi-k9/MockGPS/actions/runs/40057434380",
-      "conclusion": "failure",
-      "classification": "EXTERNAL_REPOSITORY_FEATURE_OR_PERMISSION_BLOCKER"
-    },
-    "instrumentation": {
-      "tests": 15,
-      "failures": 0,
-      "errors": 0,
-      "skipped": 0,
-      "platform": "Android16/API36 Google APIs x86_64 disposable emulator",
-      "required_vehicle_safety_methods": 4,
-      "evidence": "docs/evidence/candidate-89e01d1/push-device-results.json"
-    },
-    "unit_tests": {
-      "tests": 79,
-      "failures": 0,
-      "errors": 0,
-      "skipped": 0
-    },
-    "lint": {
-      "errors": 0,
-      "warnings": 20
-    }
-  },
-  "evidence_policy": "Immutable tested-code89e01d1 checkpoint and matching CI artifact. Later documentation-only commits do not change this APK source SHA/hash/signer. Local APK uses a separate development signer and is not the delivered CI APK."
+    "source_tree_sha": "07fc292936d55f9eeb5c2ad2dfecba5b62cafc9e",
+    "source_tree_hash_algorithm": "Git object SHA-1"
+  }
 }

@@ -53,8 +53,10 @@ object Policy {
             pendingAtElapsed = null, vehicle = VehicleState.UNKNOWN, result = "MODE_SELECTED"
         )
         is PolicyEvent.Vehicle -> {
-            if (e.sequence < 0 || e.sequence <= s.lastSequence) s else {
-                val next = s.copy(lastEventTime = e.eventTime, lastSequence = e.sequence, vehicle = e.state)
+            if (e.sequence < 0 || e.sequence <= s.lastSequence ||
+                (e.state == VehicleState.DISCONNECTED && (e.eventTime < s.lastEventTime ||
+                    (e.eventTime == s.lastEventTime && s.vehicle != VehicleState.DISCONNECTED)))) s else {
+                val next = s.copy(lastEventTime = maxOf(s.lastEventTime, e.eventTime), lastSequence = e.sequence, vehicle = e.state)
                 // A fresh safety observation ends even an explicitly started manual session.
                 // Return to AUTO, never FORCE_REAL, so a later disconnect can request a new
                 // delayed confirmation without resurrecting the terminated manual session.

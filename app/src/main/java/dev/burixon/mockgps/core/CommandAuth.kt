@@ -15,7 +15,8 @@ object CommandAuth {
     }
 
     private val commands = setOf("vehicle_connected", "vehicle_disconnected", "vehicle_unknown", "stop", "status")
-    fun authorize(enabled: Boolean, expectedToken: String?, request: ExternalRequest, nowWall: Long, lastSequence: Long): AuthResult {
+    fun authorize(enabled: Boolean, expectedToken: String?, request: ExternalRequest, nowWall: Long, lastSequence: Long,
+        lastEventTime: Long = -1, lastVehicle: VehicleState = VehicleState.UNKNOWN): AuthResult {
         fun reject(code: String) = AuthResult(false, code)
         if (!enabled) return reject("DISABLED")
         if (request.api != 2) return reject("UNSUPPORTED_API")
@@ -30,6 +31,12 @@ object CommandAuth {
         if (request.eventTime < 0 || request.eventTime > nowWall || nowWall - request.eventTime > 60_000) return reject("EXPIRED_EVENT")
         if (request.sequence < 0 || request.sequence == Long.MAX_VALUE) return reject("INVALID_SEQUENCE")
         if (request.command != "status" && request.sequence <= lastSequence) return reject("REPLAYED_EVENT")
+        // A late sender must not turn an older observation into permission to resume by
+        // allocating a newer counter. Safety wins timestamp ties; retry a fresh query.
+        if (request.command == "vehicle_disconnected" && (request.eventTime < lastEventTime ||
+            (request.eventTime == lastEventTime && lastVehicle != VehicleState.DISCONNECTED))) {
+            return reject("STALE_VEHICLE_OBSERVATION")
+        }
         return AuthResult(true, "ACCEPTED")
     }
 }
