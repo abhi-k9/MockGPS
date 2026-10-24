@@ -21,6 +21,10 @@ on:
       validation_run_id:
         description: Successful full Android run ID for signing
         type: string
+      allow_api37_blocker:
+        description: Prepare only a private draft when API37 has a reviewed infrastructure failure (does not clear checks)
+        type: boolean
+        default: false
       diagnostics_run_id:
         description: Read only the saved API37 emulator diagnostics from this run
         type: string
@@ -170,17 +174,26 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
         with:
           distribution: temurin
           java-version: '21'
       - name: Provision checksum-pinned signing tools
         run: scripts/setup-android-sdk.sh "$RUNNER_TEMP/mockgps-signing-sdk"
+      - name: Prepare draft assets from verified CI APK bytes (no signing secrets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          VALIDATION_RUN_ID: ${{ inputs.validation_run_id }}
+          ALLOW_API37_BLOCKER: ${{ inputs.allow_api37_blocker }}
+        run: python3 ci/prepare_release.py
       - name: Validate draft inputs and sign with the authorized persistent key
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ inputs.source_sha }}
           VALIDATION_RUN_ID: ${{ inputs.validation_run_id }}
+          ALLOW_API37_BLOCKER: ${{ inputs.allow_api37_blocker }}
           MOCKGPS_SIGNING_KEYSTORE_BASE64: ${{ secrets.MOCKGPS_SIGNING_KEYSTORE_BASE64 }}
           MOCKGPS_SIGNING_KEY_ALIAS: ${{ secrets.MOCKGPS_SIGNING_KEY_ALIAS }}
           MOCKGPS_SIGNING_KEY_PASSWORD: ${{ secrets.MOCKGPS_SIGNING_KEY_PASSWORD }}
