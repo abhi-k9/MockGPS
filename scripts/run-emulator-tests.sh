@@ -62,7 +62,8 @@ for p in Path('app/build/outputs/androidTest-results/connected').rglob('TEST-*.x
   for kind in ('failure','error'):
    for failure in test.findall(kind):
     frames=re.findall(r'\bat (dev\.burixon\.mockgps[\w.$]+\([\w.$]+:\d+\))',failure.text or '')[:3]
-    failed.append({'class':test.get('classname'),'test':test.get('name'),'type':failure.get('type'),'app_frames':frames})
+    causes=re.findall(r'(?m)^Caused by: ([a-zA-Z_$][\w.$]*(?:Exception|Error))(?::|$)',failure.text or '')[:3]
+    failed.append({'class':test.get('classname'),'test':test.get('name'),'type':failure.get('type') or next(iter(re.findall(r'(?m)^([a-zA-Z_$][\w.$]*(?:Exception|Error))(?::|$)',failure.text or '')),None),'causes':causes,'app_frames':frames})
 payload=json.dumps(failed).replace('%','%25').replace('\r','%0D').replace('\n','%0A')
 print(f'::error title=Device test failures (names/types only)::{payload}')
 PYFAIL
@@ -76,8 +77,17 @@ files=list(Path('app/build/outputs/androidTest-results/connected').rglob('TEST-*
 assert files,'No instrumentation result XML; compilation or a booted emulator is not a test pass'
 assert all(p.stat().st_mtime>=int(os.environ['MOCKGPS_DEVICE_TEST_START']) for p in files),'Stale instrumentation reports'
 tests=failures=errors=skipped=0
+executed=set()
 for p in files:
- r=E.parse(p).getroot();tests+=int(r.get('tests',0));failures+=int(r.get('failures',0));errors+=int(r.get('errors',0));skipped+=int(r.get('skipped',0))
+ r=E.parse(p).getroot()
+ executed.update((t.get('classname'),t.get('name')) for t in r.iter('testcase'))
+ tests+=int(r.get('tests',0));failures+=int(r.get('failures',0));errors+=int(r.get('errors',0));skipped+=int(r.get('skipped',0))
+required={('dev.burixon.mockgps.VehicleSafetyInstrumentationTest',name) for name in (
+ 'authenticatedConnectedBroadcastStopsRealManualServiceAndRejectsLateCallbacks',
+ 'unknownStopsRealManualInjectionAndCancelsAnAsynchronousStart',
+ 'failedPlatformRemovalIsVisibleAndRetriedAfterAuthorizationRestored',
+ 'unknownInvalidatesActualPendingConfirmationAndForceRealWins')}
+assert required<=executed,('Missing required vehicle safety tests',sorted(required-executed))
 assert tests>=15 and failures==errors==skipped==0,(tests,failures,errors,skipped)
 print(f'Actual emulator instrumentation: {tests} tests, {failures} failures, {errors} errors, {skipped} skipped')
 if os.environ.get('GITHUB_ACTIONS')=='true':

@@ -183,7 +183,22 @@ class VehicleSafetyInstrumentationTest {
         assertFalse(snapshot().desired)
         assertFalse(snapshot().needsConfirmation)
         startManualAndAwaitInjection()
-        main { ControlCenter.forceReal(context) } // Same centralized action as the native tile.
+        val originalTiles = shell("settings get secure sysui_qs_tiles")
+        val component = ComponentName(context, ModeTileService::class.java).flattenToString()
+        try {
+            shell("cmd statusbar add-tile $component")
+            shell("cmd statusbar expand-settings")
+            Thread.sleep(1000) // SystemUI binds asynchronously.
+            shell("cmd statusbar click-tile $component")
+            awaitCondition("The real native tile must stop active manual injection") {
+                snapshot().mode == OperatingMode.FORCE_REAL && !snapshot().desired
+            }
+        } finally {
+            shell("cmd statusbar remove-tile $component")
+            if (originalTiles == "null") shell("settings delete secure sysui_qs_tiles")
+            else shell("settings put secure sysui_qs_tiles '" + originalTiles.replace("'", "'\\''") + "'")
+            shell("cmd statusbar collapse")
+        }
         assertTrue(command("vehicle_disconnected").accepted)
         assertEquals(OperatingMode.FORCE_REAL, snapshot().mode)
         assertFalse(snapshot().desired)
