@@ -60,7 +60,7 @@ class ReadinessSafetyInstrumentationTest {
 
     @Test fun externalRevocationInvalidatesPendingWorkAndShortcutIsIndependent() {
         scenario!!.onActivity {
-            val shortcuts = it.findViewById<android.widget.Switch>(R.id.shortcutIntegrationSwitch)
+            val shortcuts = it.findViewById<android.widget.CompoundButton>(R.id.shortcutIntegrationSwitch)
             assertTrue(shortcuts.isEnabled)
             assertFalse(shortcuts.isChecked)
         }
@@ -247,6 +247,45 @@ class ReadinessSafetyInstrumentationTest {
                 scenario!!.onActivity { ControlCenter.selectAuto(it) }
             }
         } finally { main { ControlCenter.setShortcutsEnabled(context, false) } }
+    }
+
+    @Test fun unattendedShortcutAlarmsStartInjectionAcrossTwoPauseRequestCycles() {
+        try {
+            scenario!!.onActivity {
+                assertTrue(ControlCenter.setIntegrationEnabled(it, false))
+                ControlCenter.setShortcutsEnabled(it, true)
+                assertTrue(AutomationShortcuts.enabled(it))
+                ControlCenter.setDelay(it, 1)
+                ControlCenter.selectAuto(it)
+                assertTrue(ControlCenter.setUnattendedApproval(it, true))
+            }
+            awaitCondition("Visible opt-in must arm the foreground session") {
+                main { MockLocationService.isAutomationArmed() }
+            }
+            repeat(2) {
+                scenario!!.onActivity {
+                    shortcutAction(it, "pause")
+                    assertFalse(ControlCenter.snapshot(it).desired)
+                    assertFalse(MockLocationService.hasOwnedProviders(it))
+                    assertTrue(MockLocationService.isAutomationArmed())
+                    shortcutAction(it, "request_simulation")
+                    assertNotNull(ControlCenter.snapshot(it).pendingAtElapsed)
+                    assertFalse(ControlCenter.snapshot(it).desired)
+                }
+                // No direct deadline()/confirmPending(): the real alarm and receiver must deliver.
+                awaitCondition("A shortcut's scheduled alarm must start injection") {
+                    snapshot().injection == InjectionState.CONFIRMED
+                }
+                assertTrue(main { MockLocationService.hasOwnedProviders(context) })
+                assertEquals(ServiceState.INJECTING, snapshot().service)
+            }
+        } finally {
+            scenario!!.onActivity {
+                ControlCenter.forceReal(it)
+                assertTrue(ControlCenter.setUnattendedApproval(it, false))
+                ControlCenter.setShortcutsEnabled(it, false)
+            }
+        }
     }
 
     @Before fun prepareDisposableEmulator() {

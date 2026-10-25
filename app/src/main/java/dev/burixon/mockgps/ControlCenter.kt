@@ -100,17 +100,24 @@ object ControlCenter {
         return true
     }
     private fun now() = SystemClock.elapsedRealtime()
-    private fun stopAndReport(context: Context, next: PolicySnapshot) {
+    private fun stopAndReport(context: Context, next: PolicySnapshot): Boolean {
         shortcutReview = null
         cancelPending(context)
-        save(context, next.copy(desired = false)) // invalidate generation before any asynchronous service callback
+        val invalidated = save(context, next.copy(desired = false)) // invalidate generation before any asynchronous service callback
         val clean = MockLocationService.stopNow(context) && !State.legacyProviderStateUnverified(context)
         val current = ensure(context)
-        save(context, current.copy(service = if (clean) ServiceState.STOPPED else ServiceState.ERROR,
+        val persisted = save(context, current.copy(service = if (clean) ServiceState.STOPPED else ServiceState.ERROR,
             providers = if (clean) ProviderState.NONE else ProviderState.UNKNOWN,
             injection = if (clean) InjectionState.NONE else InjectionState.UNKNOWN,
             result = if (clean) next.result else "CLEANUP_UNCERTAIN"))
+        return invalidated && clean && persisted
     }
+    private fun stopAndSchedule(context: Context, next: PolicySnapshot): Boolean = PendingStart.commit(
+        next,
+        persistAndStop = { stopAndReport(context, it) },
+        current = { ensure(context) },
+        schedule = { schedule(context, it) },
+    )
     fun forceReal(context: Context) {
         val s = ensure(context)
         stopAndReport(context, s.copy(mode = OperatingMode.FORCE_REAL, generation = s.generation + 1,
@@ -294,8 +301,7 @@ object ControlCenter {
                     else Policy.reduce(s, PolicyEvent.SourceReadiness(sources.readiness), now()).copy(
                         lastSequence = request.sequence, lastEventTime = maxOf(s.lastEventTime, request.eventTime))
                 if (next.generation != s.generation) {
-                    stopAndReport(context, next)
-                    if (next.pendingAtElapsed != null && ensure(context).generation == next.generation) schedule(context, next)
+                    stopAndSchedule(context, next)
                 } else save(context, next)
             }
         }
@@ -324,8 +330,10 @@ object ControlCenter {
         // Shortcut requests have no observation timestamp; local review is the default unless explicitly waived.
         sources = if (action == AutomationCommand.REQUEST_SIMULATION) sources.simulationRequest(s.unattendedApproval)
             else sources.shortcuts(requireNotNull(action.readinessState))
-        stopAndReport(context, Policy.reduce(s, PolicyEvent.SourceReadiness(sources.readiness), now()))
-        if (action == AutomationCommand.REQUEST_SIMULATION && !s.unattendedApproval && ensure(context).mode == OperatingMode.AUTO) {
+        val next = Policy.reduce(s, PolicyEvent.SourceReadiness(sources.readiness), now())
+        val persisted = stopAndSchedule(context, next)
+        if (action == AutomationCommand.REQUEST_SIMULATION && !s.unattendedApproval && persisted &&
+            ensure(context).generation == next.generation && ensure(context).mode == OperatingMode.AUTO) {
             shortcutReview = ensure(context).generation
             changed(context)
         }
@@ -338,8 +346,7 @@ object ControlCenter {
         shortcutReview = null
         sources = sources.shortcuts(ReadinessState.READY)
         val next = Policy.reduce(s, PolicyEvent.SourceReadiness(sources.readiness), now())
-        stopAndReport(activity, next)
-        if (next.pendingAtElapsed != null && ensure(activity).generation == next.generation) schedule(activity, next)
+        stopAndSchedule(activity, next)
     }
     private fun alarmIntent(context: Context, generation: Long = 0) = PendingIntent.getBroadcast(context, REQUEST_ID,
         Intent(context, DelayReceiver::class.java).putExtra("generation", generation),
