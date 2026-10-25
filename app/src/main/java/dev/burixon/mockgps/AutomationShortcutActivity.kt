@@ -17,7 +17,8 @@ class AutomationShortcutActivity : Activity() {
             intent.extras?.get("command") == "status"
         }.getOrDefault(false)
         if (!AutomationSettings.unattendedEnabled(this) || openStatus) {
-            startActivity(Intent(this, MainActivity::class.java))
+            // Visible review/status belongs in the normal app task, never this transient task.
+            startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
         if (!accepted) android.widget.Toast.makeText(this,
             "Shortcut expired or disabled. Reopen MockGPS and retry.", android.widget.Toast.LENGTH_LONG).show()

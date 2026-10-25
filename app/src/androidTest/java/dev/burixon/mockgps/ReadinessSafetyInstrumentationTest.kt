@@ -1,14 +1,19 @@
 package dev.burixon.mockgps
 
+import android.app.Activity
+import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
+import androidx.test.runner.lifecycle.Stage
 import dev.burixon.mockgps.core.*
 import org.junit.After
 import org.junit.Assert.*
@@ -86,6 +91,7 @@ class ReadinessSafetyInstrumentationTest {
     @Test fun shortcutPrivateShortcutAuthorityAndRevocation() {
         val info = context.packageManager.getActivityInfo(android.content.ComponentName(context, AutomationShortcutActivity::class.java), 0)
         assertFalse(info.exported)
+        assertTrue("Shortcut dispatch must not share the app task's affinity", info.taskAffinity.isNullOrEmpty())
         try {
             scenario!!.onActivity {
                 ControlCenter.setShortcutsEnabled(it, true)
@@ -284,6 +290,77 @@ class ReadinessSafetyInstrumentationTest {
                 ControlCenter.forceReal(it)
                 assertTrue(ControlCenter.setUnattendedApproval(it, false))
                 ControlCenter.setShortcutsEnabled(it, false)
+            }
+        }
+    }
+
+    @Test fun unattendedShortcutActivitiesLeaveTheExistingAppTaskInBackground() {
+        lateinit var original: MainActivity
+        scenario!!.onActivity {
+            original = it
+            assertTrue(ControlCenter.setIntegrationEnabled(it, false))
+            ControlCenter.setShortcutsEnabled(it, true)
+            assertTrue(AutomationShortcuts.enabled(it))
+            ControlCenter.setDelay(it, 120)
+            ControlCenter.selectAuto(it)
+            assertTrue(ControlCenter.setUnattendedApproval(it, true))
+        }
+        awaitCondition("Visible opt-in must prepare the foreground session") {
+            main { MockLocationService.isAutomationArmed() }
+        }
+        val app = context.applicationContext as Application
+        var mainStarts = 0
+        var lastMainTask = -1
+        val observer = object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityStarted(activity: Activity) {
+                if (activity is MainActivity) { mainStarts++; lastMainTask = activity.taskId }
+            }
+            override fun onActivityResumed(activity: Activity) {
+                if (activity is MainActivity) { mainStarts++; lastMainTask = activity.taskId }
+            }
+            override fun onActivityCreated(activity: Activity, state: Bundle?) = Unit
+            override fun onActivityPaused(activity: Activity) = Unit
+            override fun onActivityStopped(activity: Activity) = Unit
+            override fun onActivitySaveInstanceState(activity: Activity, state: Bundle) = Unit
+            override fun onActivityDestroyed(activity: Activity) = Unit
+        }
+        try {
+            scenario!!.onActivity { assertTrue(it.moveTaskToBack(true)) }
+            awaitCondition("The existing map must be stopped before testing task foregrounding") {
+                main { ActivityLifecycleMonitorRegistry.getInstance().getLifecycleStageOf(original) == Stage.STOPPED }
+            }
+            main { app.registerActivityLifecycleCallbacks(observer) }
+            fun shortcut(name: String): Intent? = main {
+                assertTrue(AutomationShortcuts.publish(context))
+                context.getSystemService(android.content.pm.ShortcutManager::class.java)
+                    .dynamicShortcuts.firstOrNull { it.id == "automation_$name" }?.intent?.let {
+                        // LauncherApps adds NEW_TASK when starting a published shortcut.
+                        Intent(it).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+            }
+            for ((action, expected) in listOf("request_simulation" to ReadinessState.READY,
+                    "pause" to ReadinessState.BLOCKED, "unknown" to ReadinessState.UNKNOWN)) {
+                val previous = snapshot().generation
+                val launch = requireNotNull(shortcut(action))
+                main { context.startActivity(launch) }
+                awaitCondition("The invisible activity must dispatch $action, not merely fail to launch") {
+                    snapshot().let { it.generation > previous && it.readiness == expected }
+                }
+                instrumentation.waitForIdleSync()
+                assertEquals("Unattended $action must not expose the existing map", 0, main { mainStarts })
+            }
+            val status = shortcut("status")
+            if (status != null) {
+                main { context.startActivity(status) }
+                awaitCondition("Explicit status must still open the normal app task") { main { mainStarts > 0 } }
+                assertEquals(main { original.taskId }, main { lastMainTask })
+            }
+        } finally {
+            main {
+                app.unregisterActivityLifecycleCallbacks(observer)
+                ControlCenter.forceReal(context)
+                assertTrue(ControlCenter.setUnattendedApproval(original, false))
+                ControlCenter.setShortcutsEnabled(context, false)
             }
         }
     }

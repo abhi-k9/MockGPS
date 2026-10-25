@@ -213,6 +213,8 @@ Choose your own triggers in the automation host, such as a schedule, an app prof
 
 Shortcuts use a separate private, revocable authority and do not use the external-command token. Disabling the integration invalidates existing authority. A launcher can invoke a shortcut too, so invocation is not proof of the calling app's identity. Consume shortcuts through the host's standard shortcut support; their private activity, embedded one-use nonces, and intent extras are not a public direct-intent API.
 
+With unattended approval on, command shortcuts do not need the MockGPS screen. Their invisible activity has no task affinity, so Android cannot reuse the app's existing task by affinity and expose its map when dispatching a command. Open status deliberately opens the normal app task; manual approval can open it for review. If an automation host separately launches Open MockGPS or wakes the display, that behavior is controlled by the host. MockGPS does not request screen wake or lock-screen display access for these commands.
+
 ## Temporary overrides
 
 A timed override can be created only through the app’s visible controls, including the **MockGPS timer** tile. Choose 1–1440 minutes and either Simulate or Stop. The persistent Keep stopped setting must be cleared locally before temporary simulation is available. The original mode, manual start intention, pending automation delay and live source agreement are retained underneath the timer.

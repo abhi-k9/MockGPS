@@ -32,7 +32,10 @@
         <activity android:name="dev.burixon.mockgps.OverrideActivity" android:theme="@style/Theme.MockGPS.Dialog" android:exported="false" android:excludeFromRecents="true" />
         <receiver android:name="dev.burixon.mockgps.SessionDeadlineReceiver" android:exported="false" />
         <receiver android:name="dev.burixon.mockgps.OverrideActionReceiver" android:exported="false" />
-        <activity android:name="dev.burixon.mockgps.AutomationShortcutActivity" android:theme="@android:style/Theme.NoDisplay" android:exported="false" android:noHistory="true" android:excludeFromRecents="true" />
+        <!-- LauncherApps starts shortcuts with NEW_TASK. No affinity prevents the invisible
+             command activity from bringing the existing app task to the foreground. -->
+        <activity android:name="dev.burixon.mockgps.AutomationShortcutActivity" android:theme="@android:style/Theme.NoDisplay"
+            android:exported="false" android:taskAffinity="" android:noHistory="true" android:excludeFromRecents="true" />
         <receiver android:name="dev.burixon.mockgps.MockGpsReceiver" android:exported="true" />
         <receiver android:name="dev.burixon.mockgps.DelayReceiver" android:exported="false" />
         <receiver android:name="dev.burixon.mockgps.AutomationStopReceiver" android:exported="false" />
