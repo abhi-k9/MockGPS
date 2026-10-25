@@ -41,6 +41,12 @@ object AutomationShortcuts {
         }
     })
 
+    /** Consent changes revoke any previously issued request before fresh publication. */
+    internal fun invalidateAuthority(context: Context) {
+        authority(context).publish(emptyMap())
+        needsRefresh = true
+    }
+
     fun enabled(context: Context): Boolean = prefs(context).getBoolean("enabled", false)
 
     internal fun setEnabled(context: Context, value: Boolean) {

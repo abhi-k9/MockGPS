@@ -33,6 +33,8 @@ class MockGpsReceiver : BroadcastReceiver() {
                     putString("source_state", s.readiness.name)
                     putBoolean("desired", s.desired)
                     putBoolean("pending", s.pendingAtElapsed != null)
+                    putBoolean("unattended_approval", s.unattendedApproval)
+                    putBoolean("automation_armed", MockLocationService.isAutomationArmed())
                 })
             }
         } catch (_: RuntimeException) {

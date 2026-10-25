@@ -28,9 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="dev.burixon.mockgps.AutomationShortcutActivity" android:exported="false" android:noHistory="true" android:excludeFromRecents="true" />
+        <activity android:name="dev.burixon.mockgps.AutomationShortcutActivity" android:theme="@android:style/Theme.NoDisplay" android:exported="false" android:noHistory="true" android:excludeFromRecents="true" />
         <receiver android:name="dev.burixon.mockgps.MockGpsReceiver" android:exported="true" />
         <receiver android:name="dev.burixon.mockgps.DelayReceiver" android:exported="false" />
+        <receiver android:name="dev.burixon.mockgps.AutomationStopReceiver" android:exported="false" />
         <receiver android:name="dev.burixon.mockgps.BootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

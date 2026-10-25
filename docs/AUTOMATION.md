@@ -2,7 +2,27 @@
 
 Automation is optional. Enable each integration in the app and review its behavior before relying on it. Force real always overrides automation. Paused, unknown, or unreconciled source state blocks a simulation request. Stale incoming requests are rejected. When multiple sources are enabled, all must freshly request simulation.
 
-An eligible request waits for the configured minimum delay and asks for visible confirmation. It never silently starts a background location service. Android and device battery restrictions can delay or prevent delivery.
+An eligible request waits for the configured minimum delay. By default, it asks for visible confirmation. Optional unattended approval can start simulation without another tap through a foreground session that the user prepared while the app was visible. Android and device battery restrictions can delay requests or stop the session.
+
+## Approval and change alerts
+
+**Unattended automation** is off by default. To use it:
+
+1. Select the simulation coordinates and grant the normal precise-location/mock-location prerequisites.
+2. While MockGPS is open, enable **Settings → Unattended automation** and accept the consent prompt. Check that the app reports the session as ready.
+3. Select Auto (**Allow simulation**) and send fresh requests from every enabled integration.
+
+| Approval mode | Eligible request behavior |
+| --- | --- |
+| Manual (default) | Broadcast: delay, then visible confirmation. Shortcut: local request review, delay, then visible confirmation. |
+| Unattended, session armed | Delay, then automatic injection if source agreement, generation, permissions, coordinates, and Auto remain valid. No local review or final tap is required. |
+| Unattended, session unavailable at the deadline | No automatic start. The transition becomes `CONFIRMATION_REQUIRED_UNATTENDED_UNAVAILABLE`; open the app to prepare the session or confirm the request manually. |
+
+Force real (**Keep stopped**) always blocks starts and cancels pending work. The prepared service can remain idle while Force real is selected; armed does not mean injecting. Changing unattended consent cancels pending requests and invalidates shortcut authority, so send fresh requests afterward.
+
+Preparing the session starts a location foreground service with Android's required ongoing notification. No background-location permission or background-service exemption is requested. After process death or a device reboot, source agreement and pending starts are invalidated. Reopening the app can prepare the session again while visible; fresh requests are still required. A saved preference alone is not proof of foreground admission.
+
+**Settings → Change alerts** offers **Notification** (default), **Toast**, **Toast and notification**, or **None** for confirmed starts, stops, new errors, and unavailable unattended operation. These alerts do not control the required ongoing notification. Notification permission/channel settings and Android's toast restrictions affect delivery; an absent alert is not a state guarantee.
 
 ## Explicit broadcast API
 
@@ -32,13 +52,13 @@ The extras must contain exactly these five fields with these primitive types:
 
 | Command | Effect |
 | --- | --- |
-| `request_simulation` | Reports this source as ready. In Auto, source agreement starts the minimum delay, then requests visible confirmation. |
+| `request_simulation` | Reports this source as ready. In Auto, source agreement starts the minimum delay, then applies the user's approval setting. |
 | `pause` | Reports this source as blocked, stops active simulation, and cancels pending requests. |
 | `unknown` | Clears this source's readiness, stops active simulation, and cancels pending requests. |
 | `stop` | Stops simulation and selects the persistent Force real override. |
 | `status` | Returns current state without changing the mutation counter. Authentication and freshness checks still apply. |
 
-The API cannot select Auto, set coordinates, confirm a request, or start simulation directly. The user selects coordinates and returns to Auto in MockGPS. A request accepted while Force real is selected cannot override it. There is no HTTP endpoint, webhook, or push subscription; use ordered broadcasts to query state.
+The API cannot select Auto, set coordinates, change unattended consent, confirm a manual request, or start simulation directly. The user selects coordinates, chooses approval settings, and returns to Auto in MockGPS. A request accepted while Force real is selected cannot override it. There is no HTTP endpoint, webhook, or push subscription; use ordered broadcasts to query state.
 
 Events must be no more than 60 seconds old and cannot be future dated. A simulation request must not predate newer pause/unknown information. Re-evaluate the actual trigger after a stale-observation rejection; do not re-stamp an old event. A missing or uncertain result must be sent as `unknown`.
 
@@ -66,8 +86,12 @@ Initialize the result code to `-1`, not `0`, and require both code `0` and data 
 | `transition` | string | Diagnostic reason; treat as an opaque value, not a command or stable state enum |
 | `desired` | boolean | Simulation is currently requested by policy |
 | `pending` | boolean | A delay is pending; `false` can also mean waiting for visible confirmation |
+| `unattended_approval` | boolean | The user has enabled unattended approval; this does not establish session readiness |
+| `automation_armed` | boolean | A consented location foreground session is admitted and available; Force real or source state can still block injection |
 
-The response omits coordinates and credentials. Handle unknown future response values conservatively.
+A `service` value of `STOPPED` can coexist with `automation_armed=true`: injection is stopped while the automation session remains ready.
+
+The response omits coordinates and credentials. These two approval/session fields are additive to protocol 3; the five request extras are unchanged. Clients should ignore unknown response fields and handle unknown future state values conservatively.
 
 | Rejection code | Meaning / recovery |
 | --- | --- |
@@ -144,7 +168,7 @@ Intent-capable hosts can implement this same contract if they preserve the primi
 
 | Action | Purpose |
 | --- | --- |
-| Request simulation | Request the normal local review, delay, and final confirmation flow. |
+| Request simulation | Request simulation using the configured approval mode and minimum delay. |
 | Pause requests | Stop simulation and block requests from this source. |
 | Context unknown | Clear this source's readiness and stop simulation. |
 | Stop simulation | Stop simulation and select the persistent Force real override. |
@@ -162,10 +186,10 @@ Long-press the MockGPS launcher icon as a second check. If actions appear there 
 
 Enable **App shortcuts** in MockGPS to publish standard Android shortcuts. Their IDs are `automation_request_simulation`, `automation_pause`, `automation_unknown`, `automation_stop`, and `automation_status` (status is included when the host supports five shortcuts). Request, pause, unknown, and stop require a host supporting at least four shortcuts. Hosts may expose these as app shortcuts; availability in Samsung Modes and Routines depends on device software and host support. This is not a Samsung-specific plugin API.
 
-Choose your own triggers in the automation host, such as a schedule, an app profile, or a testing workflow. A request shortcut requires local review before it becomes eligible for a delayed confirmation request. Returning to Auto requires fresh reconciliation; shortcut publication alone does not establish valid source state.
+Choose your own triggers in the automation host, such as a schedule, an app profile, or a testing workflow. Manual mode requires local review before a delayed confirmation request. Unattended approval trusts the configured host to deliver current requests and skips those taps when the session is armed. In this mode, command shortcuts finish without opening the app; only Open status opens the UI. A shortcut cannot use a UI launch to prepare a missing automation session. Shortcuts do not supply timestamped observations, so do not queue old context changes. Returning to Auto requires fresh reconciliation; shortcut publication alone does not establish valid source state.
 
 Shortcuts use a separate private, revocable authority and do not use the external-command token. Disabling the integration invalidates existing authority. A launcher can invoke a shortcut too, so invocation is not proof of the calling app's identity. Consume shortcuts through the host's standard shortcut support; their private activity, embedded one-use nonces, and intent extras are not a public direct-intent API.
 
 ## Check on your device
 
-Confirm request, pause, unknown, pause during a pending delay, Force real, credential revocation, reboot, and battery-restricted behavior. Check that pause or unknown stops injection and that every request requires visible confirmation. Independently verify a fresh non-mock fix after stopping. Test with a throwaway automation credential and rotate it if logs or screenshots could have captured it.
+Test both approval modes: request, pause, unknown, pause during a pending delay, Force real, credential revocation, consent changes, reboot, and battery-restricted behavior. Manual requests must require their normal review/confirmation. Armed unattended requests must start only after the minimum delay and fresh source agreement. Stop the session or restart the app to check the unavailable-session fallback; no background event may recreate a missing service. Check each alert preference and blocked notification permission. Pause, unknown, and Force real must still stop injection. Independently verify a fresh non-mock fix after stopping. Test with a throwaway automation credential and rotate it if logs or screenshots could have captured it.

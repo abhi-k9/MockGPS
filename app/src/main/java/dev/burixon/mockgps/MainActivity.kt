@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.AppOpsManager
+import android.app.NotificationManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -52,6 +53,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var coordinates: TextView
     private lateinit var broadcastSwitch: CompoundButton
     private lateinit var shortcutsSwitch: CompoundButton
+    private lateinit var unattendedSwitch: CompoundButton
+    private var pendingUnattendedChoice: Boolean? = null
     private lateinit var driftSwitch: CompoundButton
     private var generation = 0L
     private var resumed = false
@@ -79,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         coordinates = findViewById(R.id.coordinatesText)
         broadcastSwitch = findViewById(R.id.broadcastSwitch)
         shortcutsSwitch = findViewById(R.id.shortcutIntegrationSwitch)
+        unattendedSwitch = findViewById(R.id.unattendedSwitch)
         driftSwitch = findViewById(R.id.driftSwitch)
         locationMap = LocationMap(this, findViewById(R.id.mapContainer), savedInstanceState,
             select = ::selectLocation, ready = { loaded ->
@@ -159,6 +163,15 @@ class MainActivity : AppCompatActivity() {
                 }.show()
         }
         findViewById<View>(R.id.delayButton).setOnClickListener { showDelayDialog() }
+        findViewById<View>(R.id.changeAlertsButton).setOnClickListener { showAlertModeDialog() }
+        findViewById<View>(R.id.notificationSettingsButton).setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+            } catch (_: android.content.ActivityNotFoundException) {
+                toast(R.string.notification_settings_unavailable)
+            }
+        }
         findViewById<View>(R.id.diagnosticsButton).setOnClickListener { showDiagnostics() }
         findViewById<View>(R.id.githubButton).setOnClickListener { openLink("https://github.com/abhi-k9/MockGPS") }
         findViewById<View>(R.id.helpButton).setOnClickListener { openLink("https://github.com/abhi-k9/MockGPS#get-started") }
@@ -188,6 +201,20 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.reviewShortcutButton).isVisible = reviewPending
         bindSwitch(broadcastSwitch, State.isBroadcastEnabled(this)) { ControlCenter.setIntegrationEnabled(this, it); render() }
         bindSwitch(shortcutsSwitch, AutomationShortcuts.enabled(this)) { ControlCenter.setShortcutsEnabled(this, it); render() }
+        val unattendedEnabled = AutomationSettings.unattendedEnabled(this)
+        bindSwitch(unattendedSwitch, unattendedEnabled, ::changeUnattendedApproval)
+        findViewById<TextView>(R.id.unattendedStatus).setText(when {
+            !unattendedEnabled -> R.string.unattended_off
+            !MockLocationService.isAutomationArmed() -> R.string.unattended_unarmed
+            state.mode == OperatingMode.FORCE_REAL -> R.string.unattended_paused
+            else -> R.string.unattended_ready
+        })
+        val alertMode = AutomationSettings.alertMode(this)
+        findViewById<Button>(R.id.changeAlertsButton).text = getString(R.string.change_alerts_selection, getString(alertModeLabel(alertMode)))
+        val usesNotifications = alertMode in setOf(AlertMode.NOTIFICATION, AlertMode.BOTH)
+        val notificationsBlocked = usesNotifications && !getSystemService(NotificationManager::class.java).areNotificationsEnabled()
+        findViewById<View>(R.id.alertsPermissionHint).isVisible = notificationsBlocked
+        findViewById<View>(R.id.notificationSettingsButton).isVisible = usesNotifications
         bindSwitch(driftSwitch, State.isDrifting(this)) { State.setDrifting(this, it) }
         findViewById<Button>(R.id.delayButton).text = resources.getQuantityString(R.plurals.delay_seconds, state.delaySeconds.toInt(), state.delaySeconds)
         toggle.isEnabled = running || (state.mode != OperatingMode.FORCE_REAL && state.readiness != ReadinessState.BLOCKED)
@@ -219,6 +246,61 @@ class MainActivity : AppCompatActivity() {
         view.setOnCheckedChangeListener(null)
         view.isChecked = enabled
         view.setOnCheckedChangeListener { _, checked -> action(checked) }
+    }
+
+    private fun changeUnattendedApproval(enabled: Boolean) {
+        if (!enabled) {
+            pendingUnattendedChoice = false
+            applyPendingUnattendedChoice()
+            return
+        }
+        // Permission setup never grants unattended consent on its own.
+        if (!hasLocationPermission() || !isMockLocationAllowed()) {
+            render()
+            setupPrerequisites()
+            return
+        }
+        render()
+        val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.unattended_automation)
+            .setMessage(R.string.unattended_consent)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.enable_unattended) { _, _ -> pendingUnattendedChoice = true }
+            .create()
+        dialog.setOnDismissListener { applyPendingUnattendedChoice(); render() }
+        dialog.show()
+    }
+
+    private fun applyPendingUnattendedChoice() {
+        if (!resumed || !hasWindowFocus()) return
+        val enabled = pendingUnattendedChoice ?: return
+        pendingUnattendedChoice = null
+        if (!ControlCenter.setUnattendedApproval(this, enabled)) toast(R.string.automation_setting_failed)
+        render()
+    }
+
+    private fun alertModeLabel(mode: AlertMode): Int = when (mode) {
+        AlertMode.NOTIFICATION -> R.string.alert_mode_notification
+        AlertMode.TOAST -> R.string.alert_mode_toast
+        AlertMode.BOTH -> R.string.alert_mode_both
+        AlertMode.NONE -> R.string.alert_mode_none
+    }
+
+    private fun showAlertModeDialog() {
+        val modes = AlertMode.entries
+        val labels = modes.map { getString(alertModeLabel(it)) }.toTypedArray()
+        MaterialAlertDialogBuilder(this).setTitle(R.string.change_alerts)
+            .setSingleChoiceItems(labels, modes.indexOf(AutomationSettings.alertMode(this))) { dialog, index ->
+                val selected = modes[index]
+                val saved = runCatching { AutomationSettings.setAlertMode(this, selected) }.isSuccess
+                if (!saved) toast(R.string.alert_setting_failed)
+                dialog.dismiss()
+                render()
+                if (saved && selected in setOf(AlertMode.NOTIFICATION, AlertMode.BOTH) && Build.VERSION.SDK_INT >= 33 &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    permissionLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null).show()
     }
 
     private fun selectLocation(lat: Double, lon: Double) {
@@ -375,7 +457,19 @@ class MainActivity : AppCompatActivity() {
         resumed = true
         ControlCenter.addListener(controlListener)
         if (!AutomationShortcuts.publish(this) && AutomationShortcuts.enabled(this)) toast(R.string.shortcut_refresh_failed)
+        if (hasWindowFocus()) {
+            applyPendingUnattendedChoice()
+            ControlCenter.armUnattendedIfEnabled(this)
+        }
         render()
+    }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && resumed) {
+            applyPendingUnattendedChoice()
+            ControlCenter.armUnattendedIfEnabled(this)
+            render()
+        }
     }
     override fun onPause() {
         resumed = false

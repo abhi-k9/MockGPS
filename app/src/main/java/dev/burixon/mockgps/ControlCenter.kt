@@ -36,6 +36,7 @@ object ControlCenter {
     private val listeners = linkedSetOf<() -> Unit>()
     private var notifying = false
     private var handlingStorageFailure = false
+    private var armingRequested = false
     private var durableLastSequence = -1L
     private const val REQUEST_ID = 2001
     private const val NOTIFICATION_ID = 2002
@@ -46,6 +47,7 @@ object ControlCenter {
         checkThread()
         state?.let { return it }
         val loaded = runCatching { PolicyStore(context).load() }.getOrDefault(PolicySnapshot())
+            .copy(unattendedApproval = AutomationSettings.unattendedEnabled(context))
         sources = SourceAgreement(AutomationAccess.isEnabled(context), AutomationShortcuts.enabled(context))
         durableLastSequence = loaded.lastSequence
         val recovered = Policy.reduce(loaded, PolicyEvent.Recover, SystemClock.elapsedRealtime())
@@ -74,6 +76,7 @@ object ControlCenter {
         } finally { notifying = false }
     }
     private fun save(context: Context, s: PolicySnapshot): Boolean {
+        val previous = state
         try {
             PolicyStore(context).save(s)
         } catch (_: RuntimeException) {
@@ -92,6 +95,7 @@ object ControlCenter {
         }
         durableLastSequence = s.lastSequence
         state = s
+        runCatching { AutomationAlerts.onTransition(context, previous, s) }
         changed(context)
         return true
     }
@@ -140,6 +144,60 @@ object ControlCenter {
         sources = SourceAgreement(enabled, AutomationShortcuts.enabled(context))
         return save(context, ensure(context).copy(lastSequence = -1, lastEventTime = -1))
     }
+    /** This opt-in can be changed only through the local visible settings screen. */
+    fun setUnattendedApproval(activity: Activity, enabled: Boolean): Boolean {
+        val s = ensure(activity)
+        if (s.unattendedApproval == enabled && AutomationSettings.unattendedEnabled(activity) == enabled) return true
+        sources = SourceAgreement(AutomationAccess.isEnabled(activity), AutomationShortcuts.enabled(activity))
+        stopAndReport(activity, s.copy(generation = s.generation + 1, pendingAtElapsed = null,
+            readiness = ReadinessState.UNKNOWN, result = "RECONCILE_REQUIRED"))
+        try {
+            AutomationShortcuts.invalidateAuthority(activity)
+            AutomationSettings.setUnattendedEnabled(activity, enabled)
+        } catch (_: RuntimeException) {
+            // Fail closed even if a preference commit changed memory before failing.
+            runCatching { AutomationSettings.setUnattendedEnabled(activity, false) }
+            save(activity, ensure(activity).copy(unattendedApproval = false, desired = false,
+                service = ServiceState.ERROR, result = "APPROVAL_STORAGE_FAILED"))
+            MockLocationService.stopNow(activity)
+            armingRequested = false
+            return false
+        }
+        val current = ensure(activity)
+        val next = Policy.reduce(current, PolicyEvent.UnattendedApproval(enabled), now()).copy(
+            // An observation queued before consent changed cannot approve a new start.
+            lastEventTime = maxOf(current.lastEventTime, System.currentTimeMillis()))
+        if (!save(activity, next)) return false
+        if (!enabled) {
+            armingRequested = false
+            val clean = MockLocationService.stopNow(activity)
+            if (!clean) save(activity, ensure(activity).copy(service = ServiceState.ERROR, result = "CLEANUP_UNCERTAIN"))
+        }
+        AutomationShortcuts.publish(activity)
+        if (enabled) armUnattendedIfEnabled(activity)
+        return true
+    }
+
+    /** Never called by alarms, external broadcasts or application initialization. */
+    fun armUnattendedIfEnabled(activity: Activity) {
+        val s = ensure(activity)
+        if (!s.unattendedApproval || !AutomationSettings.unattendedEnabled(activity) ||
+            armingRequested || MockLocationService.isAutomationArmed() || activity.isFinishing ||
+            activity.isDestroyed || !activity.hasWindowFocus()) return
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
+        armingRequested = true
+        if (!MockLocationService.arm(activity)) {
+            armingRequested = false
+            changed(activity)
+        }
+    }
+
+    fun automationArmingChanged(context: Context) {
+        checkThread()
+        armingRequested = false
+        changed(context)
+    }
+
     fun manualStart(activity: Activity) {
         val old = ensure(activity)
         val next = Policy.reduce(old, PolicyEvent.ManualStart, now())
@@ -263,11 +321,11 @@ object ControlCenter {
         if (!AutomationShortcuts.enabled(context)) return
         if (action == AutomationCommand.STATUS) return
         if (action == AutomationCommand.STOP) { forceReal(context); return }
-        // Shortcut requests supply no observation timestamp and require visible local review.
-        sources = if (action == AutomationCommand.REQUEST_SIMULATION) sources.simulationRequest()
+        // Shortcut requests have no observation timestamp; local review is the default unless explicitly waived.
+        sources = if (action == AutomationCommand.REQUEST_SIMULATION) sources.simulationRequest(s.unattendedApproval)
             else sources.shortcuts(requireNotNull(action.readinessState))
         stopAndReport(context, Policy.reduce(s, PolicyEvent.SourceReadiness(sources.readiness), now()))
-        if (action == AutomationCommand.REQUEST_SIMULATION && ensure(context).mode == OperatingMode.AUTO) {
+        if (action == AutomationCommand.REQUEST_SIMULATION && !s.unattendedApproval && ensure(context).mode == OperatingMode.AUTO) {
             shortcutReview = ensure(context).generation
             changed(context)
         }
@@ -302,7 +360,37 @@ object ControlCenter {
         val s = ensure(context)
         val next = Policy.reduce(s, PolicyEvent.Deadline(generation), now())
         if (next == s) return
+        if (next.desired && next.unattendedApproval) {
+            beginUnattended(context, next)
+            return
+        }
         if (!save(context, next)) return
+        showConfirmation(context, next)
+    }
+
+    private fun beginUnattended(context: Context, next: PolicySnapshot) {
+        if (!AutomationSettings.unattendedEnabled(context)) {
+            save(context, next.copy(unattendedApproval = false, desired = false, service = ServiceState.ERROR,
+                result = "APPROVAL_STORAGE_FAILED"))
+            return
+        }
+        if (State.getLat(context) == null || State.getLon(context) == null) {
+            save(context, next.copy(desired = false, service = ServiceState.ERROR, result = "SELECT_LOCATION"))
+            return
+        }
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            save(context, next.copy(desired = false, service = ServiceState.ERROR, result = "LOCATION_PERMISSION_REQUIRED"))
+            return
+        }
+        if (!save(context, next)) return
+        // No component is launched from the alarm. Only an already-armed FGS may inject.
+        if (!MockLocationService.startApprovedAutomation(context, next.generation)) {
+            val fallback = Policy.reduce(ensure(context), PolicyEvent.AutomationUnavailable(next.generation), now())
+            if (save(context, fallback)) AutomationAlerts.unavailable(context)
+        }
+    }
+
+    private fun showConfirmation(context: Context, next: PolicySnapshot) {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(NotificationChannel(CHANNEL, "Automation requests", NotificationManager.IMPORTANCE_DEFAULT))
         if (!manager.areNotificationsEnabled()) {

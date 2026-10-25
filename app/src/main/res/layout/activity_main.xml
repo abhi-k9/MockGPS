@@ -126,6 +126,17 @@
             <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/shortcutIntegrationSwitch" style="@style/Widget.MockGPS.Switch"
                 android:text="@string/shortcut_integration" android:contentDescription="@string/shortcut_switch_description" />
             <TextView style="@style/Widget.MockGPS.Description" android:text="@string/shortcut_description" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/unattendedSwitch" style="@style/Widget.MockGPS.Switch"
+                android:text="@string/unattended_automation" android:contentDescription="@string/unattended_automation" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/unattended_description" />
+            <TextView android:id="@+id/unattendedStatus" style="@style/Widget.MockGPS.Description"
+                android:layout_marginTop="8dp" android:accessibilityLiveRegion="polite" android:text="@string/unattended_off" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/changeAlertsButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/change_alerts" />
+            <TextView style="@style/Widget.MockGPS.Description" android:text="@string/change_alerts_description" />
+            <TextView android:id="@+id/alertsPermissionHint" style="@style/Widget.MockGPS.Description"
+                android:text="@string/change_notifications_blocked" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/notificationSettingsButton" style="@style/Widget.MockGPS.TextButton"
+                android:text="@string/notification_settings" android:visibility="gone" />
             <com.google.android.material.button.MaterialButton android:id="@+id/delayButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/automation_delay" />
             <TextView style="@style/Widget.MockGPS.Description" android:text="@string/reboot_policy" />
             <TextView style="@style/Widget.MockGPS.SectionTitle" android:text="@string/simulation" />

@@ -1,6 +1,6 @@
 package dev.burixon.mockgps.core
 
-/** The transport-independent command surface. No external command can start simulation. */
+/** The transport-independent command surface. Requests always pass through local approval settings and mode policy. */
 enum class AutomationCommand(
     val wireName: String,
     val shortcutName: String,

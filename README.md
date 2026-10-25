@@ -17,11 +17,19 @@ Use a separate location client to verify the result. Stop an older simulator bef
 ## Controls
 
 - **Force real** stops simulation, cancels pending requests, and prevents automation from restarting it.
-- **Auto** allows enabled integrations to report readiness. A fresh request waits for the configured delay and requests your confirmation; it never starts simulation silently.
+- **Auto** allows enabled integrations to report readiness. A fresh request waits for the configured delay, then asks for confirmation by default. Optional unattended approval can start simulation automatically while the automation session is armed.
 - **Manual start** starts at your selected point while the app is visible. A paused integration blocks it; a new pause or unknown event stops it.
 - The **Quick Settings tile** switches between Force real and Auto. Its status describes the app's state, not proof of genuine GPS reception.
 
 Automation is optional and disabled by default. Tasker and other intent-capable apps use an authenticated command interface. For launcher and routine actions, enable **Settings → App shortcuts** in MockGPS, then reopen the host's action picker. This publishes Request simulation, Pause requests, Context unknown, Stop simulation, and Open status where supported. See the [setup and API reference](docs/AUTOMATION.md).
+
+## Unattended automation and change alerts
+
+**Settings → Unattended automation** is off by default. Enable it explicitly while MockGPS is open to prepare a foreground automation session. In Auto, a fresh request from every enabled source can then start simulation after the configured minimum delay without another tap. Force real remains the persistent override.
+
+The session keeps Android's required ongoing notification even while waiting; no background-location permission is requested. After process death or a device reboot, reopen MockGPS to prepare the session and send fresh requests. The saved setting alone does not mean automation is armed. If the session is unavailable when a delay finishes, the request falls back to manual confirmation.
+
+Choose **Settings → Change alerts** to receive a notification (the default), a toast, both, or neither for confirmed starts, stops, and new errors. These optional alerts are separate from the required ongoing notification. Notification permission and Android's notification settings affect delivery.
 
 ## Privacy
 

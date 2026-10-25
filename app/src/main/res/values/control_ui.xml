@@ -10,7 +10,7 @@
     <string name="setup_title">Set up location simulation</string>
     <string name="setup_location">Grant precise location permission, then select MockGPS as your mock-location app in Developer options.</string>
     <string name="continue_setup">Continue setup</string>
-    <string name="reboot_policy">Restarting the app or device never resumes simulation. Fresh automation requests and your confirmation are required.</string>
+    <string name="reboot_policy">Restarting the app or device never resumes simulation. Reopen the app to prepare unattended automation, then send fresh requests.</string>
     <string name="automation_credential">Automation credential</string>
     <string name="credential_warning">This credential authorizes intent automation. Anyone with it can send commands while the integration is enabled. Keep backups private and revoke the credential if shared.\n\n%s</string>
     <string name="copy_credential">Copy credential</string>
@@ -22,7 +22,7 @@
     <string name="revoke_confirmation">This disables intent automation and invalidates the current credential. Configure a new credential before enabling it again.</string>
     <string name="revoke_short">Revoke</string>
     <string name="automation_delay">Request delay</string>
-    <string name="delay_description">Seconds to wait after an automation request before asking you to confirm simulation (0–3600).</string>
+    <string name="delay_description">Seconds to wait after an automation request before starting unattended simulation or asking for your confirmation (0–3600).</string>
     <plurals name="delay_seconds">
         <item quantity="one">Request delay: %1$d second</item>
         <item quantity="other">Request delay: %1$d seconds</item>
@@ -42,7 +42,7 @@
     <string name="intent_automation">Intent automation</string>
     <string name="intent_automation_description">For Tasker, Automate, MacroDroid, or another explicit-intent sender. Requires a credential.</string>
     <string name="shortcut_integration">App shortcuts</string>
-    <string name="shortcut_description">Use with compatible launchers and Samsung Modes and Routines. Availability depends on your device. Simulation requests require local review, a delay, and your confirmation.</string>
+    <string name="shortcut_description">Use with compatible launchers and Samsung Modes and Routines. Availability depends on your device. Requests need review and confirmation unless unattended automation is enabled.</string>
     <string name="shortcut_switch_description">Enable app shortcuts for compatible automation hosts</string>
     <string name="integration_source_status">Each integration is optional. When both are enabled, both must request simulation. A pause or unknown state cancels pending work.</string>
     <string name="location_drift">Location drift</string>
@@ -80,4 +80,33 @@
     <string name="status_review">Review an automation request</string>
     <string name="review_request_description">An app shortcut requested simulation. Confirm that you want to accept this request now. The request delay and final start confirmation still apply.</string>
     <string name="allow_request">Accept request</string>
+    <string name="unattended_automation">Unattended automation</string>
+    <string name="unattended_description">Allow enabled integrations to start simulation after the request delay. Keep stopped always overrides requests. Android requires an ongoing automation notification.</string>
+    <string name="unattended_consent">Enabled integrations will be able to start simulation at your selected location after the configured delay, without another tap. Keep stopped always blocks requests.
+
+An ongoing notification remains while automation is prepared. Changing this setting stops simulation and clears pending requests. Android may stop the service; reopen MockGPS to prepare it again and send a fresh request.</string>
+    <string name="enable_unattended">Enable unattended automation</string>
+    <string name="unattended_off">Automation requests require manual confirmation.</string>
+    <string name="unattended_ready">Ready for unattended requests. Simulation is not necessarily active.</string>
+    <string name="unattended_paused">Keep stopped is selected. Unattended requests cannot start simulation.</string>
+    <string name="unattended_unarmed">Unattended automation is not prepared. Open the app to prepare it before sending a fresh request.</string>
+    <string name="automation_setting_failed">Automation could not be prepared. Check permissions and the app status before retrying.</string>
+    <string name="change_alerts">Change alerts</string>
+    <string name="change_alerts_selection">Change alerts: %1$s</string>
+    <string name="change_alerts_description">Choose extra alerts for simulation starts, stops, and failures. Android may limit background toasts. This does not hide the required ongoing service notification.</string>
+    <string name="alert_mode_notification">Notification</string>
+    <string name="alert_mode_toast">Toast</string>
+    <string name="alert_mode_both">Toast and notification</string>
+    <string name="alert_mode_none">None</string>
+    <string name="alert_setting_failed">Change-alert settings could not be saved.</string>
+    <string name="change_notifications_blocked">Change notifications are blocked by Android. Enable them in notification settings.</string>
+    <string name="notification_settings">Notification settings</string>
+    <string name="notification_settings_unavailable">Android notification settings are unavailable.</string>
+    <string name="change_alerts_channel">Simulation changes</string>
+    <string name="change_alerts_channel_description">Optional alerts for simulation starts, stops, and failures.</string>
+    <string name="alert_simulation_started">Location simulation started.</string>
+    <string name="alert_simulation_stopped">Location simulation stopped. A fresh genuine location fix is not yet verified.</string>
+    <string name="alert_simulation_failed">Simulation needs attention. Open MockGPS for details.</string>
+    <string name="alert_cleanup_uncertain">Provider cleanup needs attention. Open MockGPS for recovery.</string>
+    <string name="alert_unattended_unavailable">Unattended automation is not prepared. Open MockGPS to prepare it or confirm the request.</string>
 </resources>

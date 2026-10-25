@@ -19,7 +19,8 @@ data class PolicySnapshot(
     val readiness: ReadinessState = ReadinessState.UNKNOWN,
     val lastEventTime: Long = -1,
     val lastSequence: Long = -1,
-    val delaySeconds: Long = 120
+    val delaySeconds: Long = 120,
+    val unattendedApproval: Boolean = false
 ) {
     val needsConfirmation: Boolean get() = result.startsWith("CONFIRMATION_REQUIRED")
     fun displayStatus(): String = when {
@@ -28,6 +29,7 @@ data class PolicySnapshot(
         service == ServiceState.INJECTING && injection == InjectionState.CONFIRMED -> "Injecting simulated location"
         service == ServiceState.STARTING -> "Starting — injection not yet confirmed"
         pendingAtElapsed != null -> "Waiting for automation delay"
+        result == "CONFIRMATION_REQUIRED_UNATTENDED_UNAVAILABLE" -> "Unattended automation is not armed — open app to continue"
         needsConfirmation -> "Open app and confirm simulation"
         service == ServiceState.UNKNOWN -> "Previous provider state unverified"
         readiness == ReadinessState.UNKNOWN && mode == OperatingMode.AUTO -> "Stopped; waiting for automation readiness"
@@ -41,6 +43,8 @@ sealed interface PolicyEvent {
     data class SourceReadiness(val state: ReadinessState) : PolicyEvent
     data class Deadline(val generation: Long) : PolicyEvent
     data class Confirm(val generation: Long) : PolicyEvent
+    data class UnattendedApproval(val enabled: Boolean) : PolicyEvent
+    data class AutomationUnavailable(val generation: Long) : PolicyEvent
     data object ManualStart : PolicyEvent
     data class Delay(val seconds: Long) : PolicyEvent
     data object Recover : PolicyEvent
@@ -65,10 +69,24 @@ object Policy {
         is PolicyEvent.Deadline -> if (
             e.generation == s.generation && s.mode == OperatingMode.AUTO &&
             s.readiness == ReadinessState.READY && s.pendingAtElapsed != null && nowElapsed >= s.pendingAtElapsed
-        ) s.copy(pendingAtElapsed = null, result = "CONFIRMATION_REQUIRED") else s
+        ) {
+            if (s.unattendedApproval) s.copy(pendingAtElapsed = null, desired = true,
+                service = ServiceState.STARTING, result = "STARTING")
+            else s.copy(pendingAtElapsed = null, result = "CONFIRMATION_REQUIRED")
+        } else s
         is PolicyEvent.Confirm -> if (e.generation == s.generation && s.mode == OperatingMode.AUTO &&
             s.readiness == ReadinessState.READY && s.needsConfirmation
         ) s.copy(desired = true, service = ServiceState.STARTING, result = "STARTING") else s
+        is PolicyEvent.UnattendedApproval -> if (e.enabled == s.unattendedApproval) s else s.copy(
+            unattendedApproval = e.enabled, desired = false, generation = s.generation + 1,
+            mode = if (s.mode == OperatingMode.FORCE_REAL) s.mode else OperatingMode.AUTO,
+            pendingAtElapsed = null, readiness = ReadinessState.UNKNOWN, result = "APPROVAL_CHANGED"
+        )
+        is PolicyEvent.AutomationUnavailable -> if (e.generation == s.generation &&
+            s.mode == OperatingMode.AUTO && s.unattendedApproval && s.desired &&
+            s.readiness == ReadinessState.READY && s.service == ServiceState.STARTING
+        ) s.copy(desired = false, service = ServiceState.STOPPED,
+            result = "CONFIRMATION_REQUIRED_UNATTENDED_UNAVAILABLE") else s
         PolicyEvent.ManualStart -> if (s.mode == OperatingMode.FORCE_REAL || s.readiness == ReadinessState.BLOCKED ||
             (s.mode == OperatingMode.MANUAL_MOCK && s.desired)) s else s.copy(
             mode = OperatingMode.MANUAL_MOCK, desired = true, service = ServiceState.STARTING,
@@ -89,7 +107,8 @@ object Policy {
         if (state != ReadinessState.READY) next.copy(
             mode = if (old.mode == OperatingMode.FORCE_REAL) old.mode else OperatingMode.AUTO,
             desired = false, generation = old.generation + 1, pendingAtElapsed = null, result = "READINESS_RECONCILED")
-        else if (old.mode != OperatingMode.AUTO || state == old.readiness) next
+        else if (old.mode != OperatingMode.AUTO || (state == old.readiness &&
+            !(old.unattendedApproval && !old.desired && old.pendingAtElapsed == null))) next
         else next.copy(desired = false, generation = old.generation + 1,
             pendingAtElapsed = now + old.delaySeconds * 1000, result = "PENDING")
 
