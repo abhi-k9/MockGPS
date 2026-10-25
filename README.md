@@ -24,6 +24,17 @@ Use a separate location client to verify the result. Stop an older simulator bef
 
 Automation is optional and disabled by default. Tasker and other intent-capable apps use an authenticated command interface. For launcher and routine actions, enable **Settings → App shortcuts** in MockGPS, then reopen the host's action picker. This publishes Request simulation, Pause requests, Context unknown, Stop simulation, and Open status where supported. See the [setup and API reference](docs/AUTOMATION.md).
 
+## Home-screen widgets
+
+Long-press the home screen, choose **Widgets → MockGPS**, then add **MockGPS compact** or **MockGPS detailed**. Both support resizing and light/dark appearance; available sizes and previews depend on your launcher.
+
+- **Compact:** last reported simulation status, report time, Force real and a shortcut to the timer controls. Tap the header to open the app.
+- **Detailed:** adds mode, unattended-session readiness, combined source state, and the next reported deadline. During an override, −5/+5 minute buttons are available when that override is the next deadline; if the session limit ends sooner, it takes priority. Timer opens the full duration/start/stop controls.
+
+Force real stops injection and keeps it stopped. Starting or resuming through Timer requires the existing visible controls and prerequisites. Widgets cannot silently select Auto, grant consent or recreate a foreground service. Neither widget displays coordinates, saved-location names, routes, credentials or integration labels.
+
+Widgets update when app state changes, with no periodic polling. The report timestamp matters: Android launchers can retain old views after process death or a force stop. The native countdown is based on the reported elapsed deadline and may appear overdue on a retained view; it is not proof of current injection. Tap the header or Open app to inspect current status. A stopped status does not verify a fresh genuine GPS fix.
+
 ## Unattended automation and change alerts
 
 **Settings → Unattended automation** is off by default. Enable it explicitly while MockGPS is open to prepare a foreground automation session. In Auto, a fresh request from every enabled source can then start simulation after the configured minimum delay without another tap. Force real remains the persistent override.

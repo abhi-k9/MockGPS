@@ -76,6 +76,7 @@ object ControlCenter {
         notifying = true
         try {
             listeners.toList().forEach { it() }
+            MockGpsWidgets.requestUpdate(context)
             TileService.requestListeningState(context, ComponentName(context, ModeTileService::class.java))
             TileService.requestListeningState(context, ComponentName(context, OverrideTileService::class.java))
         } finally { notifying = false }
