@@ -29,6 +29,7 @@ import kotlin.random.Random
 class MockLocationService : Service() {
     companion object {
         const val EXTRA_GENERATION = "generation"
+        private const val ACTION_TEMPORARY = "dev.abhik.mockgps.ARM_TEMPORARY"
         private const val ACTION_ARM = "dev.abhik.mockgps.ARM_AUTOMATION"
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "mockgps"
@@ -62,6 +63,38 @@ class MockLocationService : Service() {
             }
         }
 
+        fun armTemporary(activity: Activity): Boolean {
+            checkThread()
+            if (activity.isFinishing || activity.isDestroyed || !activity.hasWindowFocus() ||
+                ControlCenter.snapshot(activity).temporary == null) return false
+            return try {
+                activity.startService(Intent(activity, MockLocationService::class.java).setAction(ACTION_TEMPORARY))
+                true
+            } catch (_: RuntimeException) { false }
+        }
+
+        fun isTemporaryReady(): Boolean {
+            checkThread()
+            val current = live ?: return false
+            return current.temporaryAdmission && current.foreground && !current.stopping && !current.destroying
+        }
+
+        fun startAdmitted(context: Context, generation: Long): Boolean {
+            checkThread()
+            val current = live ?: return false
+            if (!current.foreground || current.stopping || current.destroying ||
+                !current.hasLocationPermission() || !ControlCenter.canRun(context, generation)) return false
+            current.startInjection(generation)
+            return true
+        }
+
+        fun releaseTemporary() {
+            checkThread()
+            val current = live ?: return
+            current.temporaryAdmission = false
+            if (current.generation < 0 && !isAutomationArmed()) current.shutdown(report = false, keepArmed = false)
+        }
+
         /** Never launches a service from a receiver/alarm. False means no admitted session handled it. */
         fun startApprovedAutomation(context: Context, generation: Long): Boolean {
             checkThread()
@@ -92,12 +125,16 @@ class MockLocationService : Service() {
     private var stopping = false
     private var destroying = false
     private var armed = false
+    private var temporaryAdmission = false
     private var lastCleanup: EngineResult? = null
     private var foreground = false
     private var firstInjection = true
+    private var lastNotificationKey: List<Any?>? = null
     private var driftPoint: Coordinates? = null
     private var driftBase: Coordinates? = null
     private var nextDriftAt = 0L
+    private var route: dev.burixon.mockgps.core.RoutePlan? = null
+    private var routeStartedAt = 0L
     private val statusListener: () -> Unit = {
         if (foreground && !stopping && !updateNotification(sessionNotification())) {
             fail("FOREGROUND_NOTIFICATION_FAILED", keepArmed = false)
@@ -115,6 +152,9 @@ class MockLocationService : Service() {
 
         private fun publishTick() {
             if (stopping) return
+            val tickGeneration = generation
+            ControlCenter.expireSessions(this@MockLocationService)
+            if (generation != tickGeneration || stopping) return
             if (!ControlCenter.canRun(this@MockLocationService, generation)) {
                 shutdown(report = true)
                 return
@@ -130,7 +170,15 @@ class MockLocationService : Service() {
                 fail("INVALID_COORDINATES")
                 return
             }
-            val result = engine.publish(MockFix(currentPoint(base), System.currentTimeMillis(), SystemClock.elapsedRealtimeNanos()))
+            val frame = route?.at(SystemClock.elapsedRealtime() - routeStartedAt)
+            if (frame?.finished == true) {
+                ControlCenter.forceReal(this@MockLocationService)
+                EventHistory.record("ROUTE_COMPLETED")
+                return
+            }
+            val result = engine.publish(MockFix(frame?.point ?: currentPoint(base), System.currentTimeMillis(),
+                SystemClock.elapsedRealtimeNanos(), altitudeMeters = frame?.altitude ?: 0.0,
+                speedMetersPerSecond = frame?.speed ?: 0f, bearingDegrees = frame?.bearing ?: 0f))
             if (!result.success) {
                 fail(result.code, result)
                 return
@@ -151,13 +199,28 @@ class MockLocationService : Service() {
         live = this
         getSystemService(NotificationManager::class.java).createNotificationChannel(
             NotificationChannel(CHANNEL_ID, "MockGPS simulation", NotificationManager.IMPORTANCE_LOW).apply {
-                description = "Simulation and unattended automation session status"
+                description = "Simulation and automation status"
+                setShowBadge(false)
             }
         )
         ControlCenter.addListener(statusListener)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_TEMPORARY) {
+            val s = ControlCenter.snapshot(this)
+            if (s.temporary != null) {
+                stopping = false
+                lastCleanup = null
+                live = this
+                if (promoteForeground(sessionNotification())) {
+                    temporaryAdmission = true
+                    if (AutomationSettings.unattendedEnabled(this)) armed = true
+                    ControlCenter.temporarySessionReady(this)
+                }
+            } else if (generation < 0) shutdown(report = true)
+            return START_NOT_STICKY
+        }
         if (intent?.action == ACTION_ARM) {
             if (AutomationSettings.unattendedEnabled(this)) {
                 stopping = false
@@ -200,7 +263,7 @@ class MockLocationService : Service() {
         lastCleanup = null
         firstInjection = true
         clearDrift()
-        if (!promoteForeground(notification("Starting simulation", "Provider readiness is not yet confirmed."))) return
+        if (!promoteForeground(notification("Starting simulation", "Preparing location simulation."))) return
         // An explicit visible manual start may retain its admitted foreground session too.
         if (AutomationSettings.unattendedEnabled(this)) armed = true
         val latitude = State.getLat(this)
@@ -209,6 +272,10 @@ class MockLocationService : Service() {
             fail("NO_LOCATION_SELECTED")
             return
         }
+        try {
+            route = if (RoutePlayback.enabled(this)) requireNotNull(RoutePlayback.load(this)) else null
+            routeStartedAt = SystemClock.elapsedRealtime()
+        } catch (_: RuntimeException) { fail("ROUTE_STORAGE_UNAVAILABLE"); return }
         val result = engine.start(Coordinates(latitude, longitude))
         if (!result.success) {
             fail(result.code, result)
@@ -274,6 +341,7 @@ class MockLocationService : Service() {
         val cleanup = shutdown(report = false, keepArmed = keepArmed)
         val uncertain = !cleanup.success || knownCleanup?.cleanupUncertain == true
         ControlCenter.serviceFailed(this, failedGeneration, code, uncertain)
+        releaseTemporary()
         if (foreground && armed) updateNotification(sessionNotification())
         ControlCenter.automationArmingChanged(this)
     }
@@ -290,9 +358,11 @@ class MockLocationService : Service() {
         val result = engine.stop()
         lastCleanup = result
         generation = -1L
+        route = null
         clearDrift()
         if (report && stoppedGeneration >= 0) ControlCenter.serviceStopped(this, stoppedGeneration, !result.success)
-        if (keepArmed && armed && foreground && !destroying && AutomationSettings.unattendedEnabled(this) && hasLocationPermission()) {
+        if (keepArmed && foreground && !destroying && hasLocationPermission() &&
+            ((armed && AutomationSettings.unattendedEnabled(this)) || temporaryAdmission)) {
             // No provider/injection activity remains. Only foreground admission is retained.
             stopping = false
             if (!updateNotification(sessionNotification())) releaseSession()
@@ -304,9 +374,11 @@ class MockLocationService : Service() {
 
     private fun releaseSession() {
         armed = false
+        temporaryAdmission = false
         if (foreground) {
             stopForeground(STOP_FOREGROUND_REMOVE)
             foreground = false
+            lastNotificationKey = null
         }
         if (live === this) live = null
         stopSelf()
@@ -315,29 +387,34 @@ class MockLocationService : Service() {
 
     private fun sessionNotification(): Notification {
         val state = ControlCenter.snapshot(this)
+        state.temporary?.let { timer ->
+            return notification(if (timer.kind == dev.burixon.mockgps.core.OverrideKind.SIMULATE)
+                "Temporary simulation" else "Temporary stop", "Returns to the updated policy when the timer ends.")
+        }
         return when {
             generation >= 0 && state.desired && state.service == ServiceState.INJECTING ->
-                notification("Simulation active", "Android accepted both test-provider updates.")
+                notification("Simulation active", if (route != null) "Playing the saved route." else "Using the selected location.")
             generation >= 0 && state.desired && state.service == ServiceState.STARTING ->
-                notification("Starting simulation", "Provider readiness is not yet confirmed.")
-            state.service == ServiceState.ERROR || lastCleanup?.cleanupUncertain == true -> notification("Automation needs attention", "Open MockGPS for the result and recovery instructions.")
+                notification("Starting simulation", "Preparing location simulation.")
+            state.service == ServiceState.ERROR || lastCleanup?.cleanupUncertain == true -> notification("Automation needs attention", "Open MockGPS for recovery.")
             generation >= 0 && !state.desired ->
-                notification("Stopping simulation", "Provider cleanup is in progress and has not yet been verified.")
-            state.mode == OperatingMode.FORCE_REAL -> notification("Automation paused", "Force real blocks simulation. No mock location is being injected.")
-            else -> notification("Automation ready", "Waiting for an eligible request. No mock location is being injected.")
+                notification("Stopping simulation", "Removing the simulated location.")
+            state.mode == OperatingMode.FORCE_REAL -> notification("Automation paused", "Keep stopped is selected.")
+            else -> notification("Automation ready", "Simulation is stopped. Waiting for requests.")
         }
     }
 
     private fun notification(title: String, text: String): Notification {
         val open = PendingIntent.getActivity(
-            this, 0, Intent(this, MainActivity::class.java),
+            this, 0, Intent(this, if (ControlCenter.snapshot(this).temporary != null) OverrideActivity::class.java else MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val stop = PendingIntent.getBroadcast(
             this, 1001, Intent(this, AutomationStopReceiver::class.java).setAction("dev.abhik.mockgps.FORCE_REAL"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        return Notification.Builder(this, CHANNEL_ID)
+        val state = ControlCenter.snapshot(this)
+        val builder = Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_mock_location)
             .setContentTitle(title)
             .setContentText(text)
@@ -346,18 +423,37 @@ class MockLocationService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
-            .addAction(Notification.Action.Builder(null, "Force real", stop).build())
-            .build()
+            .setCategory(Notification.CATEGORY_SERVICE)
+        val end = listOfNotNull(state.temporary?.endsAtElapsed, state.sessionEndsAtElapsed).minOrNull()
+        if (end != null) builder.setWhen(System.currentTimeMillis() + (end - SystemClock.elapsedRealtime()).coerceAtLeast(0))
+            .setShowWhen(true).setUsesChronometer(true).setChronometerCountDown(true)
+        state.temporary?.let { timer ->
+            fun action(action: String, request: Int) = PendingIntent.getBroadcast(this, request,
+                Intent(this, OverrideActionReceiver::class.java).setAction(action)
+                    .setData(android.net.Uri.parse("mockgps://override/${timer.id}/$action")).putExtra("session", timer.id),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            builder.addAction(Notification.Action.Builder(null, "−5 min", action("reduce", 2021)).build())
+                .addAction(Notification.Action.Builder(null, "+5 min", action("extend", 2022)).build())
+        }
+        return builder.addAction(Notification.Action.Builder(null, "Force real", stop).build()).build()
     }
 
-    private fun updateNotification(status: Notification): Boolean = try {
-        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, status)
-        true
-    } catch (_: SecurityException) {
-        // POST_NOTIFICATIONS can be denied while foreground admission remains valid.
-        true
-    } catch (_: RuntimeException) {
-        false
+    private fun updateNotification(status: Notification): Boolean {
+        val s = ControlCenter.snapshot(this)
+        val key = listOf(status.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString(),
+            status.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString(), s.temporary?.id,
+            s.temporary?.endsAtElapsed, s.sessionEndsAtElapsed)
+        if (key == lastNotificationKey) return true
+        return try {
+            getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, status)
+            lastNotificationKey = key
+            true
+        } catch (_: SecurityException) {
+            // POST_NOTIFICATIONS can be denied while foreground admission remains valid.
+            true
+        } catch (_: RuntimeException) {
+            false
+        }
     }
 
     override fun onDestroy() {

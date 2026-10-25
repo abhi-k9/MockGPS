@@ -12,7 +12,8 @@ data class TilePresentation(
     companion object {
         fun from(snapshot: PolicySnapshot): TilePresentation = TilePresentation(
             label = snapshot.mode.name,
-            status = snapshot.displayStatus(),
+            status = if (snapshot.mode == OperatingMode.FORCE_REAL && snapshot.service == ServiceState.STOPPED)
+                "${snapshot.displayStatus()}; genuine fix not verified" else snapshot.displayStatus(),
             active = snapshot.mode == OperatingMode.FORCE_REAL,
             action = if (snapshot.mode == OperatingMode.FORCE_REAL) TileAction.RETURN_AUTO else TileAction.FORCE_REAL
         )

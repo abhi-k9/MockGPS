@@ -37,9 +37,9 @@ node scripts/test-tasker-dispatch.cjs
 ./gradlew :app:connectedDebugAndroidTest
 ```
 
-Do not use an emulator as a substitute for testing OEM automation on a physical phone. Device tests are optional and are not part of CI.
+Do not use an emulator as a substitute for testing OEM automation on a physical phone. Device tests are optional and are not part of CI. Provider instrumentation tests explicitly require a disposable emulator and refuse physical phones; OEM shortcut/tile/notification behavior needs separate manual checks on the target device.
 
-JVM results are in `app/build/test-results/testDebugUnitTest/`; lint reports are in `app/build/reports/`. A compiled instrumentation APK does not mean device tests ran. Preserve existing tests for policy, authentication, and provider cleanup when changing those boundaries.
+JVM results are in `app/build/test-results/testDebugUnitTest/`; lint reports are in `app/build/reports/`. A compiled instrumentation APK does not mean device tests ran. Preserve existing tests for policy, authentication, and provider cleanup when changing those boundaries. Timer coverage includes restoration with live readiness updates, stale actions, manual approval, interrupted recovery and duplicate active requests. GPX tests cover interpolation, the date line and rejection of unsafe/malformed input. No API 37 emulator is required.
 
 ## Dependencies
 

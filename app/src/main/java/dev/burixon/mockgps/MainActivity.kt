@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.AppOpsManager
 import android.app.NotificationManager
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -16,7 +14,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
-import android.os.PersistableBundle
 import android.os.SystemClock
 import android.provider.Settings
 import android.text.InputType
@@ -55,7 +52,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shortcutsSwitch: CompoundButton
     private lateinit var unattendedSwitch: CompoundButton
     private var pendingUnattendedChoice: Boolean? = null
+    private var pendingShortcutReview: Long? = null
     private lateinit var driftSwitch: CompoundButton
+    private val routePanel by lazy { RoutePanel(this, ::render) }
+    private val routeImport = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) routePanel.importRoute(uri)
+    }
+    private val featurePanels by lazy { FeaturePanels(this, ::render) }
+    private val statusHandler = android.os.Handler(Looper.getMainLooper())
+    private val statusTick = object : Runnable {
+        override fun run() { updateStatusDescription(); statusHandler.postDelayed(this, 1000) }
+    }
     private var generation = 0L
     private var resumed = false
     private var observing = false
@@ -64,6 +71,7 @@ class MainActivity : AppCompatActivity() {
     private val locationListener = LocationListener { location ->
         if (!State.isServiceRunning(this) && isGenuine(location)) {
             // Genuine location is deliberately held in memory, never in preferences.
+            ControlCenter.observeGenuineFix(this, location.elapsedRealtimeNanos)
             locationMap.showGenuine(location.latitude, location.longitude)
         }
     }
@@ -148,8 +156,7 @@ class MainActivity : AppCompatActivity() {
                 .setMessage(R.string.review_request_description)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.allow_request) { _, _ ->
-                    ControlCenter.reviewShortcutRequest(this, requestedGeneration)
-                    render()
+                    pendingShortcutReview = requestedGeneration
                 }.show()
         }
         findViewById<View>(R.id.showTokenButton).setOnClickListener { showCredential() }
@@ -172,7 +179,24 @@ class MainActivity : AppCompatActivity() {
                 toast(R.string.notification_settings_unavailable)
             }
         }
-        findViewById<View>(R.id.diagnosticsButton).setOnClickListener { showDiagnostics() }
+        findViewById<View>(R.id.temporaryOverrideButton).setOnClickListener { startActivity(Intent(this, OverrideActivity::class.java)) }
+        findViewById<View>(R.id.presetsButton).setOnClickListener { featurePanels.presets() }
+        findViewById<View>(R.id.manageClientsButton).setOnClickListener { featurePanels.clients() }
+        findViewById<View>(R.id.routePlaybackButton).setOnClickListener { routePanel.show { routeImport.launch(arrayOf("application/gpx+xml", "application/xml", "text/xml", "application/octet-stream")) } }
+        findViewById<View>(R.id.sessionLimitButton).setOnClickListener { featurePanels.sessionLimit() }
+        findViewById<View>(R.id.quietNotificationsButton).setOnClickListener { featurePanels.quietNotifications() }
+        findViewById<View>(R.id.statusChannelButton).setOnClickListener {
+            try { startActivity(Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName).putExtra(Settings.EXTRA_CHANNEL_ID, "mockgps")) }
+            catch (_: android.content.ActivityNotFoundException) { toast(R.string.notification_settings_unavailable) }
+        }
+        findViewById<View>(R.id.exactAlarmsButton).setOnClickListener {
+            if (Build.VERSION.SDK_INT >= 31) {
+                try { startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, "package:$packageName".toUri())) }
+                catch (_: android.content.ActivityNotFoundException) { toast(R.string.notification_settings_unavailable) }
+            }
+        }
+        findViewById<View>(R.id.diagnosticsButton).setOnClickListener { featurePanels.diagnostics() }
         findViewById<View>(R.id.githubButton).setOnClickListener { openLink("https://github.com/abhi-k9/MockGPS") }
         findViewById<View>(R.id.helpButton).setOnClickListener { openLink("https://github.com/abhi-k9/MockGPS#get-started") }
         findViewById<TextView>(R.id.versionText).text = getString(R.string.version_attribution, BuildConfig.VERSION_NAME)
@@ -193,8 +217,7 @@ class MainActivity : AppCompatActivity() {
             state.pendingAtElapsed != null -> getString(R.string.status_waiting)
             else -> getString(R.string.status_stopped)
         }
-        findViewById<TextView>(R.id.statusDescription).text = if (reviewPending)
-            getString(R.string.review_request_description) else state.displayStatus()
+        updateStatusDescription()
         findViewById<MaterialButton>(R.id.autoButton).isChecked = state.mode != OperatingMode.FORCE_REAL
         findViewById<MaterialButton>(R.id.forceRealButton).isChecked = state.mode == OperatingMode.FORCE_REAL
         findViewById<View>(R.id.confirmPendingButton).isVisible = state.needsConfirmation
@@ -212,12 +235,18 @@ class MainActivity : AppCompatActivity() {
         val alertMode = AutomationSettings.alertMode(this)
         findViewById<Button>(R.id.changeAlertsButton).text = getString(R.string.change_alerts_selection, getString(alertModeLabel(alertMode)))
         val usesNotifications = alertMode in setOf(AlertMode.NOTIFICATION, AlertMode.BOTH)
-        val notificationsBlocked = usesNotifications && !getSystemService(NotificationManager::class.java).areNotificationsEnabled()
+        val notificationsBlocked = (usesNotifications || AutomationSettings.errorAlerts(this)) && !getSystemService(NotificationManager::class.java).areNotificationsEnabled()
         findViewById<View>(R.id.alertsPermissionHint).isVisible = notificationsBlocked
-        findViewById<View>(R.id.notificationSettingsButton).isVisible = usesNotifications
+        findViewById<View>(R.id.notificationSettingsButton).isVisible = true
+        findViewById<View>(R.id.exactAlarmsButton).isVisible = Build.VERSION.SDK_INT >= 31
+        val limit = AutomationSettings.maxSessionMinutes(this)
+        findViewById<Button>(R.id.sessionLimitButton).text = if (limit == 0) getString(R.string.session_limit_unlimited)
+            else getString(R.string.session_limit_current, limit)
+        findViewById<Button>(R.id.routePlaybackButton).setText(if (RoutePlayback.enabled(this)) R.string.route_playback_enabled else R.string.route_playback)
+        driftSwitch.isEnabled = !RoutePlayback.enabled(this)
         bindSwitch(driftSwitch, State.isDrifting(this)) { State.setDrifting(this, it) }
         findViewById<Button>(R.id.delayButton).text = resources.getQuantityString(R.plurals.delay_seconds, state.delaySeconds.toInt(), state.delaySeconds)
-        toggle.isEnabled = running || (state.mode != OperatingMode.FORCE_REAL && state.readiness != ReadinessState.BLOCKED)
+        toggle.isEnabled = running || (state.temporary == null && state.mode != OperatingMode.FORCE_REAL && state.readiness != ReadinessState.BLOCKED)
         toggle.setText(when {
             running -> R.string.stop_and_force_real
             state.mode == OperatingMode.FORCE_REAL -> R.string.return_auto_before_manual
@@ -240,6 +269,19 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.setupDescription).setText(if (!hasLocationPermission()) R.string.setup_location else R.string.select_mock_app)
         locationMap.updateSelection()
         if (running) stopLocationUpdates() else if (resumed) startLocationUpdates()
+    }
+
+    private fun updateStatusDescription() {
+        val s = ControlCenter.snapshot(this)
+        val parts = mutableListOf(if (ControlCenter.shortcutReviewPending(this)) getString(R.string.review_request_description) else s.displayStatus())
+        s.temporary?.let {
+            val seconds = ((it.endsAtElapsed - SystemClock.elapsedRealtime()).coerceAtLeast(0) + 999) / 1000
+            parts.add(getString(if (it.kind == dev.burixon.mockgps.core.OverrideKind.SIMULATE) R.string.timed_simulation_status else R.string.timed_stop_status, seconds / 60, seconds % 60))
+        }
+        s.pendingAtElapsed?.let { parts.add(getString(R.string.delay_remaining, ((it - SystemClock.elapsedRealtime()).coerceAtLeast(0) + 999) / 1000)) }
+        if (!s.desired) parts.add(ControlCenter.recoveryStatus())
+        parts.add(ControlCenter.sourceStatus(this))
+        findViewById<TextView>(R.id.statusDescription).text = parts.joinToString("\n")
     }
 
     private fun bindSwitch(view: CompoundButton, enabled: Boolean, action: (Boolean) -> Unit) {
@@ -305,7 +347,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun selectLocation(lat: Double, lon: Double) {
         if (!State.validLat(lat) || !State.validLon(lon)) return
-        State.setLocation(this, lat, lon)
+        if (!ControlCenter.chooseLocation(this, lat, lon)) toast(R.string.local_storage_unavailable)
         render()
     }
 
@@ -353,13 +395,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun copySensitive(label: String, value: String) {
-        val clip = ClipData.newPlainText(label, value)
-        clip.description.extras = PersistableBundle().apply {
-            putBoolean("android.content.extra.IS_SENSITIVE", true)
-        }
-        getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
-    }
+    private fun copySensitive(label: String, value: String) = SensitiveClipboard.copy(this, label, value)
 
     private fun showDelayDialog() {
         val input = EditText(this).apply {
@@ -379,17 +415,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         dialog.show()
-    }
-
-    private fun showDiagnostics() {
-        val state = ControlCenter.snapshot(this)
-        val diagnostic = ControlCenter.commandDiagnostic()
-        val accepted = if (state.lastEventTime < 0) getString(R.string.no_accepted_event)
-            else java.text.DateFormat.getDateTimeInstance().format(java.util.Date(state.lastEventTime))
-        MaterialAlertDialogBuilder(this).setTitle(R.string.diagnostics)
-            .setMessage(getString(R.string.mode_status, state.mode.name, state.displayStatus(), state.readiness.name,
-                accepted, state.result, diagnostic.lastAccepted, diagnostic.lastRejected))
-            .setPositiveButton(android.R.string.ok, null).show()
     }
 
     private fun setupPrerequisites() {
@@ -420,6 +445,7 @@ class MainActivity : AppCompatActivity() {
         if (observing || !resumed || State.isServiceRunning(this) || !hasLocationPermission()) return
         try {
             locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.takeIf(::isGenuine)?.let {
+                ControlCenter.observeGenuineFix(this, it.elapsedRealtimeNanos)
                 locationMap.showGenuine(it.latitude, it.longitude)
             }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 2f, locationListener, Looper.getMainLooper())
@@ -455,10 +481,13 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         locationMap.view.onResume()
         resumed = true
+        SessionDeadline.schedule(this, ControlCenter.snapshot(this))
+        statusHandler.post(statusTick)
         ControlCenter.addListener(controlListener)
         if (!AutomationShortcuts.publish(this) && AutomationShortcuts.enabled(this)) toast(R.string.shortcut_refresh_failed)
         if (hasWindowFocus()) {
             applyPendingUnattendedChoice()
+            pendingShortcutReview?.let { pendingShortcutReview = null; ControlCenter.reviewShortcutRequest(this, it) }
             ControlCenter.armUnattendedIfEnabled(this)
         }
         render()
@@ -467,12 +496,14 @@ class MainActivity : AppCompatActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus && resumed) {
             applyPendingUnattendedChoice()
+            pendingShortcutReview?.let { pendingShortcutReview = null; ControlCenter.reviewShortcutRequest(this, it) }
             ControlCenter.armUnattendedIfEnabled(this)
             render()
         }
     }
     override fun onPause() {
         resumed = false
+        statusHandler.removeCallbacks(statusTick)
         ControlCenter.removeListener(controlListener)
         stopLocationUpdates()
         locationMap.saveCamera()
@@ -482,6 +513,6 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onStop() { locationMap.view.onStop(); super.onStop() }
     override fun onSaveInstanceState(outState: Bundle) { locationMap.view.onSaveInstanceState(outState); super.onSaveInstanceState(outState) }
-    override fun onDestroy() { ControlCenter.removeListener(controlListener); stopLocationUpdates(); locationMap.view.onDestroy(); super.onDestroy() }
+    override fun onDestroy() { routePanel.close(); ControlCenter.removeListener(controlListener); stopLocationUpdates(); locationMap.view.onDestroy(); super.onDestroy() }
     override fun onLowMemory() { super.onLowMemory(); locationMap.view.onLowMemory() }
 }

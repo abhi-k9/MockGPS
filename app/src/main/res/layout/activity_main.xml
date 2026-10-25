@@ -99,6 +99,10 @@
                 <com.google.android.material.button.MaterialButton android:id="@+id/confirmPendingButton"
                     android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
                     android:layout_marginTop="12dp" android:text="@string/confirm_pending" android:visibility="gone" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/temporaryOverrideButton"
+                    style="@style/Widget.MockGPS.TextButton" app:icon="@drawable/ic_timer" android:text="@string/temporary_override" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/presetsButton"
+                    style="@style/Widget.MockGPS.TextButton" android:text="@string/location_presets" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/toggleButton"
                     android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
                     android:layout_marginTop="12dp" android:text="@string/manual_start" android:textColor="@color/button_text"
@@ -139,7 +143,13 @@
                 android:text="@string/notification_settings" android:visibility="gone" />
             <com.google.android.material.button.MaterialButton android:id="@+id/delayButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/automation_delay" />
             <TextView style="@style/Widget.MockGPS.Description" android:text="@string/reboot_policy" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/manageClientsButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/integration_clients" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/quietNotificationsButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/quiet_notifications" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/statusChannelButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/status_channel_settings" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/exactAlarmsButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/timer_precision" />
             <TextView style="@style/Widget.MockGPS.SectionTitle" android:text="@string/simulation" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/sessionLimitButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/session_limit" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/routePlaybackButton" style="@style/Widget.MockGPS.TextButton" android:text="@string/route_playback" />
             <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/driftSwitch" style="@style/Widget.MockGPS.Switch"
                 android:text="@string/location_drift" android:contentDescription="@string/location_drift" />
             <TextView style="@style/Widget.MockGPS.Description" android:text="@string/location_drift_description" />

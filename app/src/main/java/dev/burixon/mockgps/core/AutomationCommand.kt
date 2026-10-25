@@ -10,7 +10,8 @@ enum class AutomationCommand(
     REQUEST_SIMULATION("request_simulation", "request_simulation", ReadinessState.READY),
     UNKNOWN("unknown", "unknown", ReadinessState.UNKNOWN),
     STOP("stop", "stop"),
-    STATUS("status", "status");
+    STATUS("status", "status"),
+    SELECT_PRESET("select_preset", "select_preset");
 
     val mutates: Boolean get() = this != STATUS
 
@@ -18,6 +19,6 @@ enum class AutomationCommand(
         const val API_VERSION = 3
 
         fun fromWire(value: String?): AutomationCommand? = entries.firstOrNull { it.wireName == value }
-        fun fromShortcut(value: String?): AutomationCommand? = entries.firstOrNull { it.shortcutName == value }
+        fun fromShortcut(value: String?): AutomationCommand? = entries.firstOrNull { it != SELECT_PRESET && it.shortcutName == value }
     }
 }

@@ -101,6 +101,7 @@ object AutomationShortcuts {
                         AutomationCommand.UNKNOWN -> "Context unknown"
                         AutomationCommand.STOP -> "Stop simulation"
                         AutomationCommand.STATUS -> "Open status"
+                        AutomationCommand.SELECT_PRESET -> error("Not a shortcut")
                     }
                     ShortcutInfo.Builder(context, ID_PREFIX + command.shortcutName)
                         .setActivity(ComponentName(context, MainActivity::class.java))
@@ -113,6 +114,7 @@ object AutomationShortcuts {
                             AutomationCommand.UNKNOWN -> android.R.drawable.ic_dialog_alert
                             AutomationCommand.STOP -> android.R.drawable.ic_menu_close_clear_cancel
                             AutomationCommand.STATUS -> android.R.drawable.ic_menu_info_details
+                            AutomationCommand.SELECT_PRESET -> error("Not a shortcut")
                         }))
                         .setIntent(Intent(context, AutomationShortcutActivity::class.java).setAction(ACTION)
                             .putExtra("command", command.shortcutName)

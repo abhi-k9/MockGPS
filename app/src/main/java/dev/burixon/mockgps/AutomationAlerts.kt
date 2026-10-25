@@ -16,9 +16,12 @@ import dev.burixon.mockgps.core.ServiceState
 object AutomationAlerts {
     private const val CHANNEL = "simulation_changes"
     private const val NOTIFICATION_ID = 2003
+    const val ERROR_CHANNEL = "simulation_errors"
 
     fun onTransition(context: Context, previous: PolicySnapshot?, current: PolicySnapshot) {
         if (previous == null) return
+        if (current.service != ServiceState.ERROR && !current.result.startsWith("CONFIRMATION_REQUIRED_UNATTENDED"))
+            context.getSystemService(NotificationManager::class.java).cancel(2004)
         val message = when {
             current.service == ServiceState.ERROR &&
                 (previous.service != ServiceState.ERROR || previous.result != current.result) ->
@@ -30,14 +33,19 @@ object AutomationAlerts {
                 R.string.alert_simulation_stopped
             else -> return
         }
-        show(context, message)
+        show(context, message, current.service == ServiceState.ERROR)
     }
 
-    fun unavailable(context: Context) = show(context, R.string.alert_unattended_unavailable)
+    fun unavailable(context: Context) = show(context, R.string.alert_unattended_unavailable, true)
 
-    private fun show(context: Context, @StringRes message: Int) {
+    private fun show(context: Context, @StringRes message: Int, error: Boolean = false) {
         // Presentation failures must not affect cleanup, command acceptance or injection state.
-        val mode = runCatching { AutomationSettings.alertMode(context) }.getOrDefault(AlertMode.NOTIFICATION)
+        val mode = if (error) {
+            if (!AutomationSettings.errorAlerts(context)) return
+            AlertMode.NOTIFICATION
+        } else runCatching { AutomationSettings.alertMode(context) }.getOrDefault(AlertMode.TOAST)
+        val channel = if (error) ERROR_CHANNEL else CHANNEL
+        val id = if (error) 2004 else NOTIFICATION_ID
         if (mode == AlertMode.TOAST || mode == AlertMode.BOTH) {
             runCatching { Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show() }
         }
@@ -45,19 +53,21 @@ object AutomationAlerts {
             runCatching {
                 val manager = context.getSystemService(NotificationManager::class.java)
                 manager.createNotificationChannel(NotificationChannel(
-                    CHANNEL, context.getString(R.string.change_alerts_channel), NotificationManager.IMPORTANCE_DEFAULT
+                    channel, if (error) "Action needed" else context.getString(R.string.change_alerts_channel),
+                    if (error) NotificationManager.IMPORTANCE_DEFAULT else NotificationManager.IMPORTANCE_LOW
                 ).apply { description = context.getString(R.string.change_alerts_channel_description) })
                 if (!manager.areNotificationsEnabled()) return
                 val open = PendingIntent.getActivity(context, NOTIFICATION_ID,
                     Intent(context, MainActivity::class.java),
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                manager.notify(NOTIFICATION_ID, Notification.Builder(context, CHANNEL)
+                manager.notify(id, Notification.Builder(context, channel)
                     .setSmallIcon(R.drawable.ic_mock_location)
                     .setContentTitle(context.getString(R.string.app_name))
                     .setContentText(context.getString(message))
                     .setContentIntent(open)
                     .setVisibility(Notification.VISIBILITY_PRIVATE)
                     .setAutoCancel(true)
+                    .apply { if (!error) setTimeoutAfter(15_000) }
                     .build())
             }
         }

@@ -2,6 +2,17 @@ package dev.burixon.mockgps.core
 
 /** Commit/cleanup and deadline registration form one operation for every request transport. */
 object PendingStart {
+    /** Duplicate source observations update evidence without stopping an active session. */
+    fun transition(
+        previous: PolicySnapshot,
+        next: PolicySnapshot,
+        persist: (PolicySnapshot) -> Boolean,
+        persistAndStop: (PolicySnapshot) -> Boolean,
+        current: () -> PolicySnapshot,
+        schedule: (PolicySnapshot) -> Unit,
+    ): Boolean = if (next.generation == previous.generation) persist(next)
+        else commit(next, persistAndStop, current, schedule)
+
     fun commit(
         next: PolicySnapshot,
         persistAndStop: (PolicySnapshot) -> Boolean,

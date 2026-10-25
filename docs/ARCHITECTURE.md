@@ -1,16 +1,25 @@
 # Architecture
 
-MockGPS is a single Android app module. It keeps platform integration small and uses pure Kotlin models for decisions that need deterministic tests.
+MockGPS has one Android app module. Pure Kotlin policy and provider interfaces keep the important decisions testable without an emulator; Android adapters own service admission, storage and IPC.
 
-- **UI** displays the map, settings, policy, and observed service state. Coordinates must be explicitly selected before simulation can start.
-- **ControlCenter** serializes policy transitions, persistence, alarms, source readiness, and service requests.
-- **Core policy** separates the selected mode, desired behavior, and observed provider state. Paused or unknown sources stop simulation. After an eligible request's delay, manual approval requests confirmation; opted-in unattended approval requests injection through an already armed session. Generation checks reject obsolete deadlines and confirmations.
-- **Automation adapters** validate their own authority, translate into shared command types, and pass decisions through the same policy boundary. Tasker broadcasts and standard Android shortcuts cannot bypass it.
-- **Provider engine** tracks provider creation, injection, and cleanup through a platform port. Partial failures preserve enough state for cleanup retry.
-- **MockLocationService** owns foreground lifetime and bounded location updates. A visible app action prepares the unattended location foreground service; it may then remain idle without creating mock providers. Stopping injection can retain this session. A missing session is never recreated by a receiver or alarm. Reboot and process restart never restore an earlier injection session automatically.
-- **AutomationSettings** stores local unattended consent (off by default) and optional change-alert preferences. Consent changes cancel pending work and require fresh source requests. Armed status is ephemeral and becomes true only after foreground admission.
-- **AutomationAlerts** presents coordinate-free feedback for confirmed starts, cleanup, new errors, and unavailable unattended sessions. Alert delivery never determines policy or cleanup success; the mandatory foreground notification has a separate lifetime.
+| Boundary | Responsibility |
+| --- | --- |
+| `MainActivity`, `OverrideActivity`, secondary panels | Visible local consent, map, settings and timer controls. Display intention and observed injection separately. |
+| `ControlCenter` | Serialize inputs and effects on the main looper; persist decisions before starting, stopping or scheduling work. Reject stale generations after cleanup. |
+| `Policy`, `SourceAgreement` | Determine mode, desired state, source agreement and minimum delay. All configured readiness sources must agree. Safety observations invalidate older Ready evidence. |
+| `PendingStart` | Shared persistence/cleanup/deadline orchestration for broadcasts, shortcuts and reviewed requests. Repeated Ready observations do not stop active injection or register another alarm. |
+| `OverridePolicy` | Monotonic timed overlay above ordinary readiness. Capture the policy to resume and continue applying source updates underneath. Force real and session limits take priority. |
+| `SessionDeadline` | Private alarm and process callback; recheck current elapsed deadlines on delivery. Use optional exact-alarm access when granted, otherwise disclose inexact expiry. |
+| `CommandAuth`, `IntegrationClients`, `AutomationShortcuts` | Strict typed requests, revocable capabilities, scopes, durable replay counters and independent one-use shortcut authority. No caller-supplied identity is trusted. |
+| `LocationPresets`, `RoutePlayback` | Bounded private data. Presets need individual approval before scoped automation selection. Imported route metadata and document identifiers are discarded. |
+| `ProviderEngine`, `AndroidProviderPort` | Journal ownership before provider creation; confirm both providers accepted updates; attempt removal even after partial failure. Preserve uncertain cleanup for recovery. |
+| `MockLocationService` | Non-sticky foreground lifetime and serialized fix publication. Check expiry before each update. No idle location polling. |
+| `AutomationAlerts`, `EventHistory` | Optional coordinate-free feedback and bounded process-local event codes. Presentation never determines policy or cleanup success. |
 
-Force real is a persistent override. Auto is permission to consider eligible integration state, not a request to start simulation. The app distinguishes an armed automation session, service stopped, providers removed, and injection active; none of those states proves a fresh genuine GPS fix.
+A visible local action admits a location foreground service. Opted-in unattended automation can retain it idle between requests; a timed override can also retain its explicitly admitted session until restoration. Receivers and alarms never recreate a missing service. If restoration cannot use an admitted session, no injection starts. Process death/reboot does not restore injection or pending requests; an interrupted timed override additionally selects Keep stopped.
 
-MapLibre renders HTTPS OpenFreeMap data. Genuine location samples are filtered for mock flags and freshness, retained in memory, and used only while the map is visible. Selected mock coordinates and map camera settings remain local.
+The policy distinguishes selected mode, desired simulation, service admission, provider readiness, accepted injection and cleanup. None proves that other apps have discarded cached locations. While visible and stopped, the app can observe a fresh non-mock location sample timestamped after cleanup and report that observation separately, without retaining its coordinates.
+
+Route playback uses bounded UTF-8 GPX, rejects DTD/entity declarations before parsing, denies external entity resolution, limits XML depth/elements/points and validates every coordinate. Great-circle interpolation uses elapsed progress at a configured constant speed. Playback supplies speed, heading and altitude, disables drift and stops at completion. Each new injection session starts at the beginning; there is no automatic looping.
+
+MapLibre renders HTTPS OpenFreeMap data. Genuine location samples remain in memory and are used while the map is visible. Selected coordinates, presets, route points and map camera settings remain app-private and are excluded from backup and device transfer.

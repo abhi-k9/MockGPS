@@ -10,11 +10,11 @@ To run unattended, enable **Settings → Unattended automation** in MockGPS whil
 
 The prepared session keeps Android's required ongoing notification while idle. A saved opt-in is not proof of an armed service. Reopen MockGPS after process death or a device reboot to prepare the session, then reconcile the current context. If the session is missing when the delay finishes, automatic start falls back to manual confirmation instead of recreating a background service.
 
-Configure optional **Change alerts** in MockGPS as a notification (default), toast, both, or none. This does not remove the required ongoing notification; delivery depends on Android permissions and restrictions. See [approval and status fields](../docs/AUTOMATION.md#approval-and-change-alerts).
+Configure optional **Change alerts** in MockGPS as a toast (new-install default), notification, both, or none; errors have a separate switch. This does not remove the required ongoing notification; delivery depends on Android permissions and restrictions. See [approval and status fields](../docs/AUTOMATION.md#approval-and-change-alerts).
 
 ## Configure a single dispatcher
 
-1. In MockGPS, enable **Intent automation** and copy its private credential. Set Tasker global `%MockGPSReady` to `0` while configuring.
+1. In MockGPS, enable the default intent integration or create a credential in **Integration credentials** with Read status and Submit readiness permissions (and Force real if needed), then copy it privately. Set Tasker global `%MockGPSReady` to `0` while configuring.
 2. Set `%MockGPSToken` to that credential. For a newly issued credential only, initialize `%MockGpsSeq` to `0`. Keep the existing counter when retaining a credential. Losing the counter requires revoking and reissuing the credential in MockGPS before reseeding. Remove or disable old senders first.
 3. Create one Tasker task named **MockGPS Dispatch**. Use collision handling **Abort Existing Task** and avoid Wait or dialog actions. Add a **JavaScriptlet** action containing [dispatch.js](dispatch.js).
 4. After that action, continue only if `%mgps_ready` equals `1`. Add a **Java Function** action returning a local `Intent` object from `Intent.parseUri(%mgps_uri, 0)`, then another Java Function calling `CONTEXT.sendBroadcast(Intent)` with that object. Using `parseUri` preserves the required `int` and `long` extras; a sender that converts these fields to strings will be rejected.
@@ -33,13 +33,16 @@ Call the same dispatcher with:
 | Context unavailable, permissions missing, or automation just restarted | `unknown` |
 | Explicit user action to remain stopped | `stop` |
 | Read current status | `status` |
+| Select an approved saved location | `select_preset` (preset UUID in parameter 2) |
 
-Derive commands from the current context immediately before dispatch. Do not queue or replay old observations. Reconcile after Tasker startup, device restart or monitoring changes; silence is not permission to simulate. With both intent automation and app shortcuts enabled, both sources must agree before a request can proceed. Source observations expire across application recovery.
+For preset selection, grant the credential preset-selection permission and approve the saved location in MockGPS. Copy its ID from Saved locations and pass it as parameter 2. Selection stops injection and clears source agreement; follow it with fresh readiness commands. The dispatcher never accepts raw coordinates.
+
+Derive commands from the current context immediately before dispatch. Do not queue or replay old observations. Reconcile after Tasker startup, device restart or monitoring changes; silence is not permission to simulate. With both intent automation and app shortcuts enabled, every enabled readiness source must agree before a request can proceed. Source observations expire across application recovery.
 
 One serialized task must own the counter for a credential. Concurrent tasks, restored backups and multiple automation apps must not independently reuse the same credential. A skipped sequence is harmless; a reused or decreasing sequence is rejected. The sample stops before counter exhaustion and requires deliberate credential rotation. A status request never advances the mutation counter.
 
 ## Verify on your device
 
-Test a request, cancellation, context loss, application recovery and credential revocation. With manual approval, confirm that requests still need visible confirmation. With unattended approval enabled and armed, confirm that a fresh request starts only after the configured minimum delay. Test missing-session fallback, opting out during a pending delay, and notification/toast preferences. Cancellation must stop active simulation, and Force real must remain selected until you explicitly return to Auto. Android and manufacturer restrictions can delay automation or stop the session; a dispatched event does not grant permission to recreate a missing background service.
+Test a request, cancellation, context loss, application recovery and credential revocation. With manual approval, confirm that requests still need visible confirmation. With unattended approval enabled and armed, confirm that a fresh request starts only after the configured minimum delay. Test missing-session fallback, opting out during a pending delay, and notification/toast preferences. During a local temporary override, readiness updates affect the policy restored at expiry; `stop` cancels the timer immediately. Outside a temporary simulation, cancellation must stop active simulation, and Force real must remain selected until you explicitly return to Auto. Android and manufacturer restrictions can delay automation or stop the session; a dispatched event does not grant permission to recreate a missing background service.
 
 The JavaScript has local contract tests (`node scripts/test-tasker-dispatch.cjs`). Import and execution in Tasker require device verification.

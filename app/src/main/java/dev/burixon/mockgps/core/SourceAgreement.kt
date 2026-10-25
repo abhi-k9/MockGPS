@@ -5,10 +5,11 @@ data class SourceAgreement(
     val externalEnabled: Boolean = false,
     val shortcutsEnabled: Boolean = false,
     val external: ReadinessState = ReadinessState.UNKNOWN,
-    val shortcuts: ReadinessState = ReadinessState.UNKNOWN
+    val shortcuts: ReadinessState = ReadinessState.UNKNOWN,
+    val clients: Map<String, ReadinessState> = emptyMap()
 ) {
     val readiness: ReadinessState get() {
-        val sources = listOfNotNull(external.takeIf { externalEnabled }, shortcuts.takeIf { shortcutsEnabled })
+        val sources = listOfNotNull(external.takeIf { externalEnabled }, shortcuts.takeIf { shortcutsEnabled }) + clients.values
         return when {
             ReadinessState.BLOCKED in sources -> ReadinessState.BLOCKED
             sources.isEmpty() || ReadinessState.UNKNOWN in sources -> ReadinessState.UNKNOWN
@@ -16,9 +17,19 @@ data class SourceAgreement(
         }
     }
     fun external(state: ReadinessState) = copy(external = state,
-        shortcuts = if (state != ReadinessState.READY && shortcuts == ReadinessState.READY) ReadinessState.UNKNOWN else shortcuts)
+        shortcuts = if (state != ReadinessState.READY && shortcuts == ReadinessState.READY) ReadinessState.UNKNOWN else shortcuts,
+        clients = if (state != ReadinessState.READY) clients.mapValues { if (it.value == ReadinessState.READY) ReadinessState.UNKNOWN else it.value } else clients)
     fun shortcuts(state: ReadinessState) = copy(shortcuts = state,
-        external = if (state != ReadinessState.READY && external == ReadinessState.READY) ReadinessState.UNKNOWN else external)
+        external = if (state != ReadinessState.READY && external == ReadinessState.READY) ReadinessState.UNKNOWN else external,
+        clients = if (state != ReadinessState.READY) clients.mapValues { if (it.value == ReadinessState.READY) ReadinessState.UNKNOWN else it.value } else clients)
+    fun client(id: String, state: ReadinessState): SourceAgreement {
+        require(id in clients)
+        val safety = state != ReadinessState.READY
+        return copy(clients = clients.mapValues { (key, value) -> if (key == id) state
+            else if (safety && value == ReadinessState.READY) ReadinessState.UNKNOWN else value },
+            external = if (safety && external == ReadinessState.READY) ReadinessState.UNKNOWN else external,
+            shortcuts = if (safety && shortcuts == ReadinessState.READY) ReadinessState.UNKNOWN else shortcuts)
+    }
     // Unattended consent trusts a fresh, one-use shortcut request from the configured host.
     // Manual mode requires local review before this source can report READY.
     fun simulationRequest(unattendedApproval: Boolean = false) = if (unattendedApproval)

@@ -7,3 +7,5 @@ Runtime dependencies include AndroidX and Material Components (Apache-2.0), and 
 Map data: [© OpenStreetMap contributors](https://www.openstreetmap.org/copyright). Map tiles and styles: [OpenFreeMap](https://openfreemap.org/). Rendering: [MapLibre](https://maplibre.org/). Preserve the map's attribution control and applicable service notices when distributing the app.
 
 When distributing an APK, provide its corresponding source under GPL-3.0 and retain copyright and license notices. GitHub Releases expose source archives for each tagged version. Signing keys, automation credentials, and configured automation backups must remain private.
+
+The timer tile and notification interactions were informed by [ZzzTimer](https://github.com/abhi-k9/ZzzTimer). MockGPS uses its own policy, timer state and implementation.

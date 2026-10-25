@@ -5,11 +5,12 @@ import org.junit.Test
 
 class AutomationCommandTest {
     @Test fun everyTransportUsesTheSameContextNeutralCommands() {
-        val names = setOf("pause", "request_simulation", "unknown", "stop", "status")
+        val names = setOf("pause", "request_simulation", "unknown", "stop", "status", "select_preset")
         assertEquals(names, AutomationCommand.entries.map { it.wireName }.toSet())
         for (command in AutomationCommand.entries) {
             assertEquals(command, AutomationCommand.fromWire(command.wireName))
-            assertEquals(command, AutomationCommand.fromShortcut(command.shortcutName))
+            if (command == AutomationCommand.SELECT_PRESET) assertNull(AutomationCommand.fromShortcut(command.shortcutName))
+            else assertEquals(command, AutomationCommand.fromShortcut(command.shortcutName))
         }
     }
 
@@ -27,6 +28,6 @@ class AutomationCommandTest {
         assertNull(AutomationCommand.STOP.readinessState)
         assertNull(AutomationCommand.STATUS.readinessState)
         assertFalse(AutomationCommand.STATUS.mutates)
-        assertTrue(AutomationCommand.entries.filter { it.mutates }.size == 4)
+        assertTrue(AutomationCommand.entries.filter { it.mutates }.size == 5)
     }
 }

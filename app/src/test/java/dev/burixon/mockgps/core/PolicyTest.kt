@@ -278,7 +278,7 @@ class PolicyTest {
         val uncertain = running.copy(result = "CLEANUP_UNCERTAIN")
         assertTrue(uncertain.displayStatus().contains("uncertain"))
         val error = starting.copy(service = ServiceState.ERROR, result = "MISSING_MOCK_APP")
-        assertEquals("Error: MISSING_MOCK_APP", error.displayStatus())
+        assertEquals("Check the mock-location app in Developer options, then retry", error.displayStatus())
     }
     @Test fun sameMillisecondPauseCancelsPendingStart() {
         val initial = auto()

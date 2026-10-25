@@ -35,11 +35,16 @@ data class MockFix(
     val coordinates: Coordinates,
     val wallTimeMillis: Long,
     val elapsedRealtimeNanos: Long,
-    val accuracyMeters: Float = 3f
+    val accuracyMeters: Float = 3f,
+    val altitudeMeters: Double = 0.0,
+    val speedMetersPerSecond: Float = 0f,
+    val bearingDegrees: Float = 0f
 ) {
     val valid: Boolean
         get() = coordinates.valid && wallTimeMillis > 0 && elapsedRealtimeNanos > 0 &&
-            accuracyMeters.isFinite() && accuracyMeters > 0f
+            accuracyMeters.isFinite() && accuracyMeters > 0f && altitudeMeters.isFinite() &&
+            speedMetersPerSecond.isFinite() && speedMetersPerSecond >= 0f &&
+            bearingDegrees.isFinite() && bearingDegrees >= 0f && bearingDegrees < 360f
 }
 
 /** Android-specific operations live behind this boundary. Ownership is a durable intent journal. */

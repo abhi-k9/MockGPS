@@ -44,4 +44,14 @@ assert(run(globals, { par1: 'status' }).mgps_uri.includes('l.seq=0;'));
 assert.equal(globals.MockGpsSeq, '12');
 assert(run(globals, { par1: 'stop' }).mgps_uri.includes('l.seq=13;'));
 assert.equal(globals.MockGpsSeq, '13');
+const presetGlobals = seed();
+const presetId = '00000000-0000-0000-0000-000000000000';
+const selected = run(presetGlobals, { par1: 'select_preset', par2: presetId });
+assert(selected.mgps_uri.includes(';S.preset_id=' + presetId + ';end'));
+assert.equal(presetGlobals.MockGpsSeq, '13');
+for (const preset of ['', 'bad;S.command=stop', 42]) {
+  const invalid = seed();
+  assert.equal(run(invalid, { par1: 'select_preset', par2: preset }).mgps_ready, '0');
+  assert.equal(invalid.MockGpsSeq, '12');
+}
 console.log('Tasker dispatcher: command allowlist, typed URI, credentials, counter bounds and read-only status passed.');

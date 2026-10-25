@@ -3,17 +3,22 @@ package dev.burixon.mockgps.core
 import java.security.MessageDigest
 
 /** A capability authenticates possession, not a caller-supplied package identity. */
-data class ExternalRequest(val api: Int, val token: String?, val command: String?, val eventTime: Long, val sequence: Long = eventTime) {
+data class ExternalRequest(val api: Int, val token: String?, val command: String?, val eventTime: Long, val sequence: Long = eventTime, val presetId: String? = null) {
     val automationCommand: AutomationCommand? get() = AutomationCommand.fromWire(command)
 }
 data class AuthResult(val accepted: Boolean, val code: String)
 object CommandAuth {
     /** Read raw Bundle values without coercion or Android type-warning logs containing supplied values. */
     fun parse(extras: Map<String, Any?>): ExternalRequest? {
-        if (extras.keys != setOf("api", "token", "command", "event_time", "seq")) return null
+        val expected = setOf("api", "token", "command", "event_time", "seq") +
+            if (extras["command"] == "select_preset") setOf("preset_id") else emptySet()
+        if (extras.keys != expected) return null
+        val preset = if ("preset_id" in extras) (extras["preset_id"] as? String)?.takeIf {
+            it.matches(Regex("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"))
+        } ?: return null else null
         return ExternalRequest(extras["api"] as? Int ?: return null,
             extras["token"] as? String ?: return null, extras["command"] as? String ?: return null,
-            extras["event_time"] as? Long ?: return null, extras["seq"] as? Long ?: return null)
+            extras["event_time"] as? Long ?: return null, extras["seq"] as? Long ?: return null, preset)
     }
 
     fun authorize(enabled: Boolean, expectedToken: String?, request: ExternalRequest, nowWall: Long, lastSequence: Long,

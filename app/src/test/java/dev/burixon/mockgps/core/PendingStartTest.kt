@@ -45,9 +45,9 @@ class PendingStartTest {
             sources = if (command == AutomationCommand.REQUEST_SIMULATION) sources.simulationRequest(true)
                 else sources.shortcuts(requireNotNull(command.readinessState))
             val next = Policy.reduce(state, PolicyEvent.SourceReadiness(sources.readiness), now)
-            return PendingStart.commit(next, persistAndStop = {
+            return PendingStart.transition(state, next, persist = { if (failSave) false else { state = it; true } }, persistAndStop = {
                 alarm = null
-                if (failSave) return@commit false
+                if (failSave) return@transition false
                 state = it.copy(desired = false)
                 val cleanup = engine.stop()
                 state = state.copy(service = if (cleanup.success) ServiceState.STOPPED else ServiceState.ERROR,
@@ -86,6 +86,19 @@ class PendingStartTest {
                     injection = InjectionState.CONFIRMED)
             }
         }
+    }
+
+    @Test fun duplicateReadyKeepsInjectingWithoutAnotherCleanupOrAlarm() {
+        val session = Session()
+        assertTrue(session.command(AutomationCommand.REQUEST_SIMULATION))
+        session.advanceTo(15_000)
+        val running = session.state
+        assertEquals(ServiceState.INJECTING, running.service)
+        assertTrue(session.command(AutomationCommand.REQUEST_SIMULATION))
+        assertEquals(running, session.state)
+        assertEquals(2, session.providers.active.size)
+        assertEquals(1, session.registrations.size)
+        assertNull(session.alarm)
     }
 
     @Test fun pauseRequestAlarmAndInjectionWorkForTwoCompleteCycles() {

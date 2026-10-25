@@ -50,9 +50,9 @@ class AndroidProviderPort(context: Context) : ProviderPort {
             accuracy = fix.accuracyMeters
             time = fix.wallTimeMillis
             elapsedRealtimeNanos = fix.elapsedRealtimeNanos
-            altitude = 0.0
-            speed = 0f
-            bearing = 0f
+            altitude = fix.altitudeMeters
+            speed = fix.speedMetersPerSecond
+            bearing = fix.bearingDegrees
         })
     }
 

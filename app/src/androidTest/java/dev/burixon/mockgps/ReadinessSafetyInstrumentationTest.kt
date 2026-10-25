@@ -288,6 +288,45 @@ class ReadinessSafetyInstrumentationTest {
         }
     }
 
+    @Test fun temporaryStopRestoresManualSessionButUsesNewPauseEvidence() {
+        startManualAndAwaitInjection()
+        scenario!!.onActivity { assertTrue(ControlCenter.startOverride(it, OverrideKind.STOP, 5)) }
+        assertFalse(snapshot().desired)
+        assertFalse(main { MockLocationService.hasOwnedProviders(context) })
+        awaitCondition("Timed stop must retain an admitted foreground session") { main { MockLocationService.isTemporaryReady() } }
+        main { val timer = ControlCenter.snapshot(context).temporary!!; ControlCenter.adjustOverride(context, timer.id, -300_000) }
+        awaitCondition("Timer expiry must restore the admitted manual session") { snapshot().injection == InjectionState.CONFIRMED }
+        scenario!!.onActivity { assertTrue(ControlCenter.startOverride(it, OverrideKind.STOP, 5)) }
+        assertTrue(command("pause").accepted)
+        main { val timer = ControlCenter.snapshot(context).temporary!!; ControlCenter.adjustOverride(context, timer.id, -300_000) }
+        assertNull(snapshot().temporary)
+        assertFalse(snapshot().desired)
+        assertFalse(main { MockLocationService.hasOwnedProviders(context) })
+        assertEquals(ReadinessState.BLOCKED, snapshot().readiness)
+    }
+
+    @Test fun integrationCapabilitiesHaveIndependentDurableCountersAndRevocation() {
+        main {
+            ControlCenter.setIntegrationEnabled(context, false)
+            val scopes = setOf(ClientScope.STATUS, ClientScope.READINESS)
+            val first = IntegrationClients.add(context, "First test source", scopes)
+            val second = IntegrationClients.add(context, "Second test source", scopes)
+            ControlCenter.clientsChanged(context)
+            fun input(token: String, command: String, sequence: Long) = ExternalRequest(3, token, command, System.currentTimeMillis(), sequence)
+            assertTrue(ControlCenter.external(context, input(first.token, "unknown", 20)).accepted)
+            assertTrue(ControlCenter.external(context, input(second.token, "unknown", 1)).accepted)
+            assertEquals("REPLAYED_EVENT", ControlCenter.external(context, input(first.token, "pause", 19)).code)
+            assertEquals("SCOPE_DENIED", ControlCenter.external(context, input(second.token, "stop", 2)).code)
+            assertEquals(20L, IntegrationClients.all(context).first { it.id == first.id }.lastSequence)
+            IntegrationClients.remove(context, first.id)
+            ControlCenter.clientsChanged(context)
+            assertFalse(ControlCenter.external(context, input(first.token, "status", 0)).accepted)
+            assertTrue(ControlCenter.external(context, input(second.token, "status", 0)).accepted)
+            IntegrationClients.remove(context, second.id)
+            ControlCenter.clientsChanged(context)
+        }
+    }
+
     @Before fun prepareDisposableEmulator() {
         check(Build.HARDWARE in setOf("ranchu", "goldfish")) { "Provider tests require a disposable emulator" }
         shell("appops set ${context.packageName} android:mock_location allow")
@@ -298,6 +337,10 @@ class ReadinessSafetyInstrumentationTest {
             ControlCenter.setShortcutsEnabled(context, false)
             ControlCenter.setIntegrationEnabled(context, false)
             ControlCenter.forceReal(context)
+            IntegrationClients.all(context).forEach { IntegrationClients.remove(context, it.id) }
+            RoutePlayback.clear(context)
+            AutomationSettings.setMaxSessionMinutes(context, 0)
+            ControlCenter.clientsChanged(context)
             context.getSharedPreferences("mock_configuration", Context.MODE_PRIVATE).edit()
                 .putBoolean("legacy_unverified", false).commit().also { assertTrue(it) }
             State.setLocation(context, 0.01, 0.01) // Synthetic test point, never a genuine fix.
