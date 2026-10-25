@@ -136,6 +136,30 @@ Intent-capable hosts can implement this same contract if they preserve the primi
 
 ## Standard Android shortcuts
 
+### Make actions available to an automation host
+
+1. Open MockGPS, open **Settings**, and enable **App shortcuts**. This is off by default and is separate from **Intent automation**; no broadcast credential is needed for shortcuts.
+2. Return to the MockGPS main screen so it can publish the shortcuts.
+3. Reopen the app/action picker in your automation host. In Samsung Modes and Routines, select MockGPS again to refresh the available actions.
+
+| Action | Purpose |
+| --- | --- |
+| Request simulation | Request the normal local review, delay, and final confirmation flow. |
+| Pause requests | Stop simulation and block requests from this source. |
+| Context unknown | Clear this source's readiness and stop simulation. |
+| Stop simulation | Stop simulation and select the persistent Force real override. |
+| Open status | Open MockGPS to inspect its current state, where the host supports a fifth shortcut. |
+
+These actions do not assume any particular trigger. The automation host supplies the schedule, application state, or other condition.
+
+### If only “Open MockGPS” appears
+
+“Open MockGPS” is the ordinary launcher entry. The additional actions are published only after **App shortcuts** is enabled. Check that this switch remains on, then reopen the host's action picker.
+
+Long-press the MockGPS launcher icon as a second check. If actions appear there but not in the automation host, publication succeeded and the host may be filtering or caching the list. Host support determines which actions it displays. If the switch turns itself off or MockGPS reports a refresh failure, publication did not succeed; enabling broadcast automation does not fix shortcut publication.
+
+### Shortcut contract
+
 Enable **App shortcuts** in MockGPS to publish standard Android shortcuts. Their IDs are `automation_request_simulation`, `automation_pause`, `automation_unknown`, `automation_stop`, and `automation_status` (status is included when the host supports five shortcuts). Request, pause, unknown, and stop require a host supporting at least four shortcuts. Hosts may expose these as app shortcuts; availability in Samsung Modes and Routines depends on device software and host support. This is not a Samsung-specific plugin API.
 
 Choose your own triggers in the automation host, such as a schedule, an app profile, or a testing workflow. A request shortcut requires local review before it becomes eligible for a delayed confirmation request. Returning to Auto requires fresh reconciliation; shortcut publication alone does not establish valid source state.

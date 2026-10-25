@@ -21,7 +21,7 @@ Use a separate location client to verify the result. Stop an older simulator bef
 - **Manual start** starts at your selected point while the app is visible. A paused integration blocks it; a new pause or unknown event stops it.
 - The **Quick Settings tile** switches between Force real and Auto. Its status describes the app's state, not proof of genuine GPS reception.
 
-Automation is optional and disabled by default. Tasker and other intent-capable apps use an authenticated command interface. Standard Android shortcuts can also be used by compatible launchers and automation hosts, including Samsung Routines where supported. See [automation](docs/AUTOMATION.md).
+Automation is optional and disabled by default. Tasker and other intent-capable apps use an authenticated command interface. For launcher and routine actions, enable **Settings → App shortcuts** in MockGPS, then reopen the host's action picker. This publishes Request simulation, Pause requests, Context unknown, Stop simulation, and Open status where supported. See the [setup and API reference](docs/AUTOMATION.md).
 
 ## Privacy
 
