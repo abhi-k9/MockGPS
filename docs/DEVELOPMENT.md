@@ -45,4 +45,6 @@ JVM results are in `app/build/test-results/testDebugUnitTest/`; lint reports are
 
 Versions live in `gradle/libs.versions.toml`; checksums live in `gradle/verification-metadata.xml`. Normal builds use strict dependency verification. For an intentional dependency update, obtain artifacts from the configured Google/Maven Central repositories, inspect Gradle's verification report, independently verify new checksums, and review the metadata diff before committing it. Do not turn verification off or accept an unknown checksum merely to make a build pass.
 
+Targeted build-tool security versions live in `gradle/build-tool-security.properties`. The root build applies these to AGP's buildscript classpath and the separate `androidLintTool` configuration, without changing app runtime dependencies. When updating tooling, inspect both resolved graphs; a patched buildscript does not patch lint automatically. Build and Kotlin caches remain disabled while the bundled Kotlin plugin's build-cache deserialization advisory is unresolved.
+
 Keep generated APKs, local SDK paths, keystores, and configured automation exports out of Git. Debug APKs use a development key; release signing is documented in [RELEASING.md](RELEASING.md).
