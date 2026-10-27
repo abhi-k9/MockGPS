@@ -1,6 +1,6 @@
 [versions]
 agp = "9.4.1"
-coreKtx = "1.17.0" # Core 1.19.x requires compile SDK 37.
+coreKtx = "1.19.1" # Core 1.19.x requires compile SDK 37.
 activityKtx = "1.10.1"
 drawerlayout = "1.2.0"
 material = "1.14.0"
