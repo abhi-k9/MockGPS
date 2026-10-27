@@ -2,6 +2,7 @@ package dev.burixon.mockgps
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.SystemClock
 import android.service.quicksettings.Tile
@@ -13,6 +14,7 @@ class OverrideTileService : TileService() {
         super.onStartListening()
         val timer = ControlCenter.snapshot(this).temporary
         qsTile?.apply {
+            icon = Icon.createWithResource(this@OverrideTileService, R.drawable.ic_location_timer)
             label = getString(R.string.timer_tile)
             subtitle = if (timer == null) getString(R.string.set_temporary_override) else {
                 val minutes = ((timer.endsAtElapsed - SystemClock.elapsedRealtime()).coerceAtLeast(0) + 59_999) / 60_000
